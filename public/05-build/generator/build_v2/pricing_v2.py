@@ -218,20 +218,20 @@ def baseline_limit_usd_for(cov):
 
 # Deficiency rate = the fraction of a producer's bound/expiring coverage rows that land BELOW
 # their tier's baseline_limit_usd — this is the deliberate, grounded variance the task calls
-# for, not noise: REP.JACOB's own archetype ("Legacy Book, Decaying Contact" — bound years ago,
+# for, not noise: REP.THEA's own archetype ("Legacy Book, Decaying Contact" — bound years ago,
 # hasn't spoken to the Ring 1 signatory in 8 months, per foundation_v2.PRODUCERS) is the natural
 # place for real limit-adequacy drift (stale valuations, un-reviewed towers) to concentrate.
-# REP.ALEX's archetype ("High-Yield, Low-Touch ... the ideal state") sits at the opposite end.
+# REP.SABINE's archetype ("High-Yield, Low-Touch ... the ideal state") sits at the opposite end.
 # The remaining three producers are graded between the two on their own stated archetype:
-# REP.RAHUL (high activity, but almost none of it lands on a signatory who'd catch a stale
-# limit), REP.CRISTIAN (single-vertical concentration, has the Ring 1 ear — lower drift),
-# REP.NAOMI (rookie, cold/unmapped accounts — moderate drift from simple inexperience, not decay).
+# REP.VAUGHN (high activity, but almost none of it lands on a signatory who'd catch a stale
+# limit), REP.ELLERY (single-vertical concentration, has the Ring 1 ear — lower drift),
+# REP.BECKETT (rookie, cold/unmapped accounts — moderate drift from simple inexperience, not decay).
 PRODUCER_DEFICIENCY_RATE = {
-    "Alex": 0.04,
-    "Cristian": 0.10,
-    "Rahul": 0.14,
-    "Naomi": 0.18,
-    "Jacob": 0.45,
+    "Sabine": 0.04,
+    "Ellery": 0.10,
+    "Vaughn": 0.14,
+    "Beckett": 0.18,
+    "Thea": 0.45,
 }
 DEFAULT_DEFICIENCY_RATE = 0.15
 # an "expiring" policy is, by definition, further from its last review than a freshly bound

@@ -16,7 +16,7 @@
    * Pure structural baseline floating 5 vertical universes on ONE continuous canvas around 360 authority rings (Rings 0-4) ([`dashboard0-ontology-foundation.html`](file:///Users/celeste7/Documents/INFLUENCE/05-build/dashboard0-ontology-foundation.html)). 11 Gatekeeper cross-links (`#dcae5c`). Zero application data.
 
 3. **Step 3: Dashboard 3 (D3) — Leadership Book Rollup (SFDC Macro)** [`STATUS: DONE & APPROVED`]
-   * Whole-department CRM relationship union across all 5 real producers (**Alex, Rahul, Jacob, Cristian, Naomi**) built on the Radial Wheel Canvas ([`dashboard3-gap-radial.dc.html`](file:///Users/celeste7/Documents/INFLUENCE/05-build/dashboard3-gap-radial.dc.html)). Node size = 360 Intimacy Composite Score (`0.5*weight + 0.3*freq + 0.2*proximity`). Grey hollow nodes = Dark Matter voids (`contact_count == 0`). **STRICTLY CRM RELATIONSHIPS ONLY. ZERO GWP / ZERO DOLLARS.**
+   * Whole-department CRM relationship union across all 5 real producers (**Sabine, Vaughn, Thea, Ellery, Beckett**) built on the Radial Wheel Canvas ([`dashboard3-gap-radial.dc.html`](file:///Users/celeste7/Documents/INFLUENCE/05-build/dashboard3-gap-radial.dc.html)). Node size = 360 Intimacy Composite Score (`0.5*weight + 0.3*freq + 0.2*proximity`). Grey hollow nodes = Dark Matter voids (`contact_count == 0`). **STRICTLY CRM RELATIONSHIPS ONLY. ZERO GWP / ZERO DOLLARS.**
 
 4. **Step 4: Coverage Corpus Data Layer Creation (BEFORE D2)** [`STATUS: IN PROGRESS`]
    * Author `generator/gen_coverage_corpus.py` and enrich `Influence720_MasterOntology.xlsx` sheets (`CovCatalog_*`, `Coverages`, `Overlay_BoundPolicy`) with 50 coverage types, baseline limits ($), statutory state laws (Jones Act, FL/NY staff thresholds), and sub-limit exclusions across all 5 verticals. Export `data/coverage-corpus.json` & `data/epic-staged-ledger.json`.
@@ -28,14 +28,14 @@
    * **Reformed Right Forensic Drawer**: Restrained 320px collapsible panel displaying high-density legal citations (Jones Act, CEA code, FL/NY staff rules), limit deficiencies ($), sub-limit exclusions, and defensible peer GWP benchmarks.
 
 6. **Step 6: Dashboard 4 (D4) — Role Macro View (Epic Macro)** [`STATUS: REBUILD PENDING STEP 5`]
-   * Regional book Epic Whitespace Heatmap built on the Radial Wheel Canvas! Outer Ring Arc = Uncaptured Coverage Corpus GWP Capacity ($). Inner Ring Arc = Bound Epic GWP ($). Toggles between Domain View (45 domains), Producer Gap Skew (**Alex, Rahul, Jacob, Cristian, Naomi**), and Carrier Placement Radar.
+   * Regional book Epic Whitespace Heatmap built on the Radial Wheel Canvas! Outer Ring Arc = Uncaptured Coverage Corpus GWP Capacity ($). Inner Ring Arc = Bound Epic GWP ($). Toggles between Domain View (45 domains), Producer Gap Skew (**Sabine, Vaughn, Thea, Ellery, Beckett**), and Carrier Placement Radar.
 
 7. **Step 7: Dashboard 5 (D5) — Consolidated Micro Tactical Warfare (SFDC × Epic Micro)** [`STATUS: REBUILD PENDING STEP 6`]
    * Trojan Horse Blueprint built on the Radial Wheel Canvas! Renders Trojan Horse Conversion Edges directly across the ontology canvas connecting SFDC Known Contacts → 360 Structural Roles → Epic Priced Whitespace Gaps ($). Right panel displays execution path, DISC approach brief, and 3-factor financial credibility score.
 
 8. **Step 8: Dashboard 6 (D6) — Executive Command Center (SFDC × Epic Macro)** [`STATUS: ONTOLOGY RADIAL REBUILD IN PROGRESS`]
    * Executive C-Suite view built strictly on the **Ontology Radial Wheel Canvas** (`RingEngine.render`)!
-   * Regional Accounts / Producer Nodes (**Alex, Rahul, Jacob, Cristian, Naomi**) positioned on 360 Authority Rings & 5 Verticals.
+   * Regional Accounts / Producer Nodes (**Sabine, Vaughn, Thea, Ellery, Beckett**) positioned on 360 Authority Rings & 5 Verticals.
    * Node Radius = Annual Epic GWP ($).
    * Node Color = Effort vs Yield Composite Ratio (High-Yield = Green, Low-Yield = Amber, Silo/Legacy = Purple).
    * Orbiting Satellites = Renewal Status & SFDC Contact Decay Rate (**🔴 Red** Silent Churn Warning Satellites for <90d renewal with decaying SFDC touchpoints).

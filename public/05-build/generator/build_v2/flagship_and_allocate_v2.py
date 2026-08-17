@@ -73,19 +73,19 @@ def upgrade_coverage_type(old_type_id):
 
 FLAGSHIP_RAW = {
     "principals": [
-        {"id": "PRIN.MARCHETTI", "label": "Marchetti Family Trust", "vertical": "yacht", "producer_id": "REP.ALEX",
+        {"id": "PRIN.MARCHETTI", "label": "Marchetti Family Trust", "vertical": "yacht", "producer_id": "REP.SABINE",
          "desc": "Apex — UBO, Whisper/Gulfstream ownership structure."},
-        {"id": "PRIN.MERIDIAN", "label": "Meridian Family Office", "vertical": "yacht", "producer_id": "REP.JACOB",
+        {"id": "PRIN.MERIDIAN", "label": "Meridian Family Office", "vertical": "yacht", "producer_id": "REP.THEA",
          "desc": "Apex — UBO, M/Y Solstice."},
-        {"id": "PRIN.HARTWELL", "label": "Hartwell Holdings", "vertical": "yacht", "producer_id": "REP.RAHUL",
+        {"id": "PRIN.HARTWELL", "label": "Hartwell Holdings", "vertical": "yacht", "producer_id": "REP.VAUGHN",
          "desc": "Apex — UBO, M/Y Aurelia."},
-        {"id": "PRIN.VOSS", "label": "Voss Family Trust", "vertical": "yacht", "producer_id": "REP.CRISTIAN",
+        {"id": "PRIN.VOSS", "label": "Voss Family Trust", "vertical": "yacht", "producer_id": "REP.ELLERY",
          "desc": "Apex — UBO, M/Y Halcyon + Aspen chalet."},
-        {"id": "PRIN.CASTELLANE", "label": "Castellane Trust", "vertical": "aviation", "producer_id": "REP.ALEX",
+        {"id": "PRIN.CASTELLANE", "label": "Castellane Trust", "vertical": "aviation", "producer_id": "REP.SABINE",
          "desc": "Apex — UBO, Gulfstream G550 + hypercar collection + personal risk program."},
-        {"id": "PRIN.BELLWEATHER", "label": "Bellweather Family Office", "vertical": "aviation", "producer_id": "REP.JACOB",
+        {"id": "PRIN.BELLWEATHER", "label": "Bellweather Family Office", "vertical": "aviation", "producer_id": "REP.THEA",
          "desc": "Apex — UBO, Sikorsky S-76."},
-        {"id": "PRIN.OKONKWO", "label": "Okonkwo Family Trust", "vertical": "yacht", "producer_id": "REP.RAHUL",
+        {"id": "PRIN.OKONKWO", "label": "Okonkwo Family Trust", "vertical": "yacht", "producer_id": "REP.VAUGHN",
          "desc": "Apex — UBO, M/Y Meridian II (lapsed/lost account)."},
     ],
     "roles": [
@@ -183,37 +183,37 @@ FLAGSHIP_RAW = {
     # (coverage_id, status, responsible_node_id, bound_premium, carrier, gwp_estimate, gwp_method,
     #  unbound_reason, evidence_note, expiry_date, producer_of_record)
     "bound": [
-        ("COV.WHISPER.HULL", "bound", "OWN.9", 310000, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Alex"),
-        ("COV.WHISPER.PI", "bound", "OWN.9", 96000, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Alex"),
-        ("COV.WHISPER.CREWMED", "bound", "MCR.2.WHISPER", 41800, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Alex"),
+        ("COV.WHISPER.HULL", "bound", "OWN.9", 310000, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Sabine"),
+        ("COV.WHISPER.PI", "bound", "OWN.9", 96000, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Sabine"),
+        ("COV.WHISPER.CREWMED", "bound", "MCR.2.WHISPER", 41800, "Example Underwriters Ltd", None, None, None, None, "2027-02-01", "Sabine"),
         ("COV.WHISPER.FINEART", "unbound", "MCR.2.WHISPER", None, None, 20225, "ghost_policy", "lapsed_with_us",
          "Bound with us 2022-2024 at $18,000, allowed to lapse at 2024 renewal.", None, None),
-        ("COV.WHISPERJET.HULL", "bound", "OWN.7", 275000, "Example Underwriters Ltd", None, None, None, None, "2027-04-15", "Alex"),
+        ("COV.WHISPERJET.HULL", "bound", "OWN.7", 275000, "Example Underwriters Ltd", None, None, None, None, "2027-04-15", "Sabine"),
         ("COV.WHISPERJET.LIAB", "unbound", "OWN.7", None, None, 250000, "peer_comp", "never_written", None, None, None),
-        ("COV.WHISPERJET.CREWACC", "bound", "OWN.7", 18500, "Example Underwriters Ltd", None, None, None, None, "2027-04-15", "Alex"),
+        ("COV.WHISPERJET.CREWACC", "bound", "OWN.7", 18500, "Example Underwriters Ltd", None, None, None, None, "2027-04-15", "Sabine"),
         ("COV.WHISPERJET.WAR", "unbound", "OWN.7", None, None, 34000, "peer_comp", "competitor_held",
-         "Salesforce call note (2026-06-02, Alex): client mentioned current War Risk coverage through Global Aerospace — displacement opportunity, NOT unpriced risk.", None, None),
-        ("COV.SOLSTICE.HULL", "expiring", "OWN.7.MERIDIAN", 198000, "Northbridge Marine", None, None, None, None, "2026-10-01", "Jacob"),
-        ("COV.SOLSTICE.PI", "expiring", "OWN.7.MERIDIAN", 71000, "Northbridge Marine", None, None, None, None, "2026-10-01", "Jacob"),
-        ("COV.SOLSTICE.CREWMED", "expiring", "MCR.2.SOLSTICE", 30600, "Northbridge Marine", None, None, None, None, "2026-10-01", "Jacob"),
-        ("COV.AURELIA.HULL", "bound", "OWN.9.HARTWELL", 240000, "Northbridge Marine", None, None, None, None, "2027-01-15", "Rahul"),
-        ("COV.AURELIA.PI", "bound", "OWN.9.HARTWELL", 82000, "Northbridge Marine", None, None, None, None, "2027-01-15", "Rahul"),
+         "Salesforce call note (2026-06-02, Sabine): client mentioned current War Risk coverage through Global Aerospace — displacement opportunity, NOT unpriced risk.", None, None),
+        ("COV.SOLSTICE.HULL", "expiring", "OWN.7.MERIDIAN", 198000, "Northbridge Marine", None, None, None, None, "2026-10-01", "Thea"),
+        ("COV.SOLSTICE.PI", "expiring", "OWN.7.MERIDIAN", 71000, "Northbridge Marine", None, None, None, None, "2026-10-01", "Thea"),
+        ("COV.SOLSTICE.CREWMED", "expiring", "MCR.2.SOLSTICE", 30600, "Northbridge Marine", None, None, None, None, "2026-10-01", "Thea"),
+        ("COV.AURELIA.HULL", "bound", "OWN.9.HARTWELL", 240000, "Northbridge Marine", None, None, None, None, "2027-01-15", "Vaughn"),
+        ("COV.AURELIA.PI", "bound", "OWN.9.HARTWELL", 82000, "Northbridge Marine", None, None, None, None, "2027-01-15", "Vaughn"),
         ("COV.AURELIA.CREWMED", "unbound", "MCR.2.AURELIA", None, None, 33400, "parameter_multiplier", "never_written", None, None, None),
         ("COV.AURELIA.FINEART", "unbound", "OWN.9.HARTWELL", None, None, 24800, "peer_comp", "never_written", None, None, None),
-        ("COV.HALCYON.HULL", "bound", "OWN.9.VOSS", 165000, "Example Underwriters Ltd", None, None, None, None, "2027-03-01", "Cristian"),
-        ("COV.HALCYON.PI", "bound", "OWN.9.VOSS", 58000, "Example Underwriters Ltd", None, None, None, None, "2027-03-01", "Cristian"),
+        ("COV.HALCYON.HULL", "bound", "OWN.9.VOSS", 165000, "Example Underwriters Ltd", None, None, None, None, "2027-03-01", "Ellery"),
+        ("COV.HALCYON.PI", "bound", "OWN.9.VOSS", 58000, "Example Underwriters Ltd", None, None, None, None, "2027-03-01", "Ellery"),
         ("COV.CHALET.WINDFLOOD", "unbound", "RE.PM.VOSS", None, None, 87000, "peer_comp", "never_written", None, None, None),
         ("COV.CHALET.PROPERTY", "unbound", "OWN.9.VOSS", None, None, 190000, "peer_comp", "never_written", None, None, None),
         ("COV.CHALET.LIAB", "unbound", "RE.PM.VOSS", None, None, 41000, "peer_comp", "never_written", None, None, None),
-        ("COV.CASTJET.HULL", "bound", "AVI.RISK.CASTELLANE", 260000, "Example Underwriters Ltd", None, None, None, None, "2027-05-01", "Alex"),
+        ("COV.CASTJET.HULL", "bound", "AVI.RISK.CASTELLANE", 260000, "Example Underwriters Ltd", None, None, None, None, "2027-05-01", "Sabine"),
         ("COV.CASTJET.LIAB", "unbound", "AVI.RISK.CASTELLANE", None, None, 245000, "peer_comp", "never_written", None, None, None),
-        ("COV.CASTJET.CREWACC", "bound", "AVI.RISK.CASTELLANE", 17200, "Example Underwriters Ltd", None, None, None, None, "2027-05-01", "Alex"),
-        ("COV.CASTAUTO.FLEET", "bound", "AUTO.MGR.CASTELLANE", 88000, "Northbridge Marine", None, None, None, None, "2027-06-01", "Alex"),
+        ("COV.CASTJET.CREWACC", "bound", "AVI.RISK.CASTELLANE", 17200, "Example Underwriters Ltd", None, None, None, None, "2027-05-01", "Sabine"),
+        ("COV.CASTAUTO.FLEET", "bound", "AUTO.MGR.CASTELLANE", 88000, "Northbridge Marine", None, None, None, None, "2027-06-01", "Sabine"),
         ("COV.CASTAUTO.TRANSIT", "unbound", "AUTO.MGR.CASTELLANE", None, None, 12000, "parameter_multiplier", "never_written", None, None, None),
-        ("COV.CASTPER.KR", "bound", "PER.EA.CASTELLANE", 54000, "Example Underwriters Ltd", None, None, None, None, "2027-06-01", "Alex"),
+        ("COV.CASTPER.KR", "bound", "PER.EA.CASTELLANE", 54000, "Example Underwriters Ltd", None, None, None, None, "2027-06-01", "Sabine"),
         ("COV.CASTPER.DO", "unbound", "PER.EA.CASTELLANE", None, None, 61000, "peer_comp", "never_written", None, None, None),
         ("COV.CASTPER.CYBER", "unbound", "AVI.RISK.CASTELLANE", None, None, 95000, "peer_comp", "never_written", None, None, None),
-        ("COV.BWHELI.HULL", "bound", "AVI.RISK.BELLWEATHER", 145000, "Example Underwriters Ltd", None, None, None, None, "2027-07-01", "Jacob"),
+        ("COV.BWHELI.HULL", "bound", "AVI.RISK.BELLWEATHER", 145000, "Example Underwriters Ltd", None, None, None, None, "2027-07-01", "Thea"),
         ("COV.BWHELI.LIAB", "unbound", "AVI.RISK.BELLWEATHER", None, None, 118000, "peer_comp", "never_written", None, None, None),
         ("COV.OKONKWO.HULL", "unbound", "OWN.9.OKONKWO", None, None, 142000, "ghost_policy", "lapsed_with_us",
          "Entire account lapsed 14 months ago — full win-back, not a line-item upsell.", None, None),
@@ -231,37 +231,37 @@ FLAGSHIP_RAW = {
         ("E.101", "OWN.7", "yacht", "COV.WHISPERJET.LIAB", "aviation",
          "Same individual (Sarah Kellerman) is Ring-1 GC for the yacht's Trust AND the Aviation program's risk buyer of record for the Gulfstream.",
          {"ring": 1, "coi_weight": 9},
-         "Because Alex has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream."),
+         "Because Sabine has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream."),
         ("E.102", "OWN.9.VOSS", "yacht", "COV.CHALET.PROPERTY", "real_estate",
-         "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet — same warm path, unexploited by Cristian to date.",
+         "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet — same warm path, unexploited by Ellery to date.",
          {"ring": 1, "coi_weight": 8},
-         "Because Cristian already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet."),
+         "Because Ellery already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet."),
         ("E.103", "AVI.RISK.CASTELLANE", "aviation", "COV.CASTPER.CYBER", "personal",
          "Marcus Delacroix (Aviation risk buyer) also sits on the Castellane Trust's personal-risk committee.",
          {"ring": 1, "coi_weight": 8},
-         "Because Alex has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program."),
+         "Because Sabine has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program."),
     ],
     # 8-tuples: (producer_id, node_id, weight, activity_count_90d, last_activity_date,
     #            calls_logged, emails_sent, meetings_held) — the 3 channel fields are
     #            hand-judged per CHANNEL SPLIT PLAN flagship_rows and always sum exactly
     #            to activity_count_90d.
     "relationship_weights": [
-        ("REP.ALEX", "OWN.9", 8.7, 14, "2026-08-10", 6, 3, 5), ("REP.ALEX", "MCR.2.WHISPER", 5.1, 6, "2026-08-05", 3, 2, 1),
-        ("REP.ALEX", "AVI.RISK.CASTELLANE", 8.2, 11, "2026-08-09", 5, 3, 3), ("REP.ALEX", "PER.EA.CASTELLANE", 6.4, 7, "2026-07-28", 3, 3, 1),
-        ("REP.RAHUL", "MCR.2.AURELIA", 6.8, 40, "2026-08-13", 18, 16, 6), ("REP.RAHUL", "MCR.4.AURELIA", 5.5, 55, "2026-08-14", 22, 26, 7),
-        ("REP.RAHUL", "MCR.6.AURELIA", 4.2, 61, "2026-08-14", 28, 27, 6),
-        ("REP.JACOB", "MCR.2.SOLSTICE", 4.4, 5, "2026-07-20", 2, 2, 1), ("REP.JACOB", "MCR.3.SOLSTICE", 3.8, 4, "2026-07-18", 1, 2, 1),
-        ("REP.JACOB", "AVI.RISK.BELLWEATHER", 7.9, 9, "2026-08-11", 4, 3, 2),
-        ("REP.CRISTIAN", "OWN.9.VOSS", 9.1, 16, "2026-08-12", 6, 4, 6), ("REP.CRISTIAN", "OWN.12", 3.0, 2, "2026-05-01", 1, 1, 0),
+        ("REP.SABINE", "OWN.9", 8.7, 14, "2026-08-10", 6, 3, 5), ("REP.SABINE", "MCR.2.WHISPER", 5.1, 6, "2026-08-05", 3, 2, 1),
+        ("REP.SABINE", "AVI.RISK.CASTELLANE", 8.2, 11, "2026-08-09", 5, 3, 3), ("REP.SABINE", "PER.EA.CASTELLANE", 6.4, 7, "2026-07-28", 3, 3, 1),
+        ("REP.VAUGHN", "MCR.2.AURELIA", 6.8, 40, "2026-08-13", 18, 16, 6), ("REP.VAUGHN", "MCR.4.AURELIA", 5.5, 55, "2026-08-14", 22, 26, 7),
+        ("REP.VAUGHN", "MCR.6.AURELIA", 4.2, 61, "2026-08-14", 28, 27, 6),
+        ("REP.THEA", "MCR.2.SOLSTICE", 4.4, 5, "2026-07-20", 2, 2, 1), ("REP.THEA", "MCR.3.SOLSTICE", 3.8, 4, "2026-07-18", 1, 2, 1),
+        ("REP.THEA", "AVI.RISK.BELLWEATHER", 7.9, 9, "2026-08-11", 4, 3, 2),
+        ("REP.ELLERY", "OWN.9.VOSS", 9.1, 16, "2026-08-12", 6, 4, 6), ("REP.ELLERY", "OWN.12", 3.0, 2, "2026-05-01", 1, 1, 0),
     ],
     "referral_edges": [
-        ("REF.001", "REP.ALEX", "OWN.9", "MCR.2.WHISPER", "2026-03-14", "SPV Director introduced Alex to the Captain at haul-out."),
-        ("REF.002", "REP.CRISTIAN", "OWN.9.VOSS", "OWN.12", "2026-01-09", "SPV Director introduced Cristian to the family Trustee."),
+        ("REF.001", "REP.SABINE", "OWN.9", "MCR.2.WHISPER", "2026-03-14", "SPV Director introduced Sabine to the Captain at haul-out."),
+        ("REF.002", "REP.ELLERY", "OWN.9.VOSS", "OWN.12", "2026-01-09", "SPV Director introduced Ellery to the family Trustee."),
     ],
     "account_producer_map": [
-        ("PRIN.MARCHETTI", "REP.ALEX"), ("PRIN.MERIDIAN", "REP.JACOB"), ("PRIN.HARTWELL", "REP.RAHUL"),
-        ("PRIN.VOSS", "REP.CRISTIAN"), ("PRIN.CASTELLANE", "REP.ALEX"), ("PRIN.BELLWEATHER", "REP.JACOB"),
-        ("PRIN.OKONKWO", "REP.RAHUL"),
+        ("PRIN.MARCHETTI", "REP.SABINE"), ("PRIN.MERIDIAN", "REP.THEA"), ("PRIN.HARTWELL", "REP.VAUGHN"),
+        ("PRIN.VOSS", "REP.ELLERY"), ("PRIN.CASTELLANE", "REP.SABINE"), ("PRIN.BELLWEATHER", "REP.THEA"),
+        ("PRIN.OKONKWO", "REP.VAUGHN"),
     ],
 }
 
@@ -411,13 +411,13 @@ VERTICAL_ATTACH_RATE = {
 N_NEW_ACCOUNTS = 143
 
 # Producer distribution across the 143 new accounts (existing 7 flagship already assigned:
-# Alex 2, Jacob 2, Rahul 2, Cristian 1, Naomi 0) — archetype-consistent, sums to 143.
+# Sabine 2, Thea 2, Vaughn 2, Ellery 1, Beckett 0) — archetype-consistent, sums to 143.
 PRODUCER_NEW_ACCOUNT_COUNTS = {
-    "REP.ALEX": 20,      # Sniper — fewer, high-value
-    "REP.RAHUL": 34,     # Grinder — most by count, low average value
-    "REP.JACOB": 26,     # Legacy — moderate, aging book
-    "REP.CRISTIAN": 24,  # Silo — moderate, single-vertical-heavy
-    "REP.NAOMI": 39,     # Rookie — high count, low authority penetration, unmapped network
+    "REP.SABINE": 20,      # Sniper — fewer, high-value
+    "REP.VAUGHN": 34,     # Grinder — most by count, low average value
+    "REP.THEA": 26,     # Legacy — moderate, aging book
+    "REP.ELLERY": 24,  # Silo — moderate, single-vertical-heavy
+    "REP.BECKETT": 39,     # Rookie — high count, low authority penetration, unmapped network
 }
 assert sum(PRODUCER_NEW_ACCOUNT_COUNTS.values()) == N_NEW_ACCOUNTS
 

@@ -1266,7 +1266,7 @@
       "policy_number": "EXA-ACHT.1",
       "effective_date": null,
       "expiration_date": "2027-02-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.WHISPER.YACHT"
     },
@@ -1278,7 +1278,7 @@
       "policy_number": "EXA-.JET.2",
       "effective_date": null,
       "expiration_date": "2027-04-15",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.WHISPER.JET"
     },
@@ -1290,7 +1290,7 @@
       "policy_number": "NOR-ACHT.3",
       "effective_date": null,
       "expiration_date": "2026-10-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.SOLSTICE.YACHT"
     },
@@ -1302,7 +1302,7 @@
       "policy_number": "NOR-ACHT.4",
       "effective_date": null,
       "expiration_date": "2027-01-15",
-      "producer_of_record": "Rahul",
+      "producer_of_record": "Vaughn",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.AURELIA.YACHT"
     },
@@ -1314,7 +1314,7 @@
       "policy_number": "EXA-ACHT.5",
       "effective_date": null,
       "expiration_date": "2027-03-01",
-      "producer_of_record": "Cristian",
+      "producer_of_record": "Ellery",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.HALCYON.YACHT"
     },
@@ -1326,7 +1326,7 @@
       "policy_number": "EXA-.JET.6",
       "effective_date": null,
       "expiration_date": "2027-05-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.CASTELLANE.JET"
     },
@@ -1338,7 +1338,7 @@
       "policy_number": "NOR-AUTO.7",
       "effective_date": null,
       "expiration_date": "2027-06-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.CASTELLANE.AUTO"
     },
@@ -1350,7 +1350,7 @@
       "policy_number": "EXA-ONAL.8",
       "effective_date": null,
       "expiration_date": "2027-06-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.CASTELLANE.PERSONAL"
     },
@@ -1362,7 +1362,7 @@
       "policy_number": "EXA-HELI.9",
       "effective_date": null,
       "expiration_date": "2027-07-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "billing_type": "Agency Bill",
       "asset_ref": "AST.BELLWEATHER.HELI"
     }
@@ -1383,7 +1383,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-02-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.WHISPER.YACHT.1"
     },
     {
@@ -1401,7 +1401,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-02-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.WHISPER.YACHT.1"
     },
     {
@@ -1419,7 +1419,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-02-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.WHISPER.YACHT.1"
     },
     {
@@ -1455,7 +1455,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-04-15",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.WHISPER.JET.2"
     },
     {
@@ -1491,7 +1491,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-04-15",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.WHISPER.JET.2"
     },
     {
@@ -1507,7 +1507,7 @@
       "gwp_peer_n": null,
       "rate_trend_source": "frozen \u2014 flagship narrative figure, preserved verbatim from prior build",
       "unbound_reason": "competitor_held",
-      "evidence_note": "Salesforce call note (2026-06-02, Alex): client mentioned current War Risk coverage through Global Aerospace \u2014 displacement opportunity, NOT unpriced risk.",
+      "evidence_note": "Salesforce call note (2026-06-02, Sabine): client mentioned current War Risk coverage through Global Aerospace \u2014 displacement opportunity, NOT unpriced risk.",
       "expiry_date": null,
       "producer_of_record": null,
       "policy_id": null
@@ -1527,7 +1527,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2026-10-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "policy_id": "POL.SOLSTICE.YACHT.3"
     },
     {
@@ -1545,7 +1545,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2026-10-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "policy_id": "POL.SOLSTICE.YACHT.3"
     },
     {
@@ -1563,7 +1563,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2026-10-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "policy_id": "POL.SOLSTICE.YACHT.3"
     },
     {
@@ -1581,7 +1581,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-01-15",
-      "producer_of_record": "Rahul",
+      "producer_of_record": "Vaughn",
       "policy_id": "POL.AURELIA.YACHT.4"
     },
     {
@@ -1599,7 +1599,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-01-15",
-      "producer_of_record": "Rahul",
+      "producer_of_record": "Vaughn",
       "policy_id": "POL.AURELIA.YACHT.4"
     },
     {
@@ -1653,7 +1653,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-03-01",
-      "producer_of_record": "Cristian",
+      "producer_of_record": "Ellery",
       "policy_id": "POL.HALCYON.YACHT.5"
     },
     {
@@ -1671,7 +1671,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-03-01",
-      "producer_of_record": "Cristian",
+      "producer_of_record": "Ellery",
       "policy_id": "POL.HALCYON.YACHT.5"
     },
     {
@@ -1743,7 +1743,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-05-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.CASTELLANE.JET.6"
     },
     {
@@ -1779,7 +1779,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-05-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.CASTELLANE.JET.6"
     },
     {
@@ -1797,7 +1797,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-06-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.CASTELLANE.AUTO.7"
     },
     {
@@ -1833,7 +1833,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-06-01",
-      "producer_of_record": "Alex",
+      "producer_of_record": "Sabine",
       "policy_id": "POL.CASTELLANE.PERSONAL.8"
     },
     {
@@ -1887,7 +1887,7 @@
       "unbound_reason": null,
       "evidence_note": null,
       "expiry_date": "2027-07-01",
-      "producer_of_record": "Jacob",
+      "producer_of_record": "Thea",
       "policy_id": "POL.BELLWEATHER.HELI.9"
     },
     {
@@ -2010,7 +2010,7 @@
         "ring": 1,
         "coi_weight": 9
       },
-      "generated_narrative": "Because Alex has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream."
+      "generated_narrative": "Because Sabine has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream."
     },
     {
       "id": "E.102",
@@ -2019,12 +2019,12 @@
       "from_vertical": "yacht",
       "to": "COV.CHALET.PROPERTY",
       "to_vertical": "real_estate",
-      "why": "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet \u2014 same warm path, unexploited by Cristian to date.",
+      "why": "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet \u2014 same warm path, unexploited by Ellery to date.",
       "via_relationship": {
         "ring": 1,
         "coi_weight": 8
       },
-      "generated_narrative": "Because Cristian already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet."
+      "generated_narrative": "Because Ellery already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet."
     },
     {
       "id": "E.103",
@@ -2038,12 +2038,12 @@
         "ring": 1,
         "coi_weight": 8
       },
-      "generated_narrative": "Because Alex has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program."
+      "generated_narrative": "Because Sabine has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program."
     }
   ],
   "relationship_weights": [
     {
-      "producer_id": "REP.ALEX",
+      "producer_id": "REP.SABINE",
       "node_id": "OWN.9",
       "relationship_weight": 8.7,
       "activity_count_90d": 14,
@@ -2054,7 +2054,7 @@
       "meetings_held": 5
     },
     {
-      "producer_id": "REP.ALEX",
+      "producer_id": "REP.SABINE",
       "node_id": "MCR.2.WHISPER",
       "relationship_weight": 5.1,
       "activity_count_90d": 6,
@@ -2065,7 +2065,7 @@
       "meetings_held": 1
     },
     {
-      "producer_id": "REP.ALEX",
+      "producer_id": "REP.SABINE",
       "node_id": "AVI.RISK.CASTELLANE",
       "relationship_weight": 8.2,
       "activity_count_90d": 11,
@@ -2076,7 +2076,7 @@
       "meetings_held": 3
     },
     {
-      "producer_id": "REP.ALEX",
+      "producer_id": "REP.SABINE",
       "node_id": "PER.EA.CASTELLANE",
       "relationship_weight": 6.4,
       "activity_count_90d": 7,
@@ -2087,7 +2087,7 @@
       "meetings_held": 1
     },
     {
-      "producer_id": "REP.RAHUL",
+      "producer_id": "REP.VAUGHN",
       "node_id": "MCR.2.AURELIA",
       "relationship_weight": 6.8,
       "activity_count_90d": 40,
@@ -2098,7 +2098,7 @@
       "meetings_held": 6
     },
     {
-      "producer_id": "REP.RAHUL",
+      "producer_id": "REP.VAUGHN",
       "node_id": "MCR.4.AURELIA",
       "relationship_weight": 5.5,
       "activity_count_90d": 55,
@@ -2109,7 +2109,7 @@
       "meetings_held": 7
     },
     {
-      "producer_id": "REP.RAHUL",
+      "producer_id": "REP.VAUGHN",
       "node_id": "MCR.6.AURELIA",
       "relationship_weight": 4.2,
       "activity_count_90d": 61,
@@ -2120,7 +2120,7 @@
       "meetings_held": 6
     },
     {
-      "producer_id": "REP.JACOB",
+      "producer_id": "REP.THEA",
       "node_id": "MCR.2.SOLSTICE",
       "relationship_weight": 4.4,
       "activity_count_90d": 5,
@@ -2131,7 +2131,7 @@
       "meetings_held": 1
     },
     {
-      "producer_id": "REP.JACOB",
+      "producer_id": "REP.THEA",
       "node_id": "MCR.3.SOLSTICE",
       "relationship_weight": 3.8,
       "activity_count_90d": 4,
@@ -2142,7 +2142,7 @@
       "meetings_held": 1
     },
     {
-      "producer_id": "REP.JACOB",
+      "producer_id": "REP.THEA",
       "node_id": "AVI.RISK.BELLWEATHER",
       "relationship_weight": 7.9,
       "activity_count_90d": 9,
@@ -2153,7 +2153,7 @@
       "meetings_held": 2
     },
     {
-      "producer_id": "REP.CRISTIAN",
+      "producer_id": "REP.ELLERY",
       "node_id": "OWN.9.VOSS",
       "relationship_weight": 9.1,
       "activity_count_90d": 16,
@@ -2164,7 +2164,7 @@
       "meetings_held": 6
     },
     {
-      "producer_id": "REP.CRISTIAN",
+      "producer_id": "REP.ELLERY",
       "node_id": "OWN.12",
       "relationship_weight": 3.0,
       "activity_count_90d": 2,
@@ -2178,49 +2178,49 @@
   "referral_edges": [
     {
       "id": "REF.001",
-      "producer_id": "REP.ALEX",
+      "producer_id": "REP.SABINE",
       "from_node_id": "OWN.9",
       "to_node_id": "MCR.2.WHISPER",
       "referred_date": "2026-03-14",
-      "notes": "SPV Director introduced Alex to the Captain at haul-out."
+      "notes": "SPV Director introduced Sabine to the Captain at haul-out."
     },
     {
       "id": "REF.002",
-      "producer_id": "REP.CRISTIAN",
+      "producer_id": "REP.ELLERY",
       "from_node_id": "OWN.9.VOSS",
       "to_node_id": "OWN.12",
       "referred_date": "2026-01-09",
-      "notes": "SPV Director introduced Cristian to the family Trustee."
+      "notes": "SPV Director introduced Ellery to the family Trustee."
     }
   ],
   "account_producer_map": [
     {
       "ubo_id": "PRIN.MARCHETTI",
-      "producer_id": "REP.ALEX"
+      "producer_id": "REP.SABINE"
     },
     {
       "ubo_id": "PRIN.MERIDIAN",
-      "producer_id": "REP.JACOB"
+      "producer_id": "REP.THEA"
     },
     {
       "ubo_id": "PRIN.HARTWELL",
-      "producer_id": "REP.RAHUL"
+      "producer_id": "REP.VAUGHN"
     },
     {
       "ubo_id": "PRIN.VOSS",
-      "producer_id": "REP.CRISTIAN"
+      "producer_id": "REP.ELLERY"
     },
     {
       "ubo_id": "PRIN.CASTELLANE",
-      "producer_id": "REP.ALEX"
+      "producer_id": "REP.SABINE"
     },
     {
       "ubo_id": "PRIN.BELLWEATHER",
-      "producer_id": "REP.JACOB"
+      "producer_id": "REP.THEA"
     },
     {
       "ubo_id": "PRIN.OKONKWO",
-      "producer_id": "REP.RAHUL"
+      "producer_id": "REP.VAUGHN"
     }
   ]
 }

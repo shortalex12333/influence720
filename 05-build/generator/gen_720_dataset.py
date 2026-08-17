@@ -189,15 +189,15 @@ edge("E.005", "knows", "OWN.9.VOSS", "yacht", "RE.PM.VOSS", "real_estate",
 edge("E.101", "cross_pollination", "OWN.7", "yacht", "COV.WHISPERJET.LIAB", "aviation",
      "Same individual (Sarah Kellerman) is Ring-1 GC for the yacht's Trust AND the Aviation program's risk buyer of record for the Gulfstream.",
      via={"ring": 1, "coi_weight": 9},
-     narrative="Because Alex has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream.")
+     narrative="Because Sabine has a Ring 1 relationship with the Yacht's General Counsel, we have a direct, warm path to capture the $250,000 Aviation Liability policy on their Gulfstream.")
 edge("E.102", "cross_pollination", "OWN.9.VOSS", "yacht", "COV.CHALET.PROPERTY", "real_estate",
-     "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet — same warm path, unexploited by Cristian to date.",
+     "Isabelle Voss (yacht SPV Director) also sits on the family trust entity that owns the Aspen chalet — same warm path, unexploited by Ellery to date.",
      via={"ring": 1, "coi_weight": 8},
-     narrative="Because Cristian already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet.")
+     narrative="Because Ellery already has a Ring 1 relationship on the Voss yacht SPV, the same relationship is a direct path to the untouched $190,000 High-Value Property program on their Aspen chalet.")
 edge("E.103", "cross_pollination", "AVI.RISK.CASTELLANE", "aviation", "COV.CASTPER.CYBER", "personal",
      "Marcus Delacroix (Aviation risk buyer) also sits on the Castellane Trust's personal-risk committee.",
      via={"ring": 1, "coi_weight": 8},
-     narrative="Because Alex has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program.")
+     narrative="Because Sabine has a Ring 1 relationship with Castellane's Aviation risk buyer, the same relationship reaches the unbound $95,000 Cyber Crime line on their personal risk program.")
 
 # ============================================================
 # BOUND-POLICY OVERLAY (Epic mock) — keyed by coverage_id
@@ -213,34 +213,34 @@ def bp(coverage_id, status, responsible_node_id, bound_premium=None, carrier=Non
         "expiry_date": expiry_date, "producer_of_record": producer_of_record,
     })
 
-# --- Whisper (Alex — "The Sniper," flagship cross-pollination case) ---
+# --- Whisper (Sabine — "The Sniper," flagship cross-pollination case) ---
 # Yacht coverages: OWN.9 (SPV Director) is signatory for Hull/PI/FineArt; crew-adjacent lines go to the Captain.
-bp("COV.WHISPER.HULL", "bound", "OWN.9", 310000, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Alex")
-bp("COV.WHISPER.PI", "bound", "OWN.9", 96000, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Alex")
-bp("COV.WHISPER.CREWMED", "bound", "MCR.2.WHISPER", 41800, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Alex")
+bp("COV.WHISPER.HULL", "bound", "OWN.9", 310000, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Sabine")
+bp("COV.WHISPER.PI", "bound", "OWN.9", 96000, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Sabine")
+bp("COV.WHISPER.CREWMED", "bound", "MCR.2.WHISPER", 41800, "Example Underwriters Ltd", expiry_date="2027-02-01", producer_of_record="Sabine")
 bp("COV.WHISPER.FINEART", "unbound", "MCR.2.WHISPER", gwp_estimate=20225, gwp_method="ghost_policy", unbound_reason="lapsed_with_us",
    evidence_note="Bound with us 2022-2024 at $18,000, allowed to lapse at 2024 renewal.")
 # Aviation coverages: OWN.7 (Sarah Kellerman) is the dual-hat GC/Aviation risk buyer for this family office — matches the cross_pollination edge target.
-bp("COV.WHISPERJET.HULL", "bound", "OWN.7", 275000, "Example Underwriters Ltd", expiry_date="2027-04-15", producer_of_record="Alex")
+bp("COV.WHISPERJET.HULL", "bound", "OWN.7", 275000, "Example Underwriters Ltd", expiry_date="2027-04-15", producer_of_record="Sabine")
 bp("COV.WHISPERJET.LIAB", "unbound", "OWN.7", gwp_estimate=250000, gwp_method="peer_comp", unbound_reason="never_written")
-bp("COV.WHISPERJET.CREWACC", "bound", "OWN.7", 18500, "Example Underwriters Ltd", expiry_date="2027-04-15", producer_of_record="Alex")
+bp("COV.WHISPERJET.CREWACC", "bound", "OWN.7", 18500, "Example Underwriters Ltd", expiry_date="2027-04-15", producer_of_record="Sabine")
 bp("COV.WHISPERJET.WAR", "unbound", "OWN.7", gwp_estimate=34000, gwp_method="peer_comp", unbound_reason="competitor_held",
-   evidence_note="Salesforce call note (2026-06-02, Alex): client mentioned current War Risk coverage through Global Aerospace — displacement opportunity, NOT unpriced risk.")
+   evidence_note="Salesforce call note (2026-06-02, Sabine): client mentioned current War Risk coverage through Global Aerospace — displacement opportunity, NOT unpriced risk.")
 
-# --- Solstice (Jacob — "The Legacy," churn/expiring case) ---
-bp("COV.SOLSTICE.HULL", "expiring", "OWN.7.MERIDIAN", 198000, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Jacob")
-bp("COV.SOLSTICE.PI", "expiring", "OWN.7.MERIDIAN", 71000, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Jacob")
-bp("COV.SOLSTICE.CREWMED", "expiring", "MCR.2.SOLSTICE", 30600, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Jacob")
+# --- Solstice (Thea — "The Legacy," churn/expiring case) ---
+bp("COV.SOLSTICE.HULL", "expiring", "OWN.7.MERIDIAN", 198000, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Thea")
+bp("COV.SOLSTICE.PI", "expiring", "OWN.7.MERIDIAN", 71000, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Thea")
+bp("COV.SOLSTICE.CREWMED", "expiring", "MCR.2.SOLSTICE", 30600, "Northbridge Marine", expiry_date="2026-10-01", producer_of_record="Thea")
 
-# --- Aurelia (Rahul — "The Grinder," high touch, weak Ring-1 penetration) ---
-bp("COV.AURELIA.HULL", "bound", "OWN.9.HARTWELL", 240000, "Northbridge Marine", expiry_date="2027-01-15", producer_of_record="Rahul")
-bp("COV.AURELIA.PI", "bound", "OWN.9.HARTWELL", 82000, "Northbridge Marine", expiry_date="2027-01-15", producer_of_record="Rahul")
+# --- Aurelia (Vaughn — "The Grinder," high touch, weak Ring-1 penetration) ---
+bp("COV.AURELIA.HULL", "bound", "OWN.9.HARTWELL", 240000, "Northbridge Marine", expiry_date="2027-01-15", producer_of_record="Vaughn")
+bp("COV.AURELIA.PI", "bound", "OWN.9.HARTWELL", 82000, "Northbridge Marine", expiry_date="2027-01-15", producer_of_record="Vaughn")
 bp("COV.AURELIA.CREWMED", "unbound", "MCR.2.AURELIA", gwp_estimate=33400, gwp_method="parameter_multiplier", unbound_reason="never_written")
 bp("COV.AURELIA.FINEART", "unbound", "OWN.9.HARTWELL", gwp_estimate=24800, gwp_method="peer_comp", unbound_reason="never_written")
 
-# --- Halcyon + Chalet (Cristian — "The Silo," single-vertical only) ---
-bp("COV.HALCYON.HULL", "bound", "OWN.9.VOSS", 165000, "Example Underwriters Ltd", expiry_date="2027-03-01", producer_of_record="Cristian")
-bp("COV.HALCYON.PI", "bound", "OWN.9.VOSS", 58000, "Example Underwriters Ltd", expiry_date="2027-03-01", producer_of_record="Cristian")
+# --- Halcyon + Chalet (Ellery — "The Silo," single-vertical only) ---
+bp("COV.HALCYON.HULL", "bound", "OWN.9.VOSS", 165000, "Example Underwriters Ltd", expiry_date="2027-03-01", producer_of_record="Ellery")
+bp("COV.HALCYON.PI", "bound", "OWN.9.VOSS", 58000, "Example Underwriters Ltd", expiry_date="2027-03-01", producer_of_record="Ellery")
 # Chalet: WINDFLOOD/LIAB go to the native RE role (no cross-pollination edge to them); PROPERTY is the specific
 # coverage the E.102 cross_pollination edge targets, so its responsible node is the yacht-side path (OWN.9.VOSS),
 # not the native RE role — this is the point of the cross-pollination mechanic, not an inconsistency.
@@ -248,22 +248,22 @@ bp("COV.CHALET.WINDFLOOD", "unbound", "RE.PM.VOSS", gwp_estimate=87000, gwp_meth
 bp("COV.CHALET.PROPERTY", "unbound", "OWN.9.VOSS", gwp_estimate=190000, gwp_method="peer_comp", unbound_reason="never_written")
 bp("COV.CHALET.LIAB", "unbound", "RE.PM.VOSS", gwp_estimate=41000, gwp_method="peer_comp", unbound_reason="never_written")
 
-# --- Castellane (Alex — 2nd account, multi-vertical, feeds the Aviation Liability cluster + personal cross-pollination) ---
-bp("COV.CASTJET.HULL", "bound", "AVI.RISK.CASTELLANE", 260000, "Example Underwriters Ltd", expiry_date="2027-05-01", producer_of_record="Alex")
+# --- Castellane (Sabine — 2nd account, multi-vertical, feeds the Aviation Liability cluster + personal cross-pollination) ---
+bp("COV.CASTJET.HULL", "bound", "AVI.RISK.CASTELLANE", 260000, "Example Underwriters Ltd", expiry_date="2027-05-01", producer_of_record="Sabine")
 bp("COV.CASTJET.LIAB", "unbound", "AVI.RISK.CASTELLANE", gwp_estimate=245000, gwp_method="peer_comp", unbound_reason="never_written")
-bp("COV.CASTJET.CREWACC", "bound", "AVI.RISK.CASTELLANE", 17200, "Example Underwriters Ltd", expiry_date="2027-05-01", producer_of_record="Alex")
-bp("COV.CASTAUTO.FLEET", "bound", "AUTO.MGR.CASTELLANE", 88000, "Northbridge Marine", expiry_date="2027-06-01", producer_of_record="Alex")
+bp("COV.CASTJET.CREWACC", "bound", "AVI.RISK.CASTELLANE", 17200, "Example Underwriters Ltd", expiry_date="2027-05-01", producer_of_record="Sabine")
+bp("COV.CASTAUTO.FLEET", "bound", "AUTO.MGR.CASTELLANE", 88000, "Northbridge Marine", expiry_date="2027-06-01", producer_of_record="Sabine")
 bp("COV.CASTAUTO.TRANSIT", "unbound", "AUTO.MGR.CASTELLANE", gwp_estimate=12000, gwp_method="parameter_multiplier", unbound_reason="never_written")
-bp("COV.CASTPER.KR", "bound", "PER.EA.CASTELLANE", 54000, "Example Underwriters Ltd", expiry_date="2027-06-01", producer_of_record="Alex")
+bp("COV.CASTPER.KR", "bound", "PER.EA.CASTELLANE", 54000, "Example Underwriters Ltd", expiry_date="2027-06-01", producer_of_record="Sabine")
 bp("COV.CASTPER.DO", "unbound", "PER.EA.CASTELLANE", gwp_estimate=61000, gwp_method="peer_comp", unbound_reason="never_written")
 # CYBER is the specific coverage E.103's cross_pollination edge targets, so its responsible node is the aviation-side path.
 bp("COV.CASTPER.CYBER", "unbound", "AVI.RISK.CASTELLANE", gwp_estimate=95000, gwp_method="peer_comp", unbound_reason="never_written")
 
-# --- Bellweather (Jacob — 3rd Aviation Liability cluster member) ---
-bp("COV.BWHELI.HULL", "bound", "AVI.RISK.BELLWEATHER", 145000, "Example Underwriters Ltd", expiry_date="2027-07-01", producer_of_record="Jacob")
+# --- Bellweather (Thea — 3rd Aviation Liability cluster member) ---
+bp("COV.BWHELI.HULL", "bound", "AVI.RISK.BELLWEATHER", 145000, "Example Underwriters Ltd", expiry_date="2027-07-01", producer_of_record="Thea")
 bp("COV.BWHELI.LIAB", "unbound", "AVI.RISK.BELLWEATHER", gwp_estimate=118000, gwp_method="peer_comp", unbound_reason="never_written")
 
-# --- Okonkwo (Rahul — fully lapsed / Lost account) ---
+# --- Okonkwo (Vaughn — fully lapsed / Lost account) ---
 bp("COV.OKONKWO.HULL", "unbound", "OWN.9.OKONKWO", gwp_estimate=142000, gwp_method="ghost_policy", unbound_reason="lapsed_with_us",
    evidence_note="Entire account lapsed 14 months ago — full win-back, not a line-item upsell.")
 bp("COV.OKONKWO.PI", "unbound", "OWN.9.OKONKWO", gwp_estimate=48000, gwp_method="ghost_policy", unbound_reason="lapsed_with_us",
@@ -273,19 +273,19 @@ bp("COV.OKONKWO.PI", "unbound", "OWN.9.OKONKWO", gwp_estimate=48000, gwp_method=
 # PRODUCER ROSTER (staged names as instructed) + 90-day-ago snapshot for Comet Tail
 # ============================================================
 producers = [
-    {"producer_id": "REP.ALEX", "name": "Alex", "archetype": "High-Yield, Low-Touch", "region": "South Florida",
+    {"producer_id": "REP.SABINE", "name": "Sabine", "archetype": "High-Yield, Low-Touch", "region": "South Florida",
      "narrative": "80% Ring 1/2 signatories, massive GWP. The ideal state — talks to fewer people, exclusively economic buyers.",
      "touchpoints_90d": 22, "gwp_captured_90d": 1850000, "pct_touches_ring1_2": 0.80,
      "touchpoints_90d_prior": 26, "gwp_captured_90d_prior": 1510000, "churn_risk_score": 1.2},
-    {"producer_id": "REP.RAHUL", "name": "Rahul", "archetype": "High-Touch, Low-Yield", "region": "South Florida",
+    {"producer_id": "REP.VAUGHN", "name": "Vaughn", "archetype": "High-Touch, Low-Yield", "region": "South Florida",
      "narrative": "90% Ring 3/4 operational/crew, low GWP. Massive activity, almost none of it lands on a signatory.",
      "touchpoints_90d": 210, "gwp_captured_90d": 240000, "pct_touches_ring1_2": 0.10,
      "touchpoints_90d_prior": 188, "gwp_captured_90d_prior": 255000, "churn_risk_score": 2.0},
-    {"producer_id": "REP.JACOB", "name": "Jacob", "archetype": "Legacy Book, Decaying Contact", "region": "South Florida",
+    {"producer_id": "REP.THEA", "name": "Thea", "archetype": "Legacy Book, Decaying Contact", "region": "South Florida",
      "narrative": "Massive GWP, but comm-frequency is decaying. Bound large accounts years ago, hasn't spoken to the Ring 1 signatory in 8 months.",
      "touchpoints_90d": 9, "gwp_captured_90d": 2100000, "pct_touches_ring1_2": 0.35,
      "touchpoints_90d_prior": 21, "gwp_captured_90d_prior": 2140000, "churn_risk_score": 8.6},
-    {"producer_id": "REP.CRISTIAN", "name": "Cristian", "archetype": "Single-Vertical Concentration", "region": "South Florida",
+    {"producer_id": "REP.ELLERY", "name": "Ellery", "archetype": "Single-Vertical Concentration", "region": "South Florida",
      "narrative": "100% single-vertical GWP, zero adjacent policies. Has the Ring 1 ear of the UBO, leaves the cross-pollination money on the table.",
      "touchpoints_90d": 60, "gwp_captured_90d": 680000, "pct_touches_ring1_2": 0.75,
      "touchpoints_90d_prior": 58, "gwp_captured_90d_prior": 665000, "churn_risk_score": 1.8},
@@ -293,47 +293,47 @@ producers = [
 
 leadership = [
     {"leader_id": "LEAD.JONATHAN", "name": "Jonathan", "title": "Regional Director", "scope": "South Florida region — team lead tier, sees all 4 producers"},
-    {"leader_id": "LEAD.TRISH", "name": "Trish", "title": "SVP", "scope": "Executive — sees the full regional roll-up"},
+    {"leader_id": "LEAD.LARKIN", "name": "Larkin", "title": "SVP", "scope": "Executive — sees the full regional roll-up"},
 ]
 
 account_producer_map = [
-    {"ubo_id": "PRIN.MARCHETTI", "producer_id": "REP.ALEX"},
-    {"ubo_id": "PRIN.MERIDIAN", "producer_id": "REP.JACOB"},
-    {"ubo_id": "PRIN.HARTWELL", "producer_id": "REP.RAHUL"},
-    {"ubo_id": "PRIN.VOSS", "producer_id": "REP.CRISTIAN"},
-    {"ubo_id": "PRIN.CASTELLANE", "producer_id": "REP.ALEX"},
-    {"ubo_id": "PRIN.BELLWEATHER", "producer_id": "REP.JACOB"},
-    {"ubo_id": "PRIN.OKONKWO", "producer_id": "REP.RAHUL"},
+    {"ubo_id": "PRIN.MARCHETTI", "producer_id": "REP.SABINE"},
+    {"ubo_id": "PRIN.MERIDIAN", "producer_id": "REP.THEA"},
+    {"ubo_id": "PRIN.HARTWELL", "producer_id": "REP.VAUGHN"},
+    {"ubo_id": "PRIN.VOSS", "producer_id": "REP.ELLERY"},
+    {"ubo_id": "PRIN.CASTELLANE", "producer_id": "REP.SABINE"},
+    {"ubo_id": "PRIN.BELLWEATHER", "producer_id": "REP.THEA"},
+    {"ubo_id": "PRIN.OKONKWO", "producer_id": "REP.VAUGHN"},
 ]
 
 # ============================================================
 # PRODUCER OVERLAY — relationship weight (per producer x node) + referral edges
 # ============================================================
 relationship_weights = [
-    # Alex — Whisper + Castellane (known, strong on signatories)
-    {"producer_id": "REP.ALEX", "node_id": "OWN.9", "relationship_weight": 8.7, "activity_count_90d": 14, "last_activity_date": "2026-08-10", "contact_status": "active"},
-    {"producer_id": "REP.ALEX", "node_id": "MCR.2.WHISPER", "relationship_weight": 5.1, "activity_count_90d": 6, "last_activity_date": "2026-08-05", "contact_status": "active"},
-    {"producer_id": "REP.ALEX", "node_id": "AVI.RISK.CASTELLANE", "relationship_weight": 8.2, "activity_count_90d": 11, "last_activity_date": "2026-08-09", "contact_status": "active"},
-    {"producer_id": "REP.ALEX", "node_id": "PER.EA.CASTELLANE", "relationship_weight": 6.4, "activity_count_90d": 7, "last_activity_date": "2026-07-28", "contact_status": "active"},
-    # OWN.7 (GC) and OWN.12 (Trustee) deliberately have NO row for Alex — untapped/grey, per the Whisper cross-pollination story
-    # Rahul — Aurelia (all Ring 3/4, zero Ring-1 rows = the Grinder story)
-    {"producer_id": "REP.RAHUL", "node_id": "MCR.2.AURELIA", "relationship_weight": 6.8, "activity_count_90d": 40, "last_activity_date": "2026-08-13", "contact_status": "active"},
-    {"producer_id": "REP.RAHUL", "node_id": "MCR.4.AURELIA", "relationship_weight": 5.5, "activity_count_90d": 55, "last_activity_date": "2026-08-14", "contact_status": "active"},
-    {"producer_id": "REP.RAHUL", "node_id": "MCR.6.AURELIA", "relationship_weight": 4.2, "activity_count_90d": 61, "last_activity_date": "2026-08-14", "contact_status": "active"},
-    # Jacob — Solstice (Trustee has decayed to zero) + Bellweather (known)
-    {"producer_id": "REP.JACOB", "node_id": "MCR.2.SOLSTICE", "relationship_weight": 4.4, "activity_count_90d": 5, "last_activity_date": "2026-07-20", "contact_status": "active"},
-    {"producer_id": "REP.JACOB", "node_id": "MCR.3.SOLSTICE", "relationship_weight": 3.8, "activity_count_90d": 4, "last_activity_date": "2026-07-18", "contact_status": "active"},
-    {"producer_id": "REP.JACOB", "node_id": "AVI.RISK.BELLWEATHER", "relationship_weight": 7.9, "activity_count_90d": 9, "last_activity_date": "2026-08-11", "contact_status": "active"},
-    # OWN.7.MERIDIAN (Trustee) deliberately has NO row for Jacob within the last 8 months — the churn signal itself
-    # Cristian — Voss (strong Ring-1, single vertical only — the Silo story)
-    {"producer_id": "REP.CRISTIAN", "node_id": "OWN.9.VOSS", "relationship_weight": 9.1, "activity_count_90d": 16, "last_activity_date": "2026-08-12", "contact_status": "active"},
-    {"producer_id": "REP.CRISTIAN", "node_id": "OWN.12", "relationship_weight": 3.0, "activity_count_90d": 2, "last_activity_date": "2026-05-01", "contact_status": "active"},
-    # RE.PM.VOSS deliberately has NO row for Cristian — untapped, despite the cross-pollination edge existing structurally
+    # Sabine — Whisper + Castellane (known, strong on signatories)
+    {"producer_id": "REP.SABINE", "node_id": "OWN.9", "relationship_weight": 8.7, "activity_count_90d": 14, "last_activity_date": "2026-08-10", "contact_status": "active"},
+    {"producer_id": "REP.SABINE", "node_id": "MCR.2.WHISPER", "relationship_weight": 5.1, "activity_count_90d": 6, "last_activity_date": "2026-08-05", "contact_status": "active"},
+    {"producer_id": "REP.SABINE", "node_id": "AVI.RISK.CASTELLANE", "relationship_weight": 8.2, "activity_count_90d": 11, "last_activity_date": "2026-08-09", "contact_status": "active"},
+    {"producer_id": "REP.SABINE", "node_id": "PER.EA.CASTELLANE", "relationship_weight": 6.4, "activity_count_90d": 7, "last_activity_date": "2026-07-28", "contact_status": "active"},
+    # OWN.7 (GC) and OWN.12 (Trustee) deliberately have NO row for Sabine — untapped/grey, per the Whisper cross-pollination story
+    # Vaughn — Aurelia (all Ring 3/4, zero Ring-1 rows = the Grinder story)
+    {"producer_id": "REP.VAUGHN", "node_id": "MCR.2.AURELIA", "relationship_weight": 6.8, "activity_count_90d": 40, "last_activity_date": "2026-08-13", "contact_status": "active"},
+    {"producer_id": "REP.VAUGHN", "node_id": "MCR.4.AURELIA", "relationship_weight": 5.5, "activity_count_90d": 55, "last_activity_date": "2026-08-14", "contact_status": "active"},
+    {"producer_id": "REP.VAUGHN", "node_id": "MCR.6.AURELIA", "relationship_weight": 4.2, "activity_count_90d": 61, "last_activity_date": "2026-08-14", "contact_status": "active"},
+    # Thea — Solstice (Trustee has decayed to zero) + Bellweather (known)
+    {"producer_id": "REP.THEA", "node_id": "MCR.2.SOLSTICE", "relationship_weight": 4.4, "activity_count_90d": 5, "last_activity_date": "2026-07-20", "contact_status": "active"},
+    {"producer_id": "REP.THEA", "node_id": "MCR.3.SOLSTICE", "relationship_weight": 3.8, "activity_count_90d": 4, "last_activity_date": "2026-07-18", "contact_status": "active"},
+    {"producer_id": "REP.THEA", "node_id": "AVI.RISK.BELLWEATHER", "relationship_weight": 7.9, "activity_count_90d": 9, "last_activity_date": "2026-08-11", "contact_status": "active"},
+    # OWN.7.MERIDIAN (Trustee) deliberately has NO row for Thea within the last 8 months — the churn signal itself
+    # Ellery — Voss (strong Ring-1, single vertical only — the Silo story)
+    {"producer_id": "REP.ELLERY", "node_id": "OWN.9.VOSS", "relationship_weight": 9.1, "activity_count_90d": 16, "last_activity_date": "2026-08-12", "contact_status": "active"},
+    {"producer_id": "REP.ELLERY", "node_id": "OWN.12", "relationship_weight": 3.0, "activity_count_90d": 2, "last_activity_date": "2026-05-01", "contact_status": "active"},
+    # RE.PM.VOSS deliberately has NO row for Ellery — untapped, despite the cross-pollination edge existing structurally
 ]
 
 referral_edges = [
-    {"id": "REF.001", "producer_id": "REP.ALEX", "from_node_id": "OWN.9", "to_node_id": "MCR.2.WHISPER", "referred_date": "2026-03-14", "notes": "SPV Director introduced Alex to the Captain at haul-out."},
-    {"id": "REF.002", "producer_id": "REP.CRISTIAN", "from_node_id": "OWN.9.VOSS", "to_node_id": "OWN.12", "referred_date": "2026-01-09", "notes": "SPV Director introduced Cristian to the family Trustee."},
+    {"id": "REF.001", "producer_id": "REP.SABINE", "from_node_id": "OWN.9", "to_node_id": "MCR.2.WHISPER", "referred_date": "2026-03-14", "notes": "SPV Director introduced Sabine to the Captain at haul-out."},
+    {"id": "REF.002", "producer_id": "REP.ELLERY", "from_node_id": "OWN.9.VOSS", "to_node_id": "OWN.12", "referred_date": "2026-01-09", "notes": "SPV Director introduced Ellery to the family Trustee."},
 ]
 
 # ============================================================
@@ -404,20 +404,20 @@ CAT_LIST = list(CATEGORIES.keys())
 
 # Per-producer category weighting — reflects each archetype's actual book shape.
 PRODUCER_CATEGORY_WEIGHTS = {
-    "REP.ALEX":     {"Ownership & Family Office": 22, "Legal & Finance": 16, "Marine Crew & Command": 6,
+    "REP.SABINE":     {"Ownership & Family Office": 22, "Legal & Finance": 16, "Marine Crew & Command": 6,
                       "Aviation Ops": 18, "Real Estate & Property": 4, "Automotive & Collections": 6,
                       "Personal & Executive Staff": 14, "Insurance & Underwriting Market": 14},
-    "REP.RAHUL":    {"Ownership & Family Office": 6, "Legal & Finance": 4, "Marine Crew & Command": 42,
+    "REP.VAUGHN":    {"Ownership & Family Office": 6, "Legal & Finance": 4, "Marine Crew & Command": 42,
                       "Aviation Ops": 4, "Real Estate & Property": 4, "Automotive & Collections": 4,
                       "Personal & Executive Staff": 6, "Insurance & Underwriting Market": 30},
-    "REP.JACOB":    {"Ownership & Family Office": 16, "Legal & Finance": 10, "Marine Crew & Command": 20,
+    "REP.THEA":    {"Ownership & Family Office": 16, "Legal & Finance": 10, "Marine Crew & Command": 20,
                       "Aviation Ops": 14, "Real Estate & Property": 6, "Automotive & Collections": 4,
                       "Personal & Executive Staff": 10, "Insurance & Underwriting Market": 20},
-    "REP.CRISTIAN": {"Ownership & Family Office": 26, "Legal & Finance": 8, "Marine Crew & Command": 32,
+    "REP.ELLERY": {"Ownership & Family Office": 26, "Legal & Finance": 8, "Marine Crew & Command": 32,
                       "Aviation Ops": 2, "Real Estate & Property": 10, "Automotive & Collections": 2,
                       "Personal & Executive Staff": 8, "Insurance & Underwriting Market": 12},
 }
-PRODUCER_KNOWN_RATIO = {"REP.ALEX": 0.75, "REP.RAHUL": 0.75, "REP.JACOB": 0.65, "REP.CRISTIAN": 0.72}
+PRODUCER_KNOWN_RATIO = {"REP.SABINE": 0.75, "REP.VAUGHN": 0.75, "REP.THEA": 0.65, "REP.ELLERY": 0.72}
 POOL_SIZE_PER_PRODUCER = 100
 
 used_names = set()
@@ -771,8 +771,8 @@ write_sheet(wb5, "Producers",
     [[p["producer_id"], p["name"], p["archetype"], p["region"], p["touchpoints_90d"], p["gwp_captured_90d"], p["pct_touches_ring1_2"], p["touchpoints_90d_prior"], p["gwp_captured_90d_prior"], p["churn_risk_score"], p["narrative"]]
      for p in producers], note=GENERATED_NOTE)
 write_sheet(wb5, "Churn_Radar", ["producer_id", "producer_name", "churn_risk_score", "flagged_account", "flagged_ring1_node", "detail"], [
-    ["REP.JACOB", "Jacob", 8.6, "M/Y Solstice (Meridian Family Office)", "OWN.7.MERIDIAN — Diane Foster, Trustee",
-     "No RELATIONSHIP_WEIGHTS row for Jacob against the Trustee — contact has gone silent. Hull/PI/CrewMed all status=expiring, renewal 2026-10-01."],
+    ["REP.THEA", "Thea", 8.6, "M/Y Solstice (Meridian Family Office)", "OWN.7.MERIDIAN — Diane Foster, Trustee",
+     "No RELATIONSHIP_WEIGHTS row for Thea against the Trustee — contact has gone silent. Hull/PI/CrewMed all status=expiring, renewal 2026-10-01."],
 ], note=GENERATED_NOTE + " Top churn case only — extend with the same pattern for additional flagged accounts.")
 
 def regional_whitespace_by_type():

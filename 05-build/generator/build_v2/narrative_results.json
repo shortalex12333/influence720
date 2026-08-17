@@ -1590,7 +1590,7 @@
       },
       {
         "coverage_id": "COV.PELHAM.AUTO.GARAGE",
-        "evidence_note": "Salesforce call note (February 19, 2026, Jacob): Corinne mentioned the 4-car collection's garage keepers coverage currently sits with Fairhaven Specialty Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 19, 2026, Thea): Corinne mentioned the 4-car collection's garage keepers coverage currently sits with Fairhaven Specialty Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.PELHAM.YACHT.CHARHIRE",
@@ -2118,7 +2118,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.MOREAU.AVI.WAR",
-        "evidence_note": "Salesforce call note (March 11, 2026, Naomi): client mentioned current war risk coverage through Sterling Aerospace Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 11, 2026, Beckett): client mentioned current war risk coverage through Sterling Aerospace Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.MOREAU.YACHT.JONESACT",
@@ -2801,7 +2801,7 @@
       },
       {
         "coverage_id": "COV.MERRIVALE.RE3.WINDFLD",
-        "evidence_note": "Salesforce call note (April 22, 2026, Rahul): client mentioned current coverage on the Beverly Hills estate through Cardinal Point Insurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 22, 2026, Vaughn): client mentioned current coverage on the Beverly Hills estate through Cardinal Point Insurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.MERRIVALE.RE3.PROP",
@@ -3152,7 +3152,7 @@
       },
       {
         "coverage_id": "COV.HARCOURT.PER.BLANKET",
-        "evidence_note": "Salesforce call note (June 3, 2026, Jacob): client mentioned current blanket personal articles coverage through Ashcroft & Payne Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 3, 2026, Thea): client mentioned current blanket personal articles coverage through Ashcroft & Payne Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.HARCOURT.YACHT.LIAB",
@@ -4838,7 +4838,7 @@
       },
       {
         "role_code": "APPR",
-        "person_name": "Naomi Chen",
+        "person_name": "Beckett Chen",
         "narrative_note": "Reappraises the collection every eighteen months ahead of the fleet's Agreed Value renewal; last cycle added two cars to schedule."
       },
       {
@@ -5558,7 +5558,7 @@
       },
       {
         "coverage_id": "COV.HARTLEY.YACHT.LIAB",
-        "evidence_note": "Salesforce call note (2026-03-11, Jacob): client mentioned current liability coverage through Anchorpoint Maritime Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (2026-03-11, Thea): client mentioned current liability coverage through Anchorpoint Maritime Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.HARTLEY.RE2.PROP",
@@ -6546,7 +6546,7 @@
       },
       {
         "role_code": "PRIV",
-        "person_name": "Naomi Kessler",
+        "person_name": "Beckett Kessler",
         "narrative_note": "Holds the credit facility collateralized in part by the executive risk program, so she reviews the K&R and D&O renewals line by line."
       },
       {
@@ -8769,7 +8769,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.EASTCOTT.PER.CYBER",
-        "evidence_note": "Salesforce call note (March 4, 2026, Rahul): client mentioned current coverage through Sterling Crest Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 4, 2026, Vaughn): client mentioned current coverage through Sterling Crest Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.EASTCOTT.YACHT.IVEXCESS",
@@ -10406,7 +10406,7 @@
       },
       {
         "role_code": "FLIG",
-        "person_name": "Naomi Feldstein",
+        "person_name": "Beckett Feldstein",
         "narrative_note": "Coordinates the G650's flight logs and crew duty-time compliance; the principal's most frequent daily point of contact."
       },
       {
@@ -10976,7 +10976,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.UXBRIDGE.AVI.AVLIAB",
-        "evidence_note": "Salesforce call note (February 2026, Alex): client mentioned current aviation liability coverage placed through Falconhurst Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 2026, Sabine): client mentioned current aviation liability coverage placed through Falconhurst Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.UXBRIDGE.PER.CYBER",
@@ -11267,7 +11267,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.SINCLAIR.PER.BLANKET",
-        "evidence_note": "Salesforce call note (April 2026, Naomi): client mentioned current coverage through Castellane Private Client Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 2026, Beckett): client mentioned current coverage through Castellane Private Client Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.SINCLAIR.YACHT.HULL",
@@ -12247,7 +12247,7 @@
       },
       {
         "coverage_id": "COV.INGLEBY.RE2.PROP",
-        "evidence_note": "Salesforce call note (March 2026, Alex): client mentioned the Hamptons estate's property coverage now sits with Cresthaven Mutual \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 2026, Sabine): client mentioned the Hamptons estate's property coverage now sits with Cresthaven Mutual \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.INGLEBY.PER.BLANKET",
@@ -12510,7 +12510,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.PRENTISS.PER.CYBER",
-        "evidence_note": "Salesforce call note (February 2026, Rahul): client mentioned the cyber crime program now sits with Bellweather Specialty Group \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 2026, Vaughn): client mentioned the cyber crime program now sits with Bellweather Specialty Group \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.PRENTISS.RE1.PROP",
@@ -15304,7 +15304,7 @@
       },
       {
         "role_code": "TAXS",
-        "person_name": "Naomi Reznik",
+        "person_name": "Beckett Reznik",
         "narrative_note": "Structured the SPV that holds Ethereal and sits on every marine binder review as a result."
       },
       {
@@ -15866,7 +15866,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.FITZWILLIAM.RE1.PREMLIAB",
-        "evidence_note": "Salesforce call note (March 3, 2026, Alex): client mentioned current premises liability on the Manhattan residence is placed through Sterling Crest Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 3, 2026, Sabine): client mentioned current premises liability on the Manhattan residence is placed through Sterling Crest Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.FITZWILLIAM.RE1.EXFLOOD",
@@ -16527,7 +16527,7 @@
       },
       {
         "role_code": "APPR",
-        "person_name": "Naomi Kessler",
+        "person_name": "Beckett Kessler",
         "narrative_note": "Appraised the collection twice in three years after a Concours entry raised the agreed value on two vehicles."
       },
       {
@@ -18274,7 +18274,7 @@
       },
       {
         "coverage_id": "COV.CARRINGTON.PER.BLANKET",
-        "evidence_note": "Salesforce call note (2026-03-14, Jacob): client mentioned current coverage through Sterling Cove Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (2026-03-14, Thea): client mentioned current coverage through Sterling Cove Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.CARRINGTON.YACHT.JONESACT",
@@ -21760,7 +21760,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.DEVEREUX.YACHT.CREWMED",
-        "evidence_note": "Salesforce call note (March 11, 2026, Rahul): client mentioned the Talisman's crew medical is currently placed through Anchorpoint Maritime Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 11, 2026, Vaughn): client mentioned the Talisman's crew medical is currently placed through Anchorpoint Maritime Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.DEVEREUX.YACHT.HULL",
@@ -22011,7 +22011,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ALDERTON.RE1.PROP",
-        "evidence_note": "Salesforce call note (May 6, 2026, Rahul): client mentioned the Aspen Ranch Estate's property coverage is currently placed through Cascade Peak Mutual \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (May 6, 2026, Vaughn): client mentioned the Aspen Ranch Estate's property coverage is currently placed through Cascade Peak Mutual \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ALDERTON.AUTO.GARAGE",
@@ -22862,11 +22862,11 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.DEVENPORT.AVI.AVHULL",
-        "evidence_note": "Salesforce call note (February 12, 2026, Cristian): client mentioned current aviation hull coverage through Cascade Aerospace Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 12, 2026, Ellery): client mentioned current aviation hull coverage through Cascade Aerospace Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.DEVENPORT.RE1.PROP",
-        "evidence_note": "Salesforce call note (April 3, 2026, Cristian): client mentioned the Aspen compound is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 3, 2026, Ellery): client mentioned the Aspen compound is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.DEVENPORT.AUTO.FLEET",
@@ -22878,11 +22878,11 @@
       },
       {
         "coverage_id": "COV.DEVENPORT.AUTO.GARAGE",
-        "evidence_note": "Salesforce call note (May 20, 2026, Cristian): client mentioned the collection's garage keepers coverage is currently placed through Ironclad Collector Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (May 20, 2026, Ellery): client mentioned the collection's garage keepers coverage is currently placed through Ironclad Collector Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.DEVENPORT.PER.BLANKET",
-        "evidence_note": "Salesforce call note (June 8, 2026, Cristian): client mentioned the family's blanket personal articles coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 8, 2026, Ellery): client mentioned the family's blanket personal articles coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.DEVENPORT.YACHT.CREWMED",
@@ -22926,7 +22926,7 @@
       {
         "role_code": "LOCA",
         "person_name": "Yuki Ishida",
-        "narrative_note": "Placed the Telluride property program herself and flagged the wind/flood gap to Rahul directly rather than waiting for the renewal cycle."
+        "narrative_note": "Placed the Telluride property program herself and flagged the wind/flood gap to Vaughn directly rather than waiting for the renewal cycle."
       },
       {
         "role_code": "TRUS",
@@ -23129,11 +23129,11 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ANCASTER.RE1.WINDFLD",
-        "evidence_note": "Salesforce call note (March 14, 2026, Rahul): client mentioned the Telluride residence's wind/flood coverage is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 14, 2026, Vaughn): client mentioned the Telluride residence's wind/flood coverage is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ANCASTER.PER.CYBER",
-        "evidence_note": "Salesforce call note (May 29, 2026, Rahul): client mentioned the family's cyber crime coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (May 29, 2026, Vaughn): client mentioned the family's cyber crime coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ANCASTER.YACHT.HULL",
@@ -23512,11 +23512,11 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.NORTHCOTE.YACHT.CREWMED",
-        "evidence_note": "Salesforce call note (April 22, 2026, Naomi): client mentioned M/Y Ethereal's crew medical coverage is currently placed through Windward Yacht Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 22, 2026, Beckett): client mentioned M/Y Ethereal's crew medical coverage is currently placed through Windward Yacht Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.NORTHCOTE.RE2.WINDFLD",
-        "evidence_note": "Salesforce call note (July 9, 2026, Naomi): client mentioned the Aspen Lakefront Residence's wind/flood coverage is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (July 9, 2026, Beckett): client mentioned the Aspen Lakefront Residence's wind/flood coverage is currently placed through Alpine Crest Insurance Partners \u2014 displacement opportunity, not unpriced risk."
       }
     ]
   },
@@ -23845,11 +23845,11 @@
       },
       {
         "coverage_id": "COV.VANDERMEER.PER.KR",
-        "evidence_note": "Salesforce call note (February 27, 2026, Naomi): client mentioned the family's kidnap & ransom coverage is currently placed through Ridgeline Crisis Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 27, 2026, Beckett): client mentioned the family's kidnap & ransom coverage is currently placed through Ridgeline Crisis Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.VANDERMEER.PER.CYBER",
-        "evidence_note": "Salesforce call note (June 15, 2026, Naomi): client mentioned the family's cyber crime coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 15, 2026, Beckett): client mentioned the family's cyber crime coverage is currently placed through Sentinel Personal Lines Group \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.VANDERMEER.YACHT.EXCUMB",
@@ -24422,7 +24422,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.MONTFORT.RE1.PREMLIAB",
-        "evidence_note": "Salesforce call note (March 4, 2026, Cristian): client mentioned the Greenwich estate's premises liability currently sits with Harrowgate Mutual \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 4, 2026, Ellery): client mentioned the Greenwich estate's premises liability currently sits with Harrowgate Mutual \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.MONTFORT.YACHT.CHARHIRE",
@@ -24747,7 +24747,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ELLSWORTH.AUTO.GARAGE",
-        "evidence_note": "Salesforce call note (June 18, 2026, Alex): client mentioned the collection's garage keepers coverage currently sits with Fairhaven Casualty Group \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 18, 2026, Sabine): client mentioned the collection's garage keepers coverage currently sits with Fairhaven Casualty Group \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ELLSWORTH.AVI.AVHULL",
@@ -25681,7 +25681,7 @@
       },
       {
         "coverage_id": "COV.ASHCOMBE.PER.CYBER",
-        "evidence_note": "Salesforce call note (February 2026, Naomi): client mentioned current cyber crime coverage placed through Cambrian Assurance Partners \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 2026, Beckett): client mentioned current cyber crime coverage placed through Cambrian Assurance Partners \u2014 displacement opportunity, not unpriced risk."
       }
     ]
   },
@@ -25700,7 +25700,7 @@
       {
         "role_code": "LOCA",
         "person_name": "Renata Kowalski",
-        "narrative_note": "Handles only the Manhattan Commercial Plaza's local filings; all other placements route through Alex directly."
+        "narrative_note": "Handles only the Manhattan Commercial Plaza's local filings; all other placements route through Sabine directly."
       },
       {
         "role_code": "HOUS",
@@ -26431,7 +26431,7 @@
       {
         "role_code": "ESTA",
         "person_name": "Colette Dubois",
-        "narrative_note": "With the family since the Big Sky property was acquired; manages the plaza's tenant-facing liability exposure directly with Rahul."
+        "narrative_note": "With the family since the Big Sky property was acquired; manages the plaza's tenant-facing liability exposure directly with Vaughn."
       },
       {
         "role_code": "COLL",
@@ -27558,7 +27558,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.KENSINGTONUNDERHILL.AVI.WAR",
-        "evidence_note": "Salesforce call note (April 14, 2026, Cristian): client mentioned current war risk coverage through Ashworth Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 14, 2026, Ellery): client mentioned current war risk coverage through Ashworth Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.KENSINGTONUNDERHILL.PER.BLANKET",
@@ -27769,7 +27769,7 @@
       },
       {
         "coverage_id": "COV.MERRIVALEANCASTER.AUTO.GARAGE",
-        "evidence_note": "Salesforce call note (February 11, 2026, Naomi): client mentioned current garage keepers coverage through Cape Sentinel Insurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 11, 2026, Beckett): client mentioned current garage keepers coverage through Cape Sentinel Insurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.MERRIVALEANCASTER.PER.CYBER",
@@ -28918,7 +28918,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.JESSOPJARNAC.YACHT.LIAB",
-        "evidence_note": "Salesforce call note (March 12, 2026, Naomi): client mentioned the marine liability line is currently placed through Castellane Maritime Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 12, 2026, Beckett): client mentioned the marine liability line is currently placed through Castellane Maritime Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.JESSOPJARNAC.RE1.PROP",
@@ -29355,7 +29355,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.HARTLEYOVERBURY.YACHT.CREWMED",
-        "evidence_note": "Salesforce call note (April 2, 2026, Jacob): client mentioned crew medical is currently placed through Sovereign Crew Health Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 2, 2026, Thea): client mentioned crew medical is currently placed through Sovereign Crew Health Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.HARTLEYOVERBURY.YACHT.HULL",
@@ -30894,11 +30894,11 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ELPHINSTONERADCLIFFE.YACHT.LIAB",
-        "evidence_note": "Salesforce call note (March 12, 2026, Naomi): client mentioned M/Y Vesper's liability coverage currently sits with Brackenridge Marine Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 12, 2026, Beckett): client mentioned M/Y Vesper's liability coverage currently sits with Brackenridge Marine Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ELPHINSTONERADCLIFFE.AUTO.FLEET",
-        "evidence_note": "Salesforce call note (May 6, 2026, Naomi): client mentioned the 6-car collection is currently placed through Wintergreen Classic Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (May 6, 2026, Beckett): client mentioned the 6-car collection is currently placed through Wintergreen Classic Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ELPHINSTONERADCLIFFE.YACHT.IVEXCESS",
@@ -31281,7 +31281,7 @@
       },
       {
         "coverage_id": "COV.BRAMWELLNIGHTINGALE.PER.EXECDO",
-        "evidence_note": "Salesforce call note (June 18, 2026, Alex): client mentioned the Executive D&O program is currently placed through Cresthaven Executive Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 18, 2026, Sabine): client mentioned the Executive D&O program is currently placed through Cresthaven Executive Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.BRAMWELLNIGHTINGALE.AUTO.EXCUMB",
@@ -31530,7 +31530,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.STAVROSRADCLIFFE.YACHT.CREWMED",
-        "evidence_note": "Salesforce call note (April 22, 2026, Naomi): client mentioned M/Y Umbra's crew medical/MLC coverage is currently placed through Alderney Specialty Marine \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 22, 2026, Beckett): client mentioned M/Y Umbra's crew medical/MLC coverage is currently placed through Alderney Specialty Marine \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.STAVROSRADCLIFFE.YACHT.WARPIR",
@@ -33843,7 +33843,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ELPHINSTONEJARNAC.RE1.WINDFLD",
-        "evidence_note": "Salesforce call note (February 2026, Jacob): client mentioned current coverage through Cardinal Point Specialty \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 2026, Thea): client mentioned current coverage through Cardinal Point Specialty \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ELPHINSTONEJARNAC.YACHT.JONESACT",
@@ -34368,11 +34368,11 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.INGLEWOODGROSVENOR.RE1.WINDFLD",
-        "evidence_note": "Salesforce call note (April 2026, Cristian): client mentioned current coverage through Ashford Coastal Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 2026, Ellery): client mentioned current coverage through Ashford Coastal Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.INGLEWOODGROSVENOR.PER.CYBER",
-        "evidence_note": "Salesforce call note (June 2026, Cristian): client mentioned current coverage through Vantage Point Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 2026, Ellery): client mentioned current coverage through Vantage Point Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.INGLEWOODGROSVENOR.PER.EPLI",
@@ -35518,7 +35518,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.NORTHCOTECASTELLAN.AUTO.TRANSIT",
-        "evidence_note": "Salesforce call note (February 11, 2026, Rahul): client mentioned current collection transit coverage running through Ashford & Vale Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 11, 2026, Vaughn): client mentioned current collection transit coverage running through Ashford & Vale Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.NORTHCOTECASTELLAN.RE1.PREMLIAB",
@@ -36145,7 +36145,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.PEMBERTONGATTENBY.RE1.WINDFLD",
-        "evidence_note": "Salesforce call note (February 2026, Cristian): client mentioned current wind/flood coverage placed through Wexford Coastal Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (February 2026, Ellery): client mentioned current wind/flood coverage placed through Wexford Coastal Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.PEMBERTONGATTENBY.YACHT.CREWMED",
@@ -36922,7 +36922,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.TALBOTQUINTRELL.AVI.WAR",
-        "evidence_note": "Salesforce call note (April 2026, Cristian): client mentioned the H175's war-risk coverage is currently placed through Ridgeline Aviation Assurance \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 2026, Ellery): client mentioned the H175's war-risk coverage is currently placed through Ridgeline Aviation Assurance \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.TALBOTQUINTRELL.RE1.WINDFLD",
@@ -37550,7 +37550,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.PENHALLOWJARNAC.AUTO.TRANSIT",
-        "evidence_note": "Salesforce call note (May 2026, Naomi): client mentioned the collection's transit coverage is currently placed through Cascade Specialty Transit Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (May 2026, Beckett): client mentioned the collection's transit coverage is currently placed through Cascade Specialty Transit Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.PENHALLOWJARNAC.YACHT.LIAB",
@@ -38566,7 +38566,7 @@
       },
       {
         "role_code": "PROP",
-        "person_name": "Naomi Fitzgerald",
+        "person_name": "Beckett Fitzgerald",
         "narrative_note": "Property Manager for both residences, and the one who negotiated the Beverly Hills premises liability terms down after a 2024 claim."
       },
       {
@@ -39270,7 +39270,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.PELHAMBRAMWELL.RE1.PREMLIAB",
-        "evidence_note": "Salesforce call note (2026-03-11, Cristian): client mentioned current premises liability coverage through Ashford Cove Mutual \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (2026-03-11, Ellery): client mentioned current premises liability coverage through Ashford Cove Mutual \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.PELHAMBRAMWELL.AUTO.FLEET",
@@ -40367,7 +40367,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.HARCOURTQUINTRELL.AVI.AVHULL",
-        "evidence_note": "Salesforce call note (2026-04-02, Naomi): client mentioned current aviation hull coverage through Ridgeline Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (2026-04-02, Beckett): client mentioned current aviation hull coverage through Ridgeline Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.HARCOURTQUINTRELL.RE1.PROP",
@@ -40941,7 +40941,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.ELLSWORTHISHERWOOD.AUTO.TRANSIT",
-        "evidence_note": "Salesforce call note (March 11, 2026, Alex): client mentioned current transit coverage through Ashford Specialty Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (March 11, 2026, Sabine): client mentioned current transit coverage through Ashford Specialty Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ELLSWORTHISHERWOOD.YACHT.CREWMED",
@@ -41580,7 +41580,7 @@
       },
       {
         "coverage_id": "COV.ESTERHAZYHALLOWAY.RE1.PROP",
-        "evidence_note": "Salesforce call note (April 22, 2026, Alex): client mentioned current property coverage through Kingswood Risk Partners \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (April 22, 2026, Sabine): client mentioned current property coverage through Kingswood Risk Partners \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.ESTERHAZYHALLOWAY.RE2.PREMLIAB",
@@ -42079,7 +42079,7 @@
     "evidence_notes": [
       {
         "coverage_id": "COV.LINDQVISTVERLAINE.AVI.AVLIAB",
-        "evidence_note": "Salesforce call note (June 3, 2026, Rahul): client mentioned current aviation liability coverage through Sterling Cove Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
+        "evidence_note": "Salesforce call note (June 3, 2026, Vaughn): client mentioned current aviation liability coverage through Sterling Cove Aviation Underwriters \u2014 displacement opportunity, not unpriced risk."
       },
       {
         "coverage_id": "COV.LINDQVISTVERLAINE.AVI.CREWACC",

@@ -581,9 +581,9 @@ function peerCompFor(typeId, excludeCovId) {
 
 /* ══════════════════════════════════════════════════════════════════
    STATE + FILTERS — "current user" is a real producer-override
-   selector (Dashboard 1's pattern), defaulting to Alex.
+   selector (Dashboard 1's pattern), defaulting to Sabine.
    ══════════════════════════════════════════════════════════════════ */
-const state = { producerId: (PRODUCERS.find(p => p.name === 'Alex') || PRODUCERS[0]).producer_id, view: 'zoomed', selectedAccountId: null, selectedNode: null, sim: null };
+const state = { producerId: (PRODUCERS.find(p => p.name === 'Sabine') || PRODUCERS[0]).producer_id, view: 'zoomed', selectedAccountId: null, selectedNode: null, sim: null };
 const filters = { missing: '', held: '', size: '', expiry: '', vertical: '', status: '' };
 function currentProducer() { return producerById.get(state.producerId); }
 

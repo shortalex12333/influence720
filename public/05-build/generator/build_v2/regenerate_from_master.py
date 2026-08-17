@@ -359,8 +359,8 @@ def emit_dashboard_workbooks(dataset):
         [[p["producer_id"], p["name"], p["archetype"], p["region"], p["touchpoints_90d"], p["gwp_captured_90d"], p["pct_touches_ring1_2"], p["touchpoints_90d_prior"], p["gwp_captured_90d_prior"], p["churn_risk_score"], p["narrative"]]
          for p in dataset["producers"]], note=GENERATED_NOTE)
     write_sheet(wb5, "Churn_Radar", ["producer_id", "producer_name", "churn_risk_score", "flagged_account", "flagged_ring1_node", "detail"], [
-        ["REP.JACOB", "Jacob", 8.6, "M/Y Solstice (Meridian Family Office)", "OWN.7.MERIDIAN — Diane Foster, Trustee",
-         "No RELATIONSHIP_WEIGHTS row for Jacob against the Trustee — contact has gone silent. Hull/PI/CrewMed all status=expiring, renewal 2026-10-01."],
+        ["REP.THEA", "Thea", 8.6, "M/Y Solstice (Meridian Family Office)", "OWN.7.MERIDIAN — Diane Foster, Trustee",
+         "No RELATIONSHIP_WEIGHTS row for Thea against the Trustee — contact has gone silent. Hull/PI/CrewMed all status=expiring, renewal 2026-10-01."],
     ], note=GENERATED_NOTE + " Top churn case only — extend with the same pattern for additional flagged accounts.")
 
     def regional_whitespace_by_type():

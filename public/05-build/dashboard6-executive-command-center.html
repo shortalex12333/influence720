@@ -120,7 +120,7 @@ body.theme-dark .churn-row{background:#141618}
   </div>
   <div class="h-ctrl">
     <span class="vtag" id="whole-book-tag">Whole Book —</span>
-    <span class="vtag">Trish · SVP</span>
+    <span class="vtag">Larkin · SVP</span>
     <div class="theme-switch-wrap">
       <span class="theme-switch-lbl">Light</span>
       <button class="theme-switch" id="theme-toggle" aria-label="Toggle theme"><span class="theme-switch-thumb"></span></button>
@@ -461,7 +461,7 @@ function producerBreakdown(n) {
 // correct if the roster ever changes.
 //   1. churn_risk_score >= LEGACY_CHURN_THRESHOLD -> "legacy/decaying"
 //      (purple). Real field, 0-10 scale (rosters.js) — of the 5 real
-//      producers only Jacob's 8.6 clears 5; the rest sit 1.2-3.4.
+//      producers only Thea's 8.6 clears 5; the rest sit 1.2-3.4.
 //   2. Otherwise: $ captured per touchpoint in the last 90 days
 //      (gwp_captured_90d / touchpoints_90d), ranked against the MEDIAN
 //      of that same ratio across the other non-legacy producers (computed
@@ -898,7 +898,7 @@ document.getElementById('vfilter-reset').addEventListener('click', () => { state
 document.getElementById('sel-ring').addEventListener('change', e => { state.ringFilter = e.target.value; applyFilters(); });
 document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
 
-// Producer Gap Skew — same 5 real producers (Alex/Rahul/Jacob/Cristian/Naomi)
+// Producer Gap Skew — same 5 real producers (Sabine/Vaughn/Thea/Ellery/Beckett)
 // D1/D4's own producer picker already loads. Selecting one re-colors/re-sizes
 // the whole wheel to THEIR own gap pattern (or, in Effort vs Yield mode, to
 // their real computed classification) instead of the regional aggregate.

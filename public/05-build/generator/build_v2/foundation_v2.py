@@ -531,27 +531,27 @@ RELATIONSHIP_WEIGHT_W_ACTIVITY = 0.6
 RELATIONSHIP_WEIGHT_W_RECENCY = 0.4
 
 # ============================================================================
-# Producers (5 — adds "Naomi," the 5th archetype from 01-plan/influence720-dashboard-plan.md's
+# Producers (5 — adds "Beckett," the 5th archetype from 01-plan/influence720-dashboard-plan.md's
 # "The Rookie" that the prior build never implemented) + Leadership (unchanged).
 # ============================================================================
 PRODUCERS = [
-    {"producer_id": "REP.ALEX", "name": "Alex", "archetype": "High-Yield, Low-Touch", "region": "South Florida",
+    {"producer_id": "REP.SABINE", "name": "Sabine", "archetype": "High-Yield, Low-Touch", "region": "South Florida",
      "narrative": "80% Ring 1/2 signatories, massive GWP. The ideal state — talks to fewer people, exclusively economic buyers.",
      "touchpoints_90d": 22, "gwp_captured_90d": 1850000, "pct_touches_ring1_2": 0.80,
      "touchpoints_90d_prior": 26, "gwp_captured_90d_prior": 1510000, "churn_risk_score": 1.2},
-    {"producer_id": "REP.RAHUL", "name": "Rahul", "archetype": "High-Touch, Low-Yield", "region": "South Florida",
+    {"producer_id": "REP.VAUGHN", "name": "Vaughn", "archetype": "High-Touch, Low-Yield", "region": "South Florida",
      "narrative": "90% Ring 3/4 operational/crew, low GWP. Massive activity, almost none of it lands on a signatory.",
      "touchpoints_90d": 210, "gwp_captured_90d": 240000, "pct_touches_ring1_2": 0.10,
      "touchpoints_90d_prior": 188, "gwp_captured_90d_prior": 255000, "churn_risk_score": 2.0},
-    {"producer_id": "REP.JACOB", "name": "Jacob", "archetype": "Legacy Book, Decaying Contact", "region": "South Florida",
+    {"producer_id": "REP.THEA", "name": "Thea", "archetype": "Legacy Book, Decaying Contact", "region": "South Florida",
      "narrative": "Massive GWP, but comm-frequency is decaying. Bound large accounts years ago, hasn't spoken to the Ring 1 signatory in 8 months.",
      "touchpoints_90d": 9, "gwp_captured_90d": 2100000, "pct_touches_ring1_2": 0.35,
      "touchpoints_90d_prior": 21, "gwp_captured_90d_prior": 2140000, "churn_risk_score": 8.6},
-    {"producer_id": "REP.CRISTIAN", "name": "Cristian", "archetype": "Single-Vertical Concentration", "region": "South Florida",
+    {"producer_id": "REP.ELLERY", "name": "Ellery", "archetype": "Single-Vertical Concentration", "region": "South Florida",
      "narrative": "100% single-vertical GWP, zero adjacent policies. Has the Ring 1 ear of the UBO, leaves the cross-pollination money on the table.",
      "touchpoints_90d": 60, "gwp_captured_90d": 680000, "pct_touches_ring1_2": 0.75,
      "touchpoints_90d_prior": 58, "gwp_captured_90d_prior": 665000, "churn_risk_score": 1.8},
-    {"producer_id": "REP.NAOMI", "name": "Naomi", "archetype": "High Activity, Unmapped Network", "region": "South Florida",
+    {"producer_id": "REP.BECKETT", "name": "Beckett", "archetype": "High Activity, Unmapped Network", "region": "South Florida",
      "narrative": "High activity, calling largely unmapped Ring 3/4 contacts on cold accounts. Needs the Tier 1 referral web to find the warm path to the actual decision-makers.",
      "touchpoints_90d": 145, "gwp_captured_90d": 310000, "pct_touches_ring1_2": 0.18,
      "touchpoints_90d_prior": 98, "gwp_captured_90d_prior": 190000, "churn_risk_score": 3.4},
@@ -559,7 +559,7 @@ PRODUCERS = [
 
 LEADERSHIP = [
     {"leader_id": "LEAD.JONATHAN", "name": "Jonathan", "title": "Regional Director", "scope": "South Florida region — team lead tier, sees all 5 producers"},
-    {"leader_id": "LEAD.TRISH", "name": "Trish", "title": "SVP", "scope": "Executive — sees the full regional roll-up"},
+    {"leader_id": "LEAD.LARKIN", "name": "Larkin", "title": "SVP", "scope": "Executive — sees the full regional roll-up"},
 ]
 
 # ============================================================================

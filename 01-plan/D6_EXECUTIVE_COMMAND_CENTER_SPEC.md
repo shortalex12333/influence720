@@ -10,7 +10,7 @@
 ### What D6 IS:
 * **The Macro Consolidation of D3 + D4**: D6 merges **Salesforce CRM regional activity and producer ownership (D3)** with **Applied Epic ERP regional GWP and domain whitespace (D4)** for C-Suite Leadership, Managing Directors, and Board Members.
 * **The Leadership Persona Pitch**:
-  > *"Instead of managing the firm out of a mental notepad ('Austin is the Yacht guy, Alex is talking to a mega client'), D6 replaces informal guesswork with a forensic system of record. Leadership sees every producer's book size, conversion rate, pipeline weight, and domain skew—empowering us to pair specialists, optimize capital, and strategically expand into uncaptured networks."*
+  > *"Instead of managing the firm out of a mental notepad ('Austin is the Yacht guy, Sabine is talking to a mega client'), D6 replaces informal guesswork with a forensic system of record. Leadership sees every producer's book size, conversion rate, pipeline weight, and domain skew—empowering us to pair specialists, optimize capital, and strategically expand into uncaptured networks."*
 * **The Effort-vs-Yield Engine**: It correlates where reps spend their time (Salesforce touchpoints) against where actual revenue is captured (Epic GWP).
 * **The Silent Churn Radar**: It identifies high-value accounts that are decaying in communication frequency in Salesforce *before* their renewal date expires in Epic.
 

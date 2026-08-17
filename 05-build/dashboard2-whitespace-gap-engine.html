@@ -248,7 +248,7 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
   <div id="cv-wrap">
     <div id="cluster-banner"></div>
     <div id="cv-toolbar">
-      <button class="back-link" id="btn-back-gallery">◂ All Accounts</button>
+      <button class="back-link" id="btn-back-gallery" style="display:none">◂ All Accounts</button>
       <span id="zoom-crumb"></span>
       <div class="sim-control" id="sim-control" style="display:none;margin-left:auto">
         <label for="sim-select">Persona &amp; Scale —</label>
@@ -256,7 +256,7 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
       </div>
     </div>
     <div id="sim-banner"></div>
-    <div id="gallery"></div>
+    <div id="gallery" style="display:none !important"></div>
     <div id="zoomstage"><div id="wheel-inner"><svg id="zoom-wheel"></svg></div></div>
     <div id="legend">
       <div class="leg-item"><span class="leg-dot" style="background:var(--status-bound)"></span>Satellite — Bound, at or above required limit</div>
@@ -580,7 +580,7 @@ function peerCompFor(typeId, excludeCovId) {
    STATE + FILTERS — "current user" is a real producer-override
    selector (Dashboard 1's pattern), defaulting to Alex.
    ══════════════════════════════════════════════════════════════════ */
-const state = { producerId: (PRODUCERS.find(p => p.name === 'Alex') || PRODUCERS[0]).producer_id, view: 'gallery', selectedAccountId: null, selectedNode: null, sim: null };
+const state = { producerId: (PRODUCERS.find(p => p.name === 'Alex') || PRODUCERS[0]).producer_id, view: 'zoomed', selectedAccountId: null, selectedNode: null, sim: null };
 const filters = { missing: '', held: '', size: '', expiry: '', vertical: '', status: '' };
 function currentProducer() { return producerById.get(state.producerId); }
 
@@ -629,7 +629,7 @@ const overrideSel = document.getElementById('sel-override');
 PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name + ' — ' + p.archetype; overrideSel.appendChild(o); });
 overrideSel.value = state.producerId;
 overrideSel.addEventListener('change', () => {
-  state.producerId = overrideSel.value; state.view = 'gallery'; state.selectedAccountId = null; state.selectedNode = null; renderAll();
+  state.producerId = overrideSel.value; state.view = 'zoomed'; state.selectedAccountId = null; state.selectedNode = null; renderAll();
 });
 
 function populateCoverageSelect(sel) {
@@ -1006,7 +1006,12 @@ function renderCenter(list) {
   const gallery = document.getElementById('gallery');
   const zoomstage = document.getElementById('zoomstage');
   const toolbar = document.getElementById('cv-toolbar');
-  if (state.view === 'zoomed' && state.selectedAccountId && accountById.has(state.selectedAccountId)) {
+  if ((!state.selectedAccountId || !accountById.has(state.selectedAccountId)) && list.length > 0) {
+    const top = rankedForRail(list)[0];
+    if (top) { state.selectedAccountId = top.id; state.selectedNode = { type: 'principal', id: top.id }; }
+  }
+  state.view = 'zoomed';
+  if (state.selectedAccountId && accountById.has(state.selectedAccountId)) {
     gallery.style.display = 'none'; zoomstage.style.display = 'block'; toolbar.style.display = 'flex';
     const acc = accountById.get(state.selectedAccountId);
     const roleCount = (rolesByAccount.get(acc.id) || []).length;
@@ -1016,12 +1021,6 @@ function renderCenter(list) {
     renderZoom(acc);
     if (lastRenderedAccountId !== acc.id) resetWheelView(); else applyWheelTransform();
     lastRenderedAccountId = acc.id;
-  } else {
-    document.getElementById('sim-control').style.display = 'none';
-    document.getElementById('sim-banner').style.display = 'none';
-    gallery.style.display = 'grid'; zoomstage.style.display = 'none'; toolbar.style.display = 'none';
-    renderGallery(list);
-    lastRenderedAccountId = null;
   }
 }
 
@@ -1029,8 +1028,8 @@ function renderCenter(list) {
    SELECTION / NAVIGATION
    ══════════════════════════════════════════════════════════════════ */
 function selectAccount(id) { state.view = 'zoomed'; state.selectedAccountId = id; state.selectedNode = { type: 'principal', id }; state.sim = null; renderAll(); }
-function backToGallery() { state.view = 'gallery'; state.selectedAccountId = null; state.selectedNode = null; state.sim = null; renderAll(); }
-document.getElementById('btn-back-gallery').addEventListener('click', backToGallery);
+const backBtn = document.getElementById('btn-back-gallery');
+if (backBtn) backBtn.style.display = 'none';
 
 function selectNode(type, id) {
   state.selectedNode = { type, id };

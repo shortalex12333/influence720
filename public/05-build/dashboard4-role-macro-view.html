@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Role Macro View</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-4-specific rules only — everything shared lives in engine/style-core.css.
+   This view reuses RingEngine (engine/render-core.js) structurally unmodified for
+   layout/theming/tooltip; the split-fill node rendering below is a POST-PROCESSING
+   pass layered on top of what RingEngine already drew (see the script block's
+   splitFillNode()) — render-core.js itself is never edited.
+
+   CANVAS GEOMETRY — 2026-08-17 rebuilt to match D0's real pentagon-of-5-wheels
+   technique (dashboard0-ontology-foundation.html), NOT the old single combined
+   45-sector wheel this file used to render. Five separate <svg> elements, one
+   per vertical, each its own independent RingEngine.render() call against the
+   PLAIN 9-segment domains (TEMPLATE_ONTOLOGY.segments) — no vertOffset, no
+   combinedDomains, no per-vertical sector merging. Founder-confirmed tradeoff:
+   direct side-by-side $ comparison across verticals gets harder since they're
+   now spatially separate wheels — chosen anyway, for visual consistency with
+   D0/D1/D2/D3/D5. Node dollar sizing/coloring, the Deficiency Heatmap, the
+   Carrier Concentration Radar and the whole-book KPI rail are all UNCHANGED —
+   only the canvas geometry moved. */
+.universe-canvas{position:absolute;inset:0;overflow:hidden;cursor:grab}
+.universe-canvas.dragging{cursor:grabbing}
+#canvas-inner{position:relative;transform-origin:0 0}
+.ucluster{position:absolute}
+.ucluster svg{overflow:visible;cursor:pointer;display:block}
+.ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
+.ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ucluster-meta{font-size:11px;font-weight:700;color:var(--accent)}
+.canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
+/* Limit-adequacy hue — same rust used by dashboard2-whitespace-gap-engine.html
+   for a coverage that IS bound but whose bound_limit_usd falls below its
+   tier's required baseline_limit_usd. Deliberately not the same red as
+   fully-unbound whitespace — this is money already on file, just under-sized. */
+:root{--status-deficient:#a15a2e}
+body.theme-dark{--status-deficient:#e0916a}
+.rail-block{margin-bottom:18px}
+.rail-total{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-top:4px}
+.rail-total-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
+.vreset{cursor:pointer;color:var(--accent);font-weight:700;text-transform:none;letter-spacing:0;float:right}
+.vcard{border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;background:var(--surface);transition:border-color .15s,opacity .2s}
+.vcard:hover{border-color:var(--accent)}
+.vcard.dim{opacity:.32}
+.vcard.isolated{border-color:var(--accent);background:var(--surface3)}
+.vcard-top{display:flex;justify-content:space-between;align-items:baseline}
+.vcard-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)}
+.vcard-val{font-size:15px;font-weight:800;color:var(--text)}
+.vcard-bar{height:6px;border-radius:999px;background:var(--surface3);overflow:hidden;margin-top:6px;display:flex}
+.vcard-bar-sold{background:var(--status-bound);height:100%}
+.vcard-bar-prospect{background:var(--text3);opacity:.5;height:100%}
+.method-note{font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:4px}
+.comp-row{display:flex;align-items:center;gap:8px;min-width:220px}
+.comp-track{flex:1;height:8px;background:var(--surface3);border-radius:999px;overflow:hidden;display:flex}
+.comp-seg-sold{height:8px;background:var(--status-bound)}
+.comp-seg-prospect{height:8px;background:var(--text3);opacity:.5}
+.comp-num{font-size:11px;color:var(--text3);white-space:nowrap}
+.legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:6px;max-width:255px}
+.legend-row{display:flex;align-items:center;gap:7px}
+.legend-swatch{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.hatch-chip{display:inline-block;width:20px;height:12px;border-radius:3px;flex-shrink:0}
+.prod-table{width:100%;border-collapse:collapse;margin-top:4px}
+.prod-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border2);cursor:pointer;user-select:none}
+.prod-table th:hover{color:var(--accent)}
+.prod-table td{font-size:12px;padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+.prod-name{font-weight:700;color:var(--text)}
+.prod-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.empty-note{color:var(--text3);font-size:12px;line-height:1.5}
+.beach-row{display:flex;justify-content:space-between;gap:8px}
+.beach-val{text-align:right;white-space:nowrap}
+/* Toggleable panels (heatmap / carrier concentration) — overlay ON the wheel's
+   own stage (#cv-wrap is position:relative already), never replacing it; each
+   is closable and hidden by default. */
+.overlay-modal{display:none;position:absolute;top:14px;left:16px;right:16px;bottom:14px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;overflow:auto;z-index:5;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.overlay-modal.open{display:block}
+.overlay-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border2)}
+.overlay-modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.overlay-modal-sub{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5;max-width:640px}
+.heatmap-grid{display:grid;grid-template-columns:150px repeat(5,1fr);gap:1px;background:var(--border2);border:1px solid var(--border2);border-radius:6px;overflow:hidden;font-size:11px}
+.hm-head,.hm-rowlbl{background:var(--surface2);color:var(--text2);font-weight:700;padding:7px 8px;display:flex;align-items:center}
+.hm-head{justify-content:center;text-transform:uppercase;letter-spacing:.04em;font-size:10px}
+.hm-cell{background:var(--surface);padding:6px 8px;cursor:default;min-height:54px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.hm-cell-total{font-weight:800;color:var(--text);font-size:12px;font-variant-numeric:tabular-nums}
+.hm-cell-bar{height:5px;border-radius:999px;overflow:hidden;display:flex;background:var(--surface3)}
+.hm-seg-adequate{height:100%;background:var(--status-bound)}
+.hm-seg-deficient{height:100%;background:var(--status-deficient)}
+.hm-seg-whitespace{height:100%;background:var(--text3);opacity:.5}
+.hm-cell-empty{color:var(--text3);font-size:10px}
+.hm-cell[title]{position:relative}
+.carrier-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.carrier-ranked{flex:1;min-width:260px}
+.carrier-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.carrier-rank{width:20px;font-weight:800;color:var(--text3);font-size:12px}
+.carrier-name{flex:1;font-weight:700;font-size:12.5px;color:var(--text)}
+.carrier-bar-track{width:100%;height:6px;background:var(--surface3);border-radius:999px;overflow:hidden;margin-top:4px}
+.carrier-bar-fill{height:100%;background:var(--accent)}
+.carrier-figs{text-align:right;white-space:nowrap;font-size:11px;color:var(--text3)}
+.carrier-figs strong{display:block;color:var(--text);font-size:13px;font-variant-numeric:tabular-nums}
+.carrier-radar-wrap{flex-shrink:0}
+/* Tabular-numeral discipline on every figure this file renders that style-core's
+   own .num/.sc-val/.info-val selectors don't already cover. */
+.rail-total,.vcard-val,.beach-val,.prod-table td{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-left-row">
+      <a href="index.html" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
+      <div class="h-title">Role Macro View</div>
+    </div>
+    <div class="h-sub">Five vertical wheels — <strong>yacht, aviation, real estate, auto, personal</strong> — arranged pentagon-style, same layout as D0. Each wheel sized by that vertical's own real GWP. Node size = total $ touching this specific role (bound + estimated whitespace) · fill = solid for bound, diagonal-hatched for estimated — never shown as equally certain. Click a node for the producers already positioned to close it.</div>
+    <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
+      <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D4 Role Macro View</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+    </nav>
+  </div>
+  <div class="h-ctrl">
+    <span class="vtag" id="whole-book-tag">Whole Book —</span>
+    <span class="vtag">Trish · SVP</span>
+    <div class="theme-switch-wrap">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" aria-label="Toggle theme"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid var(--border2);background:var(--surface)">
+  <div class="filter-group"><span class="filter-lbl">Authority / Ring</span>
+    <select class="filter-sel" id="sel-ring">
+      <option value="all">All rings</option>
+      <option value="0">Ring 0 — Apex</option>
+      <option value="1">Ring 1 — Signatory</option>
+      <option value="2">Ring 2 — Conditional</option>
+      <option value="3">Ring 3 — Transaction</option>
+      <option value="4">Ring 4 — Operational</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Producer Gap Skew</span>
+    <select class="filter-sel" id="sel-producer">
+      <option value="">Regional Aggregate</option>
+    </select>
+  </div>
+  <div style="flex:1"></div>
+  <button class="btn" id="btn-heatmap" type="button">Deficiency Heatmap</button>
+  <button class="btn" id="btn-carriers" type="button">Carrier Concentration</button>
+  <div class="filter-group"><span class="filter-lbl">Whole Book Composition</span>
+    <div class="comp-row"><div class="comp-track"><div class="comp-seg-sold" id="comp-sold" style="width:0"></div><div class="comp-seg-prospect" id="comp-prospect" style="width:0"></div></div><span class="comp-num" id="comp-num">—</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh"><div id="lrh-title">Region Book Value</div><div id="lrh-sub">150 UBO accounts · 5 verticals</div></div>
+      <div id="lrb">
+        <div class="rail-block">
+          <div class="filter-lbl">Whole Book, All Verticals</div>
+          <div class="rail-total" id="grand-total">—</div>
+          <div class="rail-total-sub" id="grand-total-sub">—</div>
+        </div>
+        <div class="rail-block">
+          <div class="filter-lbl" style="margin-bottom:8px">Vertical Rollup <span class="vreset" id="vfilter-reset">reset</span></div>
+          <div id="vcards"></div>
+        </div>
+        <div class="method-note">Node dollar value = bound premium (sold) + Salesforce-modeled GWP estimate (prospected), summed only from coverage lines where this exact role is the on-file responsible party — computed live from the shared dataset at load time, not precomputed. Figures reflect coverage already modeled against an account's known assets; a vertical with no role/coverage presence for a given account means it is not yet on file for that account, not that the exposure doesn't exist.</div>
+      </div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <div class="universe-canvas" id="universe-canvas">
+      <div id="canvas-inner"></div>
+      <div class="canvas-zoom-ctrl">
+        <button id="zoom-in" type="button">+</button>
+        <button id="zoom-out" type="button">&minus;</button>
+        <button class="wide" id="zoom-reset" type="button">Reset view</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-row"><span class="legend-swatch" style="background:#2ec478"></span>Well-penetrated role — mostly bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#e0a640"></span>Partially penetrated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#8b93a3"></span>Untapped beachhead — all estimated</div>
+      <div class="legend-row"><span class="hatch-chip" style="background:repeating-linear-gradient(45deg,var(--text2) 0 2px,transparent 2px 5px)"></span>Hatched share = estimated, not bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-deficient)"></span>Solid rust = bound but under the required limit (deficient)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.4"></span>No modeled coverage responsibility</div>
+      <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--text2);background:transparent"></span>Bold outline = account-level (UBO) bubble</div>
+    </div>
+    <div class="overlay-modal" id="heatmap-modal">
+      <div class="overlay-modal-head">
+        <div><div class="overlay-modal-title">Whitespace &amp; Limit Deficiency Heatmap</div><div class="overlay-modal-sub">9 lifecycle segments × 5 verticals, region-wide. Cell shade = share of this segment's bound premium that is under the required limit (deficient); bar = Adequate / Deficient / Whitespace split.</div></div>
+        <span class="vreset" id="heatmap-close">close ✕</span>
+      </div>
+      <div class="heatmap-grid" id="heatmap-grid"></div>
+    </div>
+    <div class="overlay-modal" id="carrier-modal">
+      <div class="overlay-modal-head">
+        <div><div class="overlay-modal-title">Carrier Concentration</div><div class="overlay-modal-sub">Real bound + expiring premium and line count per carrier on BOUND_POLICY_OVERLAY, region-wide — where the book is concentrated.</div></div>
+        <span class="vreset" id="carrier-close">close ✕</span>
+      </div>
+      <div class="carrier-wrap" id="carrier-body"></div>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+  </div>
+
+</div>
+
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="data/template-ontology.js"></script>
+<script src="data/coverage-corpus.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', RingEngine.theme.toggle);
+
+// ════════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════════
+function escapeXML(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtMoney(v){
+  v = v || 0;
+  if (v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
+  if (v >= 1000) return '$' + Math.round(v/1000) + 'K';
+  return '$' + Math.round(v);
+}
+function fmtPct(v){ return Math.round((v||0)*100) + '%'; }
+
+// ════════════════════════════════════════════════════════════════════
+// PER-VERTICAL DOMAIN MODEL — FIXED 2026-08-16. This used to be hand-
+// transcribed per-vertical (yacht 9 / aviation 4 / real_estate 3 / auto 2 /
+// personal 2, four different naming schemes) from an early build_v2 draft
+// that predates this session's 9-segment lifecycle ontology unification.
+// It was stale against the live dataset the whole time this session:
+// every real role node in data/ontology-720.js already carries n.domain
+// (1-9) and n.category under the SAME 9-segment scheme for all 5
+// verticals (confirmed by direct scan — yacht/aviation/real_estate/auto/
+// personal all resolve to exactly {1..9} with identical category names).
+// Fixed by reading the canonical list LIVE from data/template-ontology.js's
+// TEMPLATE_ONTOLOGY.segments — the exact same object
+// dashboard0-ontology-foundation.html treats as its own SEGMENTS constant
+// — rather than re-hand-typing a corrected copy that could drift again.
+// fine_art is intentionally excluded here: it has no role taxonomy of its
+// own (foundation_v2.py's ROLE_TAXONOMY has no fine_art key) — fine-art
+// coverage lines are always the RESPONSIBILITY of a role that already
+// lives under one of these 5 verticals (e.g. a yacht captain responsible
+// for scheduled art aboard), so its dollars fold naturally into that
+// role's own vertical rollup below, correctly, without needing a 6th
+// wedge on the wheel.
+// ════════════════════════════════════════════════════════════════════
+const VERTICALS = ['yacht','aviation','real_estate','auto','personal'];
+const VERTICAL_LABELS = { yacht:'Yacht', aviation:'Aviation', real_estate:'Real Estate', auto:'Auto', personal:'Personal' };
+const SEGMENTS = TEMPLATE_ONTOLOGY.segments; // 9 canonical segments — id/name/col, identical source D0 renders from
+const DOMAINS_BY_VERTICAL = {};
+VERTICALS.forEach(v => {
+  DOMAINS_BY_VERTICAL[v] = { count: SEGMENTS.length, list: SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col })) };
+});
+
+// role.vertical carries a real_estate/realestate spelling split in the source
+// data (asset+coverage nodes use "real_estate", role nodes use "realestate") —
+// normalize on read everywhere rather than silently mis-bucketing 303 role
+// nodes into a wedge/rollup that doesn't exist.
+function normVertical(v){ return v === 'realestate' ? 'real_estate' : v; }
+
+// PLAIN_DOMAINS — the same 9-segment list every wheel uses, verbatim, no
+// per-vertical offset. Each vertical gets its OWN <svg>/RingEngine.render()
+// call (see the WHEEL section below), so there is no need to merge 5
+// verticals' domains into one 45-sector ring the way this file used to.
+const PLAIN_DOMAINS = SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col }));
+
+function domainName(vertical, localId) {
+  const v = normVertical(vertical);
+  const list = DOMAINS_BY_VERTICAL[v] && DOMAINS_BY_VERTICAL[v].list;
+  const d = list && list.find(x => x.id === localId);
+  return d ? d.name : ('Domain ' + localId);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INDICES over the shared dataset
+// ════════════════════════════════════════════════════════════════════
+const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
+const principalNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+const wheelNodes = roleNodes.concat(principalNodes);
+// Split once, by each node's own (normalized) vertical — this is the partition
+// that drives which of the 5 separate <svg> wheels a node renders into. A
+// principal/account node carries exactly one vertical tag even though its own
+// dollar rollup (nodeFinancials) can span every vertical that account touches
+// — same "apex node sits in its home vertical's wheel" placement this file
+// already used inside the old combined wheel, just now a real per-svg split
+// instead of a sector offset.
+const wheelNodesByVertical = {};
+VERTICALS.forEach(v => { wheelNodesByVertical[v] = wheelNodes.filter(n => normVertical(n.vertical) === v); });
+const producerNameById = new Map(PRODUCERS.map(p => [p.producer_id, p.name]));
+
+const rolesByAccount = new Map();
+roleNodes.forEach(n => { if (!rolesByAccount.has(n.account_ref)) rolesByAccount.set(n.account_ref, []); rolesByAccount.get(n.account_ref).push(n); });
+
+// ════════════════════════════════════════════════════════════════════
+// LIMIT-ADEQUACY CATALOG — data/coverage-corpus.js (COVERAGE_CORPUS),
+// regenerated FROM the same master workbook's CovCatalog_<Vertical>
+// sheets. baselineLimitFor()/aviationTier() below are the SAME client-
+// side port dashboard2-whitespace-gap-engine.html already validated
+// (pricing_v2.py's baseline_limit_usd_for()/aviation_tier(), same tier
+// keys, same fallback) — reused verbatim rather than re-derived, then
+// rolled up here to the per-role/per-domain AGGREGATE (not per-asset —
+// D4 has no single-asset satellite view to hang a per-coverage ring on).
+// ════════════════════════════════════════════════════════════════════
+const covNodeById = new Map(ONTOLOGY_NODES.filter(n => n.node_type === 'coverage').map(n => [n.id, n]));
+const assetById = new Map(ONTOLOGY_NODES.filter(n => n.node_type === 'asset').map(n => [n.id, n]));
+const covCatalogByKey = new Map(); // "vertical|coverage_type_id" -> corpus entry
+Object.keys((typeof COVERAGE_CORPUS !== 'undefined' && COVERAGE_CORPUS.verticals) || {}).forEach(v => {
+  COVERAGE_CORPUS.verticals[v].forEach(entry => covCatalogByKey.set(v + '|' + entry.coverage_type_id, entry));
+});
+const AVIATION_TIER_KEYWORDS = { light: ['Sikorsky', 'Citation', 'H175'], mid: ['Challenger', 'Falcon'], heavy: ['Gulfstream', 'Global'] };
+const AVIATION_TIERS = ['light', 'mid', 'heavy'];
+function aviationTier(assetLabel) {
+  const label = assetLabel || '';
+  for (const tier of AVIATION_TIERS) { if (AVIATION_TIER_KEYWORDS[tier].some(k => label.includes(k))) return tier; }
+  return 'mid';
+}
+function baselineLimitFor(vertical, coverageTypeId, asset) {
+  const entry = covCatalogByKey.get(vertical + '|' + coverageTypeId);
+  if (!entry) return null;
+  const byTier = entry.baseline_limit_by_tier;
+  if (byTier) {
+    let tier;
+    if (vertical === 'yacht') tier = (asset && asset.size_class) || 'S4';
+    else if (vertical === 'aviation') tier = aviationTier(asset && asset.label);
+    else return null;
+    return byTier[tier] != null ? byTier[tier] : null;
+  }
+  return entry.baseline_limit_usd != null ? entry.baseline_limit_usd : null;
+}
+// Real per-overlay-row verdict — 'whitespace' (never bound), 'adequate' (bound
+// at/above the tier's required baseline limit), or 'deficient' (bound BELOW
+// it — real money on file, real gap still open). 'expiring' rows are folded
+// into adequate/deficient by the same limit check — they're already real
+// bound premium today, same as the existing sold/prospected split treats them.
+function overlayGapState(o) {
+  if (o.status !== 'bound' && o.status !== 'expiring') return 'whitespace';
+  const covNode = covNodeById.get(o.coverage_id);
+  if (!covNode) return 'adequate'; // no catalog trace available — never invent a deficiency
+  const asset = covNode.parent_asset_ref ? assetById.get(covNode.parent_asset_ref) : null;
+  const baseline = baselineLimitFor(covNode.vertical, covNode.coverage_type_id, asset);
+  if (baseline != null && o.bound_limit_usd != null && o.bound_limit_usd < baseline) return 'deficient';
+  return 'adequate';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FINANCIALS — every BOUND_POLICY_OVERLAY row carries a real, direct
+// responsible_node_id FK to the exact role that owns it (verified: 1945/1945
+// overlay rows resolve to a role node, 0 misses). No name-matching, no
+// id-parsing heuristics — this is the real join the prior build's dashboard4
+// never used (it hand-matched principal name tokens against free text and
+// crashed on any fine_art-vertical coverage; that whole class of fragility
+// is gone).
+// ════════════════════════════════════════════════════════════════════
+const roleFin = new Map();
+roleNodes.forEach(n => roleFin.set(n.id, { sold: 0, soldAdequate: 0, soldDeficient: 0, deficiencyAmount: 0, prospected: 0, rows: [] }));
+BOUND_POLICY_OVERLAY.forEach(o => {
+  const f = roleFin.get(o.responsible_node_id);
+  if (!f) { console.warn('[Role Macro View] overlay row references an unresolvable role id', o.responsible_node_id); return; }
+  const gState = overlayGapState(o);
+  o._gapState = gState; // tag once here so producer-mode/panel/tooltip reuse it, never recompute
+  f.rows.push(o);
+  if (o.status === 'bound' || o.status === 'expiring') {
+    f.sold += (o.bound_premium || 0);
+    if (gState === 'deficient') {
+      f.soldDeficient += (o.bound_premium || 0);
+      const covNode = covNodeById.get(o.coverage_id);
+      const asset = covNode && covNode.parent_asset_ref ? assetById.get(covNode.parent_asset_ref) : null;
+      const baseline = covNode ? baselineLimitFor(covNode.vertical, covNode.coverage_type_id, asset) : null;
+      if (baseline != null && o.bound_limit_usd != null) { o._deficiencyAmt = baseline - o.bound_limit_usd; f.deficiencyAmount += o._deficiencyAmt; }
+    } else {
+      f.soldAdequate += (o.bound_premium || 0);
+    }
+  } else {
+    f.prospected += (o.gwp_estimate || 0);
+  }
+});
+
+const nodeFinCache = new Map();
+function nodeFinancials(n) {
+  if (nodeFinCache.has(n.id)) return nodeFinCache.get(n.id);
+  const ids = n.node_type === 'principal' ? (rolesByAccount.get(n.id) || []).map(r => r.id) : [n.id];
+  let sold = 0, soldAdequate = 0, soldDeficient = 0, deficiencyAmount = 0, prospected = 0; const rows = [];
+  ids.forEach(id => {
+    const f = roleFin.get(id); if (!f) return;
+    sold += f.sold; soldAdequate += f.soldAdequate; soldDeficient += f.soldDeficient;
+    deficiencyAmount += f.deficiencyAmount; prospected += f.prospected;
+    rows.push.apply(rows, f.rows);
+  });
+  const total = sold + prospected;
+  const result = { sold, soldAdequate, soldDeficient, deficiencyAmount, prospected, total, ratio: total > 0 ? sold / total : null, rows, roleIds: ids };
+  nodeFinCache.set(n.id, result);
+  return result;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PRODUCER GAP SKEW — reuses D1's exact per-producer filtering pattern:
+// RELATIONSHIP_WEIGHTS is keyed by (producer_id, node_id=role id), and a
+// bound overlay row already carries its own producer_of_record name. No
+// new join invented — same two keys D1's rwIndex/producerAccounts already
+// filter on. "This producer's own gap pattern" = the bound premium THEY
+// actually wrote, plus the whitespace on roles where they already have a
+// documented relationship foothold (RELATIONSHIP_WEIGHTS row) to work it —
+// whitespace on a role a producer has never touched is not "their" gap.
+// ════════════════════════════════════════════════════════════════════
+const rwByProducerRole = new Map(RELATIONSHIP_WEIGHTS.map(r => [r.producer_id + '|' + r.node_id, r]));
+const producerFinCache = new Map(); // "producerId|nodeId" -> result
+function nodeFinancialsForProducer(n, producerId) {
+  const producerName = producerNameById.get(producerId);
+  const cacheKey = producerId + '|' + n.id;
+  if (producerFinCache.has(cacheKey)) return producerFinCache.get(cacheKey);
+  const ids = n.node_type === 'principal' ? (rolesByAccount.get(n.id) || []).map(r => r.id) : [n.id];
+  let sold = 0, soldAdequate = 0, soldDeficient = 0, deficiencyAmount = 0, prospected = 0; const rows = [];
+  ids.forEach(id => {
+    const f = roleFin.get(id); if (!f) return;
+    f.rows.forEach(r => {
+      if ((r.status === 'bound' || r.status === 'expiring') && r.producer_of_record === producerName) {
+        sold += (r.bound_premium || 0);
+        if (r._gapState === 'deficient') { soldDeficient += (r.bound_premium || 0); deficiencyAmount += (r._deficiencyAmt || 0); }
+        else soldAdequate += (r.bound_premium || 0);
+        rows.push(r);
+      }
+    });
+    if (rwByProducerRole.has(producerId + '|' + id)) {
+      prospected += f.prospected;
+      f.rows.forEach(r => { if (r.status === 'unbound') rows.push(r); });
+    }
+  });
+  const total = sold + prospected;
+  const result = { sold, soldAdequate, soldDeficient, deficiencyAmount, prospected, total, ratio: total > 0 ? sold / total : null, rows, roleIds: ids };
+  producerFinCache.set(cacheKey, result);
+  return result;
+}
+// Single call site every render/hover/panel function goes through — swaps
+// the whole wheel from "regional aggregate" to "this producer's own book"
+// without touching any of the rendering/panel code that consumes it.
+function currentFin(n) { return state.producerId ? nodeFinancialsForProducer(n, state.producerId) : nodeFinancials(n); }
+
+// NOTE: recomputeMaxNodeTotal() is defined here (next to currentFin(), which
+// it depends on) but not CALLED until renderWheel() — it reads state.producerId
+// via currentFin(), and `state` itself isn't declared until the STATE section
+// below; calling it at module-eval time here would hit the TDZ.
+let MAX_NODE_TOTAL = 1;
+function recomputeMaxNodeTotal() {
+  MAX_NODE_TOTAL = 1;
+  wheelNodes.forEach(n => { MAX_NODE_TOTAL = Math.max(MAX_NODE_TOTAL, currentFin(n).total); });
+}
+
+// Whole-book vertical rollup, via the responsible ROLE's own (normalized)
+// vertical — not the coverage's own vertical tag. This is deliberate: a
+// fine_art coverage responsible-owned by a yacht captain rolls up under
+// Yacht, correctly reflecting who on the org chart actually carries it.
+const verticalRollup = {};
+VERTICALS.forEach(v => verticalRollup[v] = { sold: 0, prospected: 0 });
+roleNodes.forEach(n => {
+  const v = normVertical(n.vertical);
+  const f = roleFin.get(n.id);
+  if (!verticalRollup[v]) { console.warn('[Role Macro View] unexpected role vertical', n.vertical); return; }
+  verticalRollup[v].sold += f.sold;
+  verticalRollup[v].prospected += f.prospected;
+});
+const GRAND_SOLD = VERTICALS.reduce((s, v) => s + verticalRollup[v].sold, 0);
+const GRAND_PROSPECTED = VERTICALS.reduce((s, v) => s + verticalRollup[v].prospected, 0);
+const GRAND_TOTAL = GRAND_SOLD + GRAND_PROSPECTED;
+
+// Domain-level rollup (vertical × 1-9 segment) for the whitespace & limit
+// deficiency heatmap — the same aggregate rollup as verticalRollup above,
+// one level more granular, still summed straight from roleFin (no new
+// join, no re-derivation of numbers already computed above).
+const domainRollup = {}; // key "vertical|domainId" -> {sold, soldAdequate, soldDeficient, deficiencyAmount, prospected}
+VERTICALS.forEach(v => { for (let d = 1; d <= 9; d++) domainRollup[v + '|' + d] = { sold: 0, soldAdequate: 0, soldDeficient: 0, deficiencyAmount: 0, prospected: 0 }; });
+roleNodes.forEach(n => {
+  const v = normVertical(n.vertical);
+  const key = v + '|' + n.domain;
+  const f = roleFin.get(n.id);
+  const d = domainRollup[key];
+  if (!d || !f) return;
+  d.sold += f.sold; d.soldAdequate += f.soldAdequate; d.soldDeficient += f.soldDeficient;
+  d.deficiencyAmount += f.deficiencyAmount; d.prospected += f.prospected;
+});
+
+// ════════════════════════════════════════════════════════════════════
+// PRODUCER BREAKDOWN for a clicked node (role or account/principal)
+// ════════════════════════════════════════════════════════════════════
+function rwRowsFor(n) {
+  const ids = new Set(nodeFinancials(n).roleIds);
+  return RELATIONSHIP_WEIGHTS.filter(r => ids.has(r.node_id));
+}
+function producerBreakdown(n) {
+  const fin = nodeFinancials(n);
+  const soldMap = new Map();
+  fin.rows.filter(r => r.status === 'bound' || r.status === 'expiring').forEach(r => {
+    const name = r.producer_of_record || 'Unassigned';
+    if (!soldMap.has(name)) soldMap.set(name, { name, qty: 0, val: 0, statusCounts: {} });
+    const e = soldMap.get(name);
+    e.qty += 1; e.val += (r.bound_premium || 0);
+    e.statusCounts[r.status] = (e.statusCounts[r.status] || 0) + 1;
+  });
+  // Prospected bucket is honestly NOT a $ figure per producer — Epic/Salesforce
+  // never attribute an unbound estimate to a specific producer (producer_of_record
+  // is null on every unbound row, verified). What IS real per-producer here is
+  // relationship strength: sum of RELATIONSHIP_WEIGHTS.relationship_weight for
+  // every contact this producer already has inside this role/account. That is
+  // what "who already has the strongest foothold" actually sorts on. The
+  // aggregate whitespace $ is shown once, at the role/account level, not
+  // duplicated per row as if it were separable — the same discipline as the
+  // proportional split-fill: never render more certainty than the data has.
+  const prospectMap = new Map();
+  rwRowsFor(n).forEach(r => {
+    const name = producerNameById.get(r.producer_id) || r.producer_id;
+    if (!prospectMap.has(name)) prospectMap.set(name, { name, qty: 0, weight: 0, lastActivity: null });
+    const e = prospectMap.get(name);
+    e.qty += 1; e.weight += r.relationship_weight;
+    if (!e.lastActivity || r.last_activity_date > e.lastActivity) e.lastActivity = r.last_activity_date;
+  });
+  return {
+    sold: [...soldMap.values()].sort((a, b) => b.val - a.val),
+    prospected: [...prospectMap.values()].sort((a, b) => b.weight - a.weight),
+    fin
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// VISUAL ENCODING
+// ════════════════════════════════════════════════════════════════════
+function colorScale(ratio) {
+  if (ratio == null) return 'var(--text3)';
+  const grey = [139,147,163], amber = [224,166,64], green = [46,196,120];
+  let c;
+  if (ratio <= 0.5) { const k = ratio/0.5; c = grey.map((v,i) => Math.round(v + (amber[i]-v)*k)); }
+  else { const k = (ratio-0.5)/0.5; c = amber.map((v,i) => Math.round(v + (green[i]-v)*k)); }
+  return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+}
+function pxRadius(total, isPrincipal) {
+  const floor = isPrincipal ? 3.2 : 2.2;
+  const range = isPrincipal ? 24 : 19;
+  if (!total) return floor;
+  return floor + Math.sqrt(total / MAX_NODE_TOTAL) * range;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════
+const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null, zoom: 1, panX: 0, panY: 0 };
+// Regional-aggregate total for one producer's own book (roleNodes only — not
+// principals — matching how GRAND_TOTAL itself sums off roleFin, never wheelNodes,
+// so a role's dollars are never counted twice through its account rollup).
+function producerGrandTotal(producerId) {
+  let sold = 0, prospected = 0;
+  roleNodes.forEach(n => { const f = nodeFinancialsForProducer(n, producerId); sold += f.sold; prospected += f.prospected; });
+  return { sold, prospected, total: sold + prospected };
+}
+function producerVerticalTotal(vertical, producerId) {
+  let sold = 0, prospected = 0;
+  roleNodes.forEach(n => {
+    if (normVertical(n.vertical) !== vertical) return;
+    const f = nodeFinancialsForProducer(n, producerId); sold += f.sold; prospected += f.prospected;
+  });
+  return sold + prospected;
+}
+const panelEl = document.getElementById('panel');
+const svgByVertical = {};
+const clusterElByVertical = {};
+
+// ════════════════════════════════════════════════════════════════════
+// PENTAGON CANVAS — D0's real technique (dashboard0-ontology-foundation.html),
+// reused verbatim: 5 clusters on a shared coordinate space, each cluster's
+// center on a circle of radius ORBIT_RADIUS, evenly spaced (72° apart),
+// starting at 12 o'clock and going clockwise. CANVAS_SIZE just needs to be
+// big enough that no cluster's absolute box clips outside #canvas-inner.
+// Unlike D0 (which sizes each cluster by role count), D4 sizes each cluster
+// by that vertical's own real $ magnitude — sqrt-scaled between MIN_PX/MAX_PX
+// so area (not radius) tracks $ roughly linearly, same "size communicates the
+// real signal" principle as every other dollar-scaled element in this suite.
+// ════════════════════════════════════════════════════════════════════
+const ORBIT_RADIUS = 700;
+const CANVAS_SIZE = 2700;
+const CLUSTER_MIN_PX = 540, CLUSTER_MAX_PX = 1000;
+function verticalTotal(v) { return verticalRollup[v].sold + verticalRollup[v].prospected; }
+const VERTICAL_TOTAL_LO = Math.min(...VERTICALS.map(verticalTotal));
+const VERTICAL_TOTAL_HI = Math.max(...VERTICALS.map(verticalTotal));
+function verticalPx(v) {
+  if (VERTICAL_TOTAL_HI <= VERTICAL_TOTAL_LO) return Math.round((CLUSTER_MIN_PX + CLUSTER_MAX_PX) / 2);
+  const frac = Math.sqrt((verticalTotal(v) - VERTICAL_TOTAL_LO) / (VERTICAL_TOTAL_HI - VERTICAL_TOTAL_LO));
+  return Math.round(CLUSTER_MIN_PX + frac * (CLUSTER_MAX_PX - CLUSTER_MIN_PX));
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ZOOM & PAN — same interaction model as D0/D1/D2: plain scroll wheel
+// zooms, click-drag pans, zoom is anchored to the viewport CENTER (the
+// content point under the middle of the visible canvas stays put).
+// ════════════════════════════════════════════════════════════════════
+function applyZoom() {
+  document.getElementById('canvas-inner').style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+}
+function zoomBy(delta) {
+  const newZoom = Math.max(0.25, Math.min(2.5, state.zoom + delta));
+  if (newZoom === state.zoom) return;
+  const canvas = document.getElementById('universe-canvas');
+  const vx = canvas.clientWidth / 2, vy = canvas.clientHeight / 2;
+  const contentX = (vx - state.panX) / state.zoom, contentY = (vy - state.panY) / state.zoom;
+  state.panX = vx - newZoom * contentX;
+  state.panY = vy - newZoom * contentY;
+  state.zoom = newZoom;
+  applyZoom();
+}
+function centerView() {
+  const canvas = document.getElementById('universe-canvas');
+  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+(function(){
+  const canvasEl = document.getElementById('universe-canvas');
+  canvasEl.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+  let drag = null;
+  canvasEl.addEventListener('mousedown', (e) => { drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false }; canvasEl.classList.add('dragging'); });
+  canvasEl.addEventListener('mousemove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    if (drag.moved) { state.panX = drag.panX + dx; state.panY = drag.panY + dy; applyZoom(); }
+  });
+  function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
+  canvasEl.addEventListener('mouseup', endDrag);
+  canvasEl.addEventListener('mouseleave', endDrag);
+})();
+
+// ════════════════════════════════════════════════════════════════════
+// WHEEL — RingEngine.render() draws layout/rings/domain wedges/tooltip
+// wiring/click wiring exactly as shipped, once PER VERTICAL against the
+// plain 9-segment domains. Everything below is a post-processing pass on
+// the DOM each call produces: (1) inject that svg's own hatch <defs>
+// pattern, (2) replace each node's plain circle with a proportional
+// solid/hatched split-fill built from the SAME x/y/r RingEngine already
+// computed, (3) tag each node with data-ring so the ring filter can dim
+// in place without re-running layout.
+// ════════════════════════════════════════════════════════════════════
+function injectDefs(svg, v) {
+  svg.insertAdjacentHTML('afterbegin',
+    '<defs><pattern id="hatch-prospect-' + v + '" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+    '<rect width="5" height="5" fill="none"/>' +
+    '<line x1="0" y1="0" x2="0" y2="5" stroke="var(--text2)" stroke-width="1.6" stroke-opacity="0.85"/>' +
+    '</pattern></defs>'
+  );
+}
+
+// Draws one full-circle-or-pie-wedge segment for splitFillNode() below —
+// factored out so the 1/2/3-slice cases share one arc-path formula instead
+// of three hand-duplicated ones (the single-segment case just skips the path
+// math entirely and fills the whole circle, avoiding the classic 0-sweep-arc
+// SVG degenerate case).
+function arcSegPath(cx, cy, r, startAngle, sweep) {
+  const end = startAngle + sweep;
+  const large = sweep > Math.PI ? 1 : 0;
+  const p0x = cx + r * Math.cos(startAngle), p0y = cy + r * Math.sin(startAngle);
+  const p1x = cx + r * Math.cos(end), p1y = cy + r * Math.sin(end);
+  return 'M ' + cx + ' ' + cy + ' L ' + p0x + ' ' + p0y + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + p1x + ' ' + p1y + ' Z';
+}
+
+// Split-fill: up to 3 wedges per node — Adequate (solid, penetration color),
+// Deficient (solid, rust — bound but under the tier's required limit), and
+// Whitespace (hatched, penetration color at low opacity — never written).
+// When soldDeficient is 0 (the overwhelming majority of nodes) this collapses
+// to EXACTLY the original 2-wedge sold/prospected rendering — same paths,
+// same opacities — so the pre-existing macro read never regresses.
+function splitFillNode(p, svg, v) {
+  const n = p.n;
+  const isPrincipal = n.node_type === 'principal';
+  const fin = currentFin(n);
+  const g = svg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
+  if (!g) return;
+  g.setAttribute('data-ring', n.ring);
+  g.setAttribute('data-deficient', fin.soldDeficient > 0 ? '1' : '0');
+  const hatchUrl = 'url(#hatch-prospect-' + v + ')';
+  const cx = p.x, cy = p.y, r = p.r;
+  const isActive = state.selectedId === n.id;
+  let inner = '';
+  if (isActive) {
+    inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 6) + '" fill="' + (fin.total > 0 ? colorScale(fin.ratio) : 'var(--text3)') + '" fill-opacity="0.18"/>';
+  }
+  if (fin.total <= 0) {
+    inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="var(--text3)" fill-opacity="0.28" stroke="var(--text3)" stroke-opacity="0.5" stroke-width="1"/>';
+  } else {
+    const col = colorScale(fin.ratio);
+    const sw = isPrincipal ? 2 : 1.2;
+    const segs = [
+      { frac: fin.soldAdequate / fin.total, fill: col, opacity: 0.92, hatch: false },
+      { frac: fin.soldDeficient / fin.total, fill: 'var(--status-deficient)', opacity: 0.92, hatch: false },
+      { frac: fin.prospected / fin.total, fill: col, opacity: 0.22, hatch: true },
+    ].filter(s => s.frac > 0.0005);
+    if (segs.length <= 1) {
+      const s = segs[0] || { fill: col, opacity: 0.22, hatch: true };
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
+      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + hatchUrl + '"/>';
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.fill + '" stroke-width="' + sw + '"/>';
+    } else {
+      let start = -Math.PI / 2;
+      segs.forEach(s => {
+        const sweep = s.frac * Math.PI * 2;
+        const d = arcSegPath(cx, cy, r, start, sweep);
+        inner += '<path d="' + d + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
+        if (s.hatch) inner += '<path d="' + d + '" fill="' + hatchUrl + '"/>';
+        start += sweep;
+      });
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"/>';
+    }
+  }
+  g.innerHTML = inner;
+}
+
+// Small floating corner label per cluster — vertical name + a real summary
+// stat (this vertical's own $ total, whole-book or the active producer's own
+// gap pattern). This replaces the old combined-wheel's center hub + mega-
+// segment overlay labels (drawHub()/drawVerticalOverlay(), both retired) —
+// same real numbers, now anchored per-cluster instead of drawn onto one wheel.
+function updateClusterMeta(v) {
+  const meta = document.getElementById('meta-' + v);
+  if (!meta) return;
+  const producer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
+  const total = producer ? producerVerticalTotal(v, state.producerId) : verticalTotal(v);
+  const roleCount = wheelNodesByVertical[v].filter(n => n.node_type === 'role').length;
+  meta.textContent = fmtMoney(total) + (producer ? " · " + producer.name + "'s book" : ' · Whole Book') + ' · ' + roleCount + ' roles';
+}
+
+function renderUniverse(v) {
+  const svg = svgByVertical[v];
+  const nodes = wheelNodesByVertical[v];
+  const px = verticalPx(v);
+  const HUB_MAX_R = RingEngine.DEFAULT_RING.RO[4] + 200;
+  const fitZoom = px / (2 * (HUB_MAX_R + 30));
+  const { layout } = RingEngine.render(svg, {
+    nodes, domains: PLAIN_DOMAINS,
+    colorFn: n => { const f = currentFin(n); return f.total > 0 ? colorScale(f.ratio) : 'var(--text3)'; },
+    sizeFn: n => pxRadius(currentFin(n).total, n.node_type === 'principal'),
+    scoreFn: n => currentFin(n).total || 0,
+    ringOf: n => n.ring,
+    domainOf: n => n.domain,
+    labelFn: n => n.label,
+    edges: [],
+    activeId: state.selectedId,
+    showLabels: false,
+    vz: Math.max(0.12, fitZoom),
+    onSelect: n => { state.selectedId = n.id; renderAll(); },
+    onHover: (evt, n) => {
+      const f = currentFin(n);
+      const meta = 'RING ' + n.ring + ' · ' + VERTICAL_LABELS[normVertical(n.vertical)];
+      let desc;
+      if (f.total > 0) {
+        desc = fmtMoney(f.total) + ' touching this ' + (n.node_type === 'principal' ? 'account' : 'role') + ' — ' + fmtPct(f.ratio) + ' bound, ' + fmtPct(1 - f.ratio) + ' estimated';
+        if (f.soldDeficient > 0) desc += ' · ' + fmtMoney(f.soldDeficient) + ' of the bound share is under-limit (deficient), ' + fmtMoney(f.deficiencyAmount) + ' short of required';
+      } else {
+        desc = 'No modeled coverage responsibility on file for this ' + (n.node_type === 'principal' ? 'account' : 'role') + ' yet.';
+      }
+      RingEngine.tooltip.show(evt, n.label, meta, desc);
+    },
+    onLeave: RingEngine.tooltip.hide,
+  });
+  injectDefs(svg, v);
+  layout.forEach(p => splitFillNode(p, svg, v));
+  updateClusterMeta(v);
+}
+
+function renderWheel() {
+  recomputeMaxNodeTotal(); // must run before sizeFn below — reflects the active producer mode, GLOBAL across all 5 wheels (not per-vertical) so node radii stay comparable across verticals
+  const inner = document.getElementById('canvas-inner');
+  inner.innerHTML = '';
+  inner.style.width = CANVAS_SIZE + 'px';
+  inner.style.height = CANVAS_SIZE + 'px';
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  VERTICALS.forEach((v, i) => {
+    const px = verticalPx(v);
+    const angle = (2 * Math.PI * i / VERTICALS.length) - Math.PI / 2;
+    const clusterCx = cx + ORBIT_RADIUS * Math.cos(angle);
+    const clusterCy = cy + ORBIT_RADIUS * Math.sin(angle);
+    // Frameless — no card border, no per-cluster background. Just the wheel
+    // and a small floating label anchored to its corner (D0's own pattern).
+    const cluster = document.createElement('div');
+    cluster.className = 'ucluster';
+    cluster.style.left = (clusterCx - px / 2) + 'px';
+    cluster.style.top = (clusterCy - px / 2) + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', px); svg.setAttribute('height', px);
+    svgByVertical[v] = svg;
+    cluster.appendChild(svg);
+    const label = document.createElement('div');
+    label.className = 'ucluster-label';
+    label.innerHTML = '<span class="ucluster-name">' + VERTICAL_LABELS[v] + '</span><span class="ucluster-meta" id="meta-' + v + '"></span>';
+    cluster.appendChild(label);
+    inner.appendChild(cluster);
+    clusterElByVertical[v] = cluster;
+    renderUniverse(v);
+  });
+  applyZoom();
+  applyFilters();
+}
+
+function applyFilters() {
+  VERTICALS.forEach(v => {
+    const cluster = clusterElByVertical[v];
+    const svg = svgByVertical[v];
+    if (!cluster || !svg) return;
+    const activeV = state.activeVerticals.has(v);
+    cluster.style.opacity = activeV ? '1' : '0.12';
+    cluster.style.pointerEvents = activeV ? 'auto' : 'none';
+    if (activeV) {
+      svg.querySelectorAll('g[data-nid]').forEach(el => {
+        const ring = el.getAttribute('data-ring');
+        const show = state.ringFilter === 'all' || state.ringFilter === ring;
+        el.style.opacity = show ? '1' : '0.08';
+        el.style.pointerEvents = show ? 'auto' : 'none';
+      });
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// LEFT RAIL
+// ════════════════════════════════════════════════════════════════════
+document.getElementById('whole-book-tag').textContent = 'Whole Book — ' + fmtMoney(GRAND_TOTAL);
+
+function renderCompBar() {
+  const pct = GRAND_TOTAL > 0 ? (GRAND_SOLD / GRAND_TOTAL * 100) : 0;
+  document.getElementById('comp-sold').style.width = pct + '%';
+  document.getElementById('comp-prospect').style.width = (100 - pct) + '%';
+  document.getElementById('comp-num').textContent = fmtPct(GRAND_SOLD/GRAND_TOTAL) + ' bound · ' + fmtPct(GRAND_PROSPECTED/GRAND_TOTAL) + ' estimated, whole book';
+}
+
+function renderVCards() {
+  const wrap = document.getElementById('vcards');
+  wrap.innerHTML = VERTICALS.map(v => {
+    const roll = verticalRollup[v];
+    const total = roll.sold + roll.prospected;
+    const pct = total > 0 ? (roll.sold/total*100) : 0;
+    const isolated = state.activeVerticals.size === 1 && state.activeVerticals.has(v);
+    const dim = state.activeVerticals.size < VERTICALS.length && !state.activeVerticals.has(v);
+    return '<div class="vcard' + (dim?' dim':'') + (isolated?' isolated':'') + '" data-vertical="' + v + '">' +
+      '<div class="vcard-top"><span class="vcard-name">' + VERTICAL_LABELS[v] + '</span><span class="vcard-val">' + fmtMoney(total) + '</span></div>' +
+      '<div class="vcard-bar"><div class="vcard-bar-sold" style="width:' + pct + '%"></div><div class="vcard-bar-prospect" style="width:' + (100-pct) + '%"></div></div>' +
+    '</div>';
+  }).join('');
+  wrap.querySelectorAll('.vcard').forEach(el => {
+    el.addEventListener('click', () => {
+      // Click isolates this vertical (the common case: "show me just Auto");
+      // clicking the already-isolated card resets to all 5. Explicit
+      // multi-exclude isn't offered here — the "reset" link plus this one
+      // click already covers every state a filter card needs to reach.
+      const v = el.dataset.vertical;
+      if (state.activeVerticals.size === 1 && state.activeVerticals.has(v)) state.activeVerticals = new Set(VERTICALS);
+      else state.activeVerticals = new Set([v]);
+      renderVCards(); applyFilters();
+    });
+  });
+}
+
+function renderRail() {
+  document.getElementById('grand-total').textContent = fmtMoney(GRAND_TOTAL);
+  document.getElementById('grand-total-sub').textContent = fmtMoney(GRAND_SOLD) + ' bound · ' + fmtMoney(GRAND_PROSPECTED) + ' estimated whitespace across ' + principalNodes.length + ' UBO accounts, ' + VERTICALS.length + ' verticals';
+  renderVCards();
+}
+
+document.getElementById('vfilter-reset').addEventListener('click', () => { state.activeVerticals = new Set(VERTICALS); renderVCards(); applyFilters(); });
+document.getElementById('sel-ring').addEventListener('change', e => { state.ringFilter = e.target.value; applyFilters(); });
+document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+
+// Producer Gap Skew — same 5 real producers rosters.js already loads for
+// D1's own producer picker (Alex/Rahul/Jacob/Cristian/Naomi); selecting one
+// re-colors/re-sizes the whole wheel to THEIR own gap pattern (see
+// nodeFinancialsForProducer()/currentFin() above) instead of the regional
+// aggregate — reset to "Regional Aggregate" to go back.
+const selProducer = document.getElementById('sel-producer');
+PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name; selProducer.appendChild(o); });
+selProducer.addEventListener('change', e => { state.producerId = e.target.value || null; renderAll(); });
+
+// ════════════════════════════════════════════════════════════════════
+// RIGHT PANEL
+// ════════════════════════════════════════════════════════════════════
+function rowsHtmlSold(list) {
+  return list.map(r => '<tr><td><div class="prod-name">' + escapeXML(r.name) + '</div><div class="prod-sub">' + (r.statusCounts.bound||0) + ' bound' + (r.statusCounts.expiring ? ', ' + r.statusCounts.expiring + ' expiring' : '') + '</div></td><td style="text-align:center">' + r.qty + '</td><td style="text-align:right;font-weight:700" class="num">' + fmtMoney(r.val) + '</td></tr>').join('');
+}
+function renderSoldTable(list) {
+  if (!list.length) return '<p class="empty-note">No producer has bound coverage tied to this role yet.</p>';
+  return '<table class="prod-table" data-kind="sold"><thead><tr><th>Producer</th><th data-sort="qty" style="text-align:center;width:44px">Qty</th><th data-sort="val" style="text-align:right;width:90px">$ Bound ▼</th></tr></thead><tbody>' + rowsHtmlSold(list) + '</tbody></table>';
+}
+function rowsHtmlProspect(list) {
+  return list.map(r => '<tr><td><div class="prod-name">' + escapeXML(r.name) + '</div><div class="prod-sub">last active ' + (r.lastActivity||'—') + '</div></td><td style="text-align:center">' + r.qty + '</td><td style="text-align:right;font-weight:700" class="num">' + r.weight.toFixed(1) + '</td></tr>').join('');
+}
+function renderProspectTable(list) {
+  if (!list.length) return '<p class="empty-note">No producer has a logged relationship touching this role yet.</p>';
+  return '<table class="prod-table" data-kind="prospect"><thead><tr><th>Producer</th><th data-sort="qty" style="text-align:center;width:44px">Qty</th><th data-sort="weight" style="text-align:right;width:90px">Σ Weight ▼</th></tr></thead><tbody>' + rowsHtmlProspect(list) + '</tbody></table>';
+}
+function wireSortButtons(bd) {
+  document.querySelectorAll('#panel .prod-table').forEach(table => {
+    const kind = table.dataset.kind;
+    const list = kind === 'sold' ? bd.sold : bd.prospected;
+    table.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const field = th.dataset.sort;
+        if (kind === 'sold') list.sort((a,b) => field==='qty' ? b.qty-a.qty : b.val-a.val);
+        else list.sort((a,b) => field==='qty' ? b.qty-a.qty : b.weight-a.weight);
+        table.querySelector('tbody').innerHTML = kind === 'sold' ? rowsHtmlSold(list) : rowsHtmlProspect(list);
+      });
+    });
+  });
+}
+
+function renderNodePanel(n) {
+  const fin = nodeFinancials(n);
+  const bd = producerBreakdown(n);
+  const isPrincipal = n.node_type === 'principal';
+  const v = normVertical(n.vertical);
+  const ringLabel = RingEngine.DEFAULT_RING.RL[n.ring];
+  const soldPct = fin.total ? (fin.sold/fin.total*100) : 0;
+  const xEdges = isPrincipal
+    ? EDGES_720.filter(e => e.edge_type === 'cross_pollination' && fin.roleIds.indexOf(e.from) !== -1)
+    : EDGES_720.filter(e => e.edge_type === 'cross_pollination' && e.from === n.id);
+  const acct = isPrincipal ? null : nodeById.get(n.account_ref);
+  const activeProducer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
+
+  let html = '' +
+    '<div class="panel-header">' +
+      '<div class="panel-title">' + escapeXML(n.label) + '</div>' +
+      '<div class="panel-meta-row">' +
+        '<span class="badge badge-ring">' + (isPrincipal ? 'Ring 0 · ' + ringLabel : 'Ring ' + n.ring + ' · ' + ringLabel) + '</span>' +
+        (isPrincipal ? '' : '<span class="badge badge-coi ' + n.coi_type + '">' + n.coi_type + '</span>') +
+        '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + VERTICAL_LABELS[v] + ' · ' + escapeXML(domainName(n.vertical, n.domain)) + '</span>' +
+      '</div>' +
+    '</div>' +
+    (activeProducer ? '<p class="empty-note" style="margin:-4px 0 10px">Wheel is currently colored/sized to <strong style="color:var(--text2)">' + escapeXML(activeProducer.name) + "'s</strong> own gap pattern — the figures below are the full regional detail for this node (every producer), the same reference view regardless of the wheel toggle.</p>" : '') +
+    '<div class="box">' +
+      '<h3>' + (isPrincipal ? 'Total $ Touching This Account' : 'Total $ Touching This Role') + '</h3>' +
+      '<p class="num" style="font-size:26px;font-weight:900;color:var(--text)">' + fmtMoney(fin.total) + '</p>' +
+      (fin.total > 0 ?
+        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--status-bound)"></div></div></div></div>' +
+        '<div class="info-row" style="grid-template-columns:1fr 1fr;margin-top:5px"><span class="info-val">Bound ' + fmtMoney(fin.sold) + '</span><span class="info-val" style="text-align:right">Estimated whitespace ' + fmtMoney(fin.prospected) + '</span></div>' +
+        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--status-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient) — ' + fmtMoney(fin.deficiencyAmount) + ' short of the tier-required baseline across those lines</span></div>' : '')
+        : '<p class="empty-note" style="margin-top:6px">No bound or estimated coverage is currently modeled as this ' + (isPrincipal ? 'account' : "role's") + ' responsibility.</p>') +
+      (acct ? '<div style="margin-top:9px;font-size:11px;color:var(--text3)">Account: <strong style="color:var(--text2)">' + escapeXML(acct.label) + '</strong></div>' : '') +
+    '</div>' +
+    (xEdges.length ? '<div class="box"><h3>Cross-Pollination Path</h3>' + xEdges.map(e => '<p>' + escapeXML(e.generated_narrative || e.why) + '</p>').join('') + '</div>' : '') +
+    '<div class="box"><h3>Sold / Bound — by Producer</h3>' + renderSoldTable(bd.sold) + '</div>' +
+    '<div class="box"><h3>Prospected — Relationship Foothold by Producer</h3>' + renderProspectTable(bd.prospected) +
+      (fin.prospected > 0 ? '<p class="empty-note" style="margin-top:8px">Total estimated whitespace here: <strong style="color:var(--text)">' + fmtMoney(fin.prospected) + '</strong> — not separable by producer in this dataset (Salesforce doesn’t attribute an unbound estimate to one rep); the table above ranks who already has an existing relationship to work it.</p>' : '') +
+    '</div>' +
+    '<div class="box"><h3>' + (isPrincipal ? 'Account Detail' : 'Role Detail') + '</h3><p>' + escapeXML(n.desc || '') + '</p></div>';
+
+  panelEl.innerHTML = html;
+  wireSortButtons(bd);
+}
+
+function renderBeachheadsPanel() {
+  const rows = principalNodes.map(p => ({ p, fin: nodeFinancials(p) }))
+    .filter(r => r.fin.prospected > 0)
+    .sort((a,b) => b.fin.prospected - a.fin.prospected)
+    .slice(0, 10);
+  let html = '<div class="panel-header">' +
+    '<div class="panel-title">Top Beachheads</div>' +
+    '<div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5">Accounts carrying the most estimated whitespace across every role touching them, region-wide. Click any node on the wheel — or a row below — for full producer detail.</div>' +
+  '</div>';
+  rows.forEach(r => {
+    const verticals = Array.from(new Set((rolesByAccount.get(r.p.id)||[]).map(x => VERTICAL_LABELS[normVertical(x.vertical)])));
+    html += '<div class="lr-row beach-row" data-id="' + r.p.id + '" style="margin-bottom:7px">' +
+      '<div><div class="lr-row-label">' + escapeXML(r.p.label) + '</div><div class="lr-row-sub">' + verticals.join(' · ') + '</div></div>' +
+      '<div class="beach-val"><div class="lr-row-score num" style="font-weight:800;color:var(--text);font-size:13px">' + fmtMoney(r.fin.prospected) + '</div><div class="lr-row-sub">estimated whitespace</div></div>' +
+    '</div>';
+  });
+  panelEl.innerHTML = html;
+  panelEl.querySelectorAll('.lr-row').forEach(el => el.addEventListener('click', () => { state.selectedId = el.dataset.id; renderAll(); }));
+}
+
+function renderPanel() {
+  if (!state.selectedId) { renderBeachheadsPanel(); return; }
+  const n = nodeById.get(state.selectedId);
+  if (!n) { renderBeachheadsPanel(); return; }
+  renderNodePanel(n);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// WHITESPACE & LIMIT DEFICIENCY HEATMAP — overlay panel, toggled on top of
+// the wheel (never replacing it). Reads domainRollup (built once, up in the
+// FINANCIALS section, straight off the same roleFin numbers everything else
+// on this page already uses) — 9 canonical segments × 5 verticals, 45 real
+// cells matching the 45-sector wheel 1:1.
+// ════════════════════════════════════════════════════════════════════
+function renderHeatmap() {
+  const grid = document.getElementById('heatmap-grid');
+  let html = '<div class="hm-head"></div>' + VERTICALS.map(v => '<div class="hm-head">' + VERTICAL_LABELS[v] + '</div>').join('');
+  SEGMENTS.forEach(seg => {
+    html += '<div class="hm-rowlbl">' + escapeXML(seg.name) + '</div>';
+    VERTICALS.forEach(v => {
+      const d = domainRollup[v + '|' + seg.id] || { sold: 0, soldAdequate: 0, soldDeficient: 0, deficiencyAmount: 0, prospected: 0 };
+      const total = d.sold + d.prospected;
+      if (total <= 0) { html += '<div class="hm-cell"><span class="hm-cell-empty">no coverage on file</span></div>'; return; }
+      const deficientRatio = d.sold > 0 ? d.soldDeficient / d.sold : 0;
+      const bg = deficientRatio > 0 ? ('rgba(161,90,46,' + (0.08 + deficientRatio * 0.34).toFixed(3) + ')') : 'transparent';
+      const pctA = d.soldAdequate / total * 100, pctD = d.soldDeficient / total * 100, pctW = d.prospected / total * 100;
+      const title = seg.name + ' · ' + VERTICAL_LABELS[v] + ' — Adequate ' + fmtMoney(d.soldAdequate) + ', Deficient ' + fmtMoney(d.soldDeficient) +
+        (d.soldDeficient > 0 ? ' (' + fmtMoney(d.deficiencyAmount) + ' short of required limits)' : '') + ', Whitespace ' + fmtMoney(d.prospected);
+      html += '<div class="hm-cell" style="background:' + bg + '" title="' + escapeXML(title) + '">' +
+        '<span class="hm-cell-total">' + fmtMoney(total) + '</span>' +
+        '<div class="hm-cell-bar"><div class="hm-seg-adequate" style="width:' + pctA + '%"></div><div class="hm-seg-deficient" style="width:' + pctD + '%"></div><div class="hm-seg-whitespace" style="width:' + pctW + '%"></div></div>' +
+      '</div>';
+    });
+  });
+  grid.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CARRIER CONCENTRATION RADAR — real carrier field off BOUND_POLICY_OVERLAY
+// (bound + expiring rows only — the same "sold" definition roleFin already
+// uses), aggregated to premium + line count per carrier. Ranked list gives
+// the exact traceable $ figures; the radar/spoke chart gives the shape of
+// concentration at a glance.
+// ════════════════════════════════════════════════════════════════════
+function buildCarrierRadar(rows, maxPremium) {
+  const n = rows.length;
+  if (!n) return '<p class="empty-note">No bound carrier data.</p>';
+  const size = 320, cx = size / 2, cy = size / 2, maxR = 112;
+  const angleStep = (Math.PI * 2) / n;
+  let ring = '', spokes = '', labels = '';
+  const poly = [];
+  [0.25, 0.5, 0.75, 1].forEach(f => {
+    const pts = [];
+    for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * angleStep; pts.push((cx + Math.cos(a) * maxR * f).toFixed(1) + ',' + (cy + Math.sin(a) * maxR * f).toFixed(1)); }
+    ring += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--border2)" stroke-width="1" opacity="0.6"/>';
+  });
+  rows.forEach((r, i) => {
+    const a = -Math.PI / 2 + i * angleStep;
+    const frac = maxPremium > 0 ? r.premium / maxPremium : 0;
+    const px = cx + Math.cos(a) * maxR * frac, py = cy + Math.sin(a) * maxR * frac;
+    poly.push(px.toFixed(1) + ',' + py.toFixed(1));
+    spokes += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + Math.cos(a) * maxR).toFixed(1) + '" y2="' + (cy + Math.sin(a) * maxR).toFixed(1) + '" stroke="var(--border2)" stroke-width="1" opacity="0.5"/>';
+    const lx = cx + Math.cos(a) * (maxR + 30), ly = cy + Math.sin(a) * (maxR + 30);
+    const anchor = Math.cos(a) > 0.15 ? 'start' : (Math.cos(a) < -0.15 ? 'end' : 'middle');
+    const shortName = r.carrier.length > 18 ? r.carrier.slice(0, 17) + '…' : r.carrier;
+    labels += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '" font-size="10" font-weight="700" fill="var(--text2)">' + escapeXML(shortName) + '</text>';
+    labels += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4" fill="var(--accent)"><title>' + escapeXML(r.carrier) + ' — ' + fmtMoney(r.premium) + ', ' + r.count + ' lines</title></circle>';
+  });
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + ring + spokes +
+    '<polygon points="' + poly.join(' ') + '" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2"/>' + labels + '</svg>';
+}
+function renderCarrierPanel() {
+  const byCarrier = new Map();
+  BOUND_POLICY_OVERLAY.forEach(o => {
+    if ((o.status !== 'bound' && o.status !== 'expiring') || !o.carrier) return;
+    if (!byCarrier.has(o.carrier)) byCarrier.set(o.carrier, { carrier: o.carrier, premium: 0, count: 0 });
+    const e = byCarrier.get(o.carrier);
+    e.premium += (o.bound_premium || 0);
+    e.count += 1;
+  });
+  const rows = [...byCarrier.values()].sort((a, b) => b.premium - a.premium);
+  const totalPremium = rows.reduce((s, r) => s + r.premium, 0);
+  const maxPremium = rows.length ? rows[0].premium : 1;
+  const rankedHtml = rows.map((r, i) => {
+    const pct = totalPremium > 0 ? (r.premium / totalPremium) : 0;
+    const barPct = maxPremium > 0 ? (r.premium / maxPremium * 100) : 0;
+    return '<div class="carrier-row">' +
+      '<span class="carrier-rank">#' + (i + 1) + '</span>' +
+      '<div style="flex:1"><span class="carrier-name">' + escapeXML(r.carrier) + '</span>' +
+      '<div class="carrier-bar-track"><div class="carrier-bar-fill" style="width:' + barPct + '%"></div></div></div>' +
+      '<div class="carrier-figs"><strong>' + fmtMoney(r.premium) + '</strong>' + r.count + ' bound lines · ' + fmtPct(pct) + ' of book</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('carrier-body').innerHTML =
+    '<div class="carrier-ranked"><div class="empty-note" style="margin-bottom:8px">Ranked by real bound + expiring premium — ' + rows.length + ' carriers, ' + fmtMoney(totalPremium) + ' total on file.</div>' + rankedHtml + '</div>' +
+    '<div class="carrier-radar-wrap">' + buildCarrierRadar(rows, maxPremium) + '</div>';
+}
+
+const heatmapModal = document.getElementById('heatmap-modal');
+const carrierModal = document.getElementById('carrier-modal');
+const btnHeatmap = document.getElementById('btn-heatmap');
+const btnCarriers = document.getElementById('btn-carriers');
+btnHeatmap.addEventListener('click', () => {
+  carrierModal.classList.remove('open'); btnCarriers.classList.remove('on');
+  const opening = !heatmapModal.classList.contains('open');
+  heatmapModal.classList.toggle('open', opening); btnHeatmap.classList.toggle('on', opening);
+  if (opening) renderHeatmap();
+});
+document.getElementById('heatmap-close').addEventListener('click', () => { heatmapModal.classList.remove('open'); btnHeatmap.classList.remove('on'); });
+btnCarriers.addEventListener('click', () => {
+  heatmapModal.classList.remove('open'); btnHeatmap.classList.remove('on');
+  const opening = !carrierModal.classList.contains('open');
+  carrierModal.classList.toggle('open', opening); btnCarriers.classList.toggle('on', opening);
+  if (opening) renderCarrierPanel();
+});
+document.getElementById('carrier-close').addEventListener('click', () => { carrierModal.classList.remove('open'); btnCarriers.classList.remove('on'); });
+
+// ════════════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════════════
+function renderAll() { renderRail(); renderWheel(); renderPanel(); }
+// Each cluster's own <svg> has explicit fixed width/height (verticalPx(v)),
+// not "100%", so a window resize doesn't require refitting content — only
+// the pan/zoom viewport around it changes. Rebuilding on resize is kept
+// anyway (cheap, ~300 nodes total) for parity with D0's own resize handler.
+window.addEventListener('resize', renderWheel);
+renderCompBar();
+renderAll();
+centerView();
+applyZoom();
+RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
+</script>
+</body>
+</html>

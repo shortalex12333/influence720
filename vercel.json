@@ -3,6 +3,7 @@
   "name": "influence720",
   "cleanUrls": true,
   "trailingSlash": false,
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/d0", "destination": "/05-build/dashboard0-ontology-foundation.html" },

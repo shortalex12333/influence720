@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Leadership Book Rollup</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-3-specific rules only — everything shared lives in engine/style-core.css.
+   Do not redefine a shared class here; only add new, dashboard-local ones. */
+
+#panel-toggle{position:absolute;top:50%;left:-20px;transform:translateY(-50%);z-index:30;width:20px;height:56px;background:var(--surface);border:1px solid var(--accent);border-right:none;border-radius:6px 0 0 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;font-weight:700;padding:0}
+#panel-toggle:hover{background:var(--surface2);color:var(--text)}
+.panel-wrap.collapsed #panel-toggle{border-right:1px solid var(--border2);border-radius:6px}
+
+.filter-sel.producer-sel{border-color:var(--accent);font-weight:700;color:var(--accent);background-color:var(--surface)}
+
+.state-crumb{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border)}
+.state-crumb button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;padding:0}
+
+/* Legend — dashboard-local overlay, same placement convention as Dashboard 1 */
+.legend{position:absolute;right:16px;top:16px;display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--text2);max-width:230px}
+.legend-title{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:2px}
+.legend-row{display:flex;align-items:center;gap:7px}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.legend-sw{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.legend-note{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4}
+
+/* Vertical-breakdown bar rows — own component; style-core's .score-chart
+   reserves only 40px for its value column, too narrow for these $ figures,
+   so this is a new class rather than a redefinition of a shared one. */
+.vb-row{display:grid;grid-template-columns:82px 1fr 82px;align-items:center;gap:8px;margin-bottom:7px}
+.vb-row:last-child{margin-bottom:0}
+.vb-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)}
+.vb-track{height:9px;background:var(--surface3);border-radius:999px;overflow:hidden}
+.vb-fill{height:9px;border-radius:999px}
+.vb-val{font-size:11.5px;font-weight:700;color:var(--text);text-align:right}
+
+/* "Suspected additional exposure" — a distinct, deliberately muted signal,
+   never the red/amber palette used for bound-with-us status (founder
+   clarification: an unmapped vertical is not the same claim as a known,
+   unbound coverage line). */
+.chip.unmapped-chip{border-style:dashed;border-color:var(--text3);color:var(--text3);font-style:italic}
+
+.open-hint{font-size:10.5px;color:var(--accent);font-weight:700;margin-top:2px}
+.lr-row-money{font-size:11px;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Leadership Book Rollup</div>
+    <div class="h-sub">All five producers at once — node size is total book value, the ring around each shows their vertical mix. Click a producer to open their accounts; click an account to open its full coverage picture in the Whitespace / Gap Engine.</div>
+  </div>
+  <div class="h-ctrl">
+    <span class="vtag" id="viewer-tag">Viewing as —</span>
+    <div class="filter-group">
+      <label class="filter-lbl">Salesman</label>
+      <select id="f-producer" class="filter-sel producer-sel"></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Coverage (Missing)</label>
+      <select id="f-missing" class="filter-sel"><option value="">Any</option></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Coverage (Held)</label>
+      <select id="f-held" class="filter-sel"><option value="">Any</option></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Account Size</label>
+      <select id="f-size" class="filter-sel"><option value="">All</option></select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Expiry</label>
+      <select id="f-expiry" class="filter-sel">
+        <option value="">Any time</option>
+        <option value="30">Within 30 days</option>
+        <option value="60">Within 60 days</option>
+        <option value="90">Within 90 days</option>
+        <option value="180">Within 180 days</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Vertical</label>
+      <select id="f-vertical" class="filter-sel">
+        <option value="">All</option>
+        <option value="yacht">Yacht</option>
+        <option value="aviation">Aviation</option>
+        <option value="real_estate">Real Estate</option>
+        <option value="auto">Auto</option>
+        <option value="personal">Personal</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-lbl">Account Status</label>
+      <select id="f-status" class="filter-sel">
+        <option value="">All</option>
+        <option value="Active">Active</option>
+        <option value="Expiring">Expiring</option>
+        <option value="Lost">Lost</option>
+      </select>
+    </div>
+    <button class="btn" id="btn-reset">Reset Filters</button>
+    <div class="theme-switch-wrap" title="Switch between light and dark mode">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode">
+        <span class="theme-switch-thumb"></span>
+      </button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh">
+        <div id="lrh-title">All Producers — Regional Roll-Up</div>
+        <div id="lrh-sub">—</div>
+      </div>
+      <div class="state-crumb" id="state-crumb" style="display:none"><button id="btn-back">&larr; All producers</button><span id="crumb-label"></span></div>
+      <div id="lrb"></div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <svg id="cv"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+    <button id="panel-toggle">&#8250;</button>
+  </div>
+</div>
+
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+(function(){
+'use strict';
+
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', RingEngine.theme.toggle);
+
+/* ══════════════════════════════════════════════════════════════════
+   REFERENCE "TODAY" — matches the session's current date, used by the
+   expiry filter, identical convention to Dashboards 1 and 2.
+   ══════════════════════════════════════════════════════════════════ */
+const TODAY = new Date('2026-08-15T00:00:00');
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA INDEXING — everything below is computed live from the three
+   shared data files, never hand-authored.
+   ══════════════════════════════════════════════════════════════════ */
+const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+const principals = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+const assetNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'asset');
+const covNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'coverage');
+
+const assetsByOwner = {};
+assetNodes.forEach(a => { (assetsByOwner[a.owner_ref] = assetsByOwner[a.owner_ref] || []).push(a); });
+const covsByAsset = {};
+covNodes.forEach(c => { (covsByAsset[c.parent_asset_ref] = covsByAsset[c.parent_asset_ref] || []).push(c); });
+const overlayByCovId = {};
+BOUND_POLICY_OVERLAY.forEach(o => { overlayByCovId[o.coverage_id] = o; });
+
+const producerById = {};
+PRODUCERS.forEach(p => { producerById[p.producer_id] = p; });
+const producerIdByUbo = {};
+ACCOUNT_PRODUCER_MAP.forEach(m => { producerIdByUbo[m.ubo_id] = m.producer_id; });
+
+// Coverage type catalog, built from the coverage nodes actually present in
+// ONTOLOGY_NODES — there is no COVERAGE_CATALOG global in the shared data
+// files (verified against every file in 05-build/data/), so this is
+// computed here rather than assumed.
+const VERTICAL_ORDER = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
+const VERTICAL_META = {
+  yacht:       { label: 'Yacht',       cssVar: '--domain3' },
+  aviation:    { label: 'Aviation',    cssVar: '--domain4' },
+  real_estate: { label: 'Real Estate', cssVar: '--domain6' },
+  auto:        { label: 'Auto',        cssVar: '--domain2' },
+  personal:    { label: 'Personal',    cssVar: '--domain5' },
+  other:       { label: 'Other (Fine Art, etc.)', cssVar: '--domain7' },
+};
+// The composite vertical-mix glyph and the "book value" $ figure it backs
+// must always agree — BREAKDOWN_KEYS adds an "Other" bucket (fine_art and
+// any coverage outside the 5 filterable verticals) so the ring's slices sum
+// to exactly bound + prospected, never a total that's quietly short of the
+// number printed next to it.
+const BREAKDOWN_KEYS = VERTICAL_ORDER.concat(['other']);
+// Every coverage vertical present in the data gets a catalog entry (matches
+// Dashboard 2's own coverage catalog) — the Coverage (Missing)/(Held)
+// filters can reach a fine_art line even though fine_art sits outside the
+// 5-vertical Vertical filter and the composite ring's canonical buckets;
+// those are a different concept (asset-vertical coverage, not a coverage
+// type to search by).
+const catalogByVertical = {};
+covNodes.forEach(c => {
+  if (!catalogByVertical[c.vertical]) catalogByVertical[c.vertical] = new Map();
+  if (!catalogByVertical[c.vertical].has(c.coverage_type_id)) catalogByVertical[c.vertical].set(c.coverage_type_id, c.label);
+});
+
+function fmt$(v) { return '$' + Math.round(v || 0).toLocaleString('en-US'); }
+
+/* ══════════════════════════════════════════════════════════════════
+   BUILD ONE ACCOUNT (a UBO's full picture) — rendering-only aggregation,
+   never written back onto ONTOLOGY_NODES. Coverage → asset linkage uses
+   each coverage node's own parent_asset_ref (the real field on the live
+   data); required_coverage_ids does not exist anywhere in ontology-720.js
+   and would silently yield zero coverage rows for every account.
+   ══════════════════════════════════════════════════════════════════ */
+function buildAccount(prin) {
+  const assets = assetsByOwner[prin.id] || [];
+  const coverages = [];
+  assets.forEach(a => {
+    (covsByAsset[a.id] || []).forEach(c => {
+      coverages.push({ node: c, asset: a, overlay: overlayByCovId[c.id] || {} });
+    });
+  });
+
+  const boundValue = coverages.reduce((s, c) => s + ((c.overlay.status === 'bound' || c.overlay.status === 'expiring') ? (c.overlay.bound_premium || 0) : 0), 0);
+  const prospectedValue = coverages.reduce((s, c) => s + (c.overlay.status === 'unbound' ? (c.overlay.gwp_estimate || 0) : 0), 0);
+  const gapCount = coverages.filter(c => c.overlay.status === 'unbound').length;
+  const hasExpiring = coverages.some(c => c.overlay.status === 'expiring');
+  const allUnboundLapsed = coverages.length > 0 && coverages.every(c => c.overlay.status === 'unbound' && c.overlay.unbound_reason === 'lapsed_with_us');
+
+  // Same status taxonomy as Dashboard 2 (Whitespace/Gap Engine) — Lost = the
+  // whole account has lapsed with us, Expiring = a bound line is nearing
+  // renewal, Active = default.
+  let status = 'Active';
+  if (hasExpiring) status = 'Expiring';
+  else if (allUnboundLapsed) status = 'Lost';
+
+  const presentVerticals = new Set(assets.map(a => a.vertical).filter(v => VERTICAL_ORDER.indexOf(v) !== -1));
+  const missingVerticals = VERTICAL_ORDER.filter(v => !presentVerticals.has(v));
+
+  // Per-vertical $ breakdown for this account (bound premium where bound/
+  // expiring, prospected GWP where unbound) — rolls up into each producer's
+  // composite vertical-mix glyph. Buckets by BREAKDOWN_KEYS (the 5 canonical
+  // verticals plus "Other" for anything outside them, e.g. fine_art scheduled
+  // items) so this always sums to exactly boundValue + prospectedValue —
+  // a vertical outside the filterable 5 must not just silently disappear
+  // from the $ total shown next to it.
+  const vertBreakdown = {};
+  BREAKDOWN_KEYS.forEach(v => { vertBreakdown[v] = 0; });
+  coverages.forEach(c => {
+    const v = VERTICAL_ORDER.indexOf(c.node.vertical) !== -1 ? c.node.vertical : 'other';
+    const amt = c.overlay.status === 'unbound' ? (c.overlay.gwp_estimate || 0)
+      : (c.overlay.status === 'bound' || c.overlay.status === 'expiring') ? (c.overlay.bound_premium || 0) : 0;
+    vertBreakdown[v] += amt;
+  });
+
+  return {
+    id: prin.id, principal: prin, producerId: producerIdByUbo[prin.id] || null,
+    assets, coverages, boundValue, prospectedValue, totalValue: boundValue + prospectedValue,
+    gapCount, status, verticals: Array.from(presentVerticals), missingVerticals, vertBreakdown,
+  };
+}
+const allAccounts = principals.map(buildAccount);
+const accountById = new Map(allAccounts.map(a => [a.id, a]));
+
+/* ══════════════════════════════════════════════════════════════════
+   FILTERS — the same six as Dashboard 2's header, same predicates.
+   ══════════════════════════════════════════════════════════════════ */
+const filters = { missing: '', held: '', size: '', expiry: '', vertical: '', status: '' };
+function matchesFilters(acc) {
+  if (filters.missing && !acc.coverages.some(c => c.overlay.status === 'unbound' && c.node.coverage_type_id === filters.missing)) return false;
+  if (filters.held && !acc.coverages.some(c => c.overlay.status === 'bound' && c.node.coverage_type_id === filters.held)) return false;
+  if (filters.size && !acc.assets.some(a => a.size_class === filters.size)) return false;
+  if (filters.expiry) {
+    const win = parseInt(filters.expiry, 10);
+    const cutoff = new Date(TODAY); cutoff.setDate(cutoff.getDate() + win);
+    const ok = acc.coverages.some(c => {
+      if (!c.overlay.expiry_date) return false;
+      const d = new Date(c.overlay.expiry_date + 'T00:00:00');
+      return d >= TODAY && d <= cutoff;
+    });
+    if (!ok) return false;
+  }
+  if (filters.vertical && acc.verticals.indexOf(filters.vertical) === -1) return false;
+  if (filters.status && acc.status !== filters.status) return false;
+  return true;
+}
+function hasActiveAccountFilters() { return !!(filters.missing || filters.held || filters.size || filters.expiry || filters.vertical || filters.status); }
+
+/* ══════════════════════════════════════════════════════════════════
+   PRODUCER AGGREGATION — book value, vertical mix, status counts.
+   Vertical mix / total book value are computed over the producer's FULL
+   book (not the filtered view) so macro node sizes stay stable while
+   filters are toggled — the ring only shrinks the account list once
+   drilled into a single producer, same discipline the original build
+   used for exactly this reason.
+   ══════════════════════════════════════════════════════════════════ */
+function computeProducerAgg(producerId) {
+  const accts = allAccounts.filter(a => a.producerId === producerId);
+  const matched = accts.filter(matchesFilters);
+  const vertShares = BREAKDOWN_KEYS.map(v => ({ vertical: v, amount: accts.reduce((s, a) => s + a.vertBreakdown[v], 0) }));
+  const bookValue = vertShares.reduce((s, v) => s + v.amount, 0);
+  const counts = { Active: 0, Expiring: 0, Lost: 0 };
+  accts.forEach(a => counts[a.status]++);
+  const unmappedAccounts = accts.filter(a => a.missingVerticals.length > 0).length;
+  return { producerId, accounts: accts, matched, vertShares, bookValue, counts, unmappedAccounts, totalCount: accts.length, matchCount: matched.length };
+}
+const allProducerAgg = PRODUCERS.map(p => computeProducerAgg(p.producer_id));
+const maxBook = Math.max(1, ...allProducerAgg.map(p => p.bookValue));
+
+function producerRadius(book) {
+  const R_MIN = 54, R_MAX = 104;
+  return R_MIN + Math.sqrt(book / maxBook) * (R_MAX - R_MIN);
+}
+function statusColorVar(status) {
+  return status === 'Active' ? 'var(--status-bound)' : status === 'Expiring' ? 'var(--status-expiring)' : 'var(--status-unbound)';
+}
+function statusBadgeClass(status) {
+  return status === 'Active' ? 'bound' : status === 'Expiring' ? 'expiring' : 'unbound';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════════ */
+const state = { mode: 'macro', producerId: null, lastOpenedUbo: null };
+
+document.getElementById('viewer-tag').textContent = 'Viewing as ' + LEADERSHIP[0].name + ' · ' + LEADERSHIP[0].title;
+
+/* ══════════════════════════════════════════════════════════════════
+   FILTER DROPDOWN POPULATION
+   ══════════════════════════════════════════════════════════════════ */
+const producerSel = document.getElementById('f-producer');
+const optAll = document.createElement('option'); optAll.value = ''; optAll.textContent = 'All Producers — Regional Roll-Up';
+producerSel.appendChild(optAll);
+PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name + ' — ' + p.archetype; producerSel.appendChild(o); });
+producerSel.value = '';
+
+const missingSel = document.getElementById('f-missing');
+const heldSel = document.getElementById('f-held');
+const catalogVerticalOrder = VERTICAL_ORDER.concat(Object.keys(catalogByVertical).filter(v => VERTICAL_ORDER.indexOf(v) === -1));
+catalogVerticalOrder.forEach(vert => {
+  const catalog = catalogByVertical[vert];
+  if (!catalog) return;
+  const vertLabel = VERTICAL_META[vert] ? VERTICAL_META[vert].label : (vert.charAt(0).toUpperCase() + vert.slice(1)).replace('_', ' ');
+  const og1 = document.createElement('optgroup'); og1.label = vertLabel;
+  const og2 = document.createElement('optgroup'); og2.label = vertLabel;
+  catalog.forEach((label, typeId) => {
+    const o1 = document.createElement('option'); o1.value = typeId; o1.textContent = label; og1.appendChild(o1);
+    const o2 = document.createElement('option'); o2.value = typeId; o2.textContent = label; og2.appendChild(o2);
+  });
+  missingSel.appendChild(og1);
+  heldSel.appendChild(og2);
+});
+
+const sizeSel = document.getElementById('f-size');
+const allSizeClasses = Array.from(new Set(assetNodes.map(a => a.size_class).filter(s => s && s !== 'N/A'))).sort();
+allSizeClasses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sizeSel.appendChild(o); });
+
+/* ══════════════════════════════════════════════════════════════════
+   SVG HELPERS — arc math for the composite vertical-mix glyph, ported
+   from the same technique Dashboard 2 uses for its mini-donuts.
+   ══════════════════════════════════════════════════════════════════ */
+function polarDeg(cx, cy, r, deg) { const rad = (deg - 90) * Math.PI / 180; return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }; }
+function arcPathDeg(cx, cy, r0, r1, a0, a1) {
+  a0 = Math.max(0, Math.min(360, a0)); a1 = Math.max(0, Math.min(360, a1));
+  if (a1 - a0 < 0.01) a1 = a0 + 0.01;
+  const large = (a1 - a0) > 180 ? 1 : 0;
+  const po0 = polarDeg(cx, cy, r1, a0), po1 = polarDeg(cx, cy, r1, a1);
+  const pi0 = polarDeg(cx, cy, r0, a1), pi1 = polarDeg(cx, cy, r0, a0);
+  return `M ${po0.x} ${po0.y} A ${r1} ${r1} 0 ${large} 1 ${po1.x} ${po1.y} L ${pi0.x} ${pi0.y} A ${r0} ${r0} 0 ${large} 0 ${pi1.x} ${pi1.y} Z`;
+}
+
+// The composite node — a producer's (or a macro region's) total book value
+// as a circle, ringed by one arc per vertical sized by that vertical's
+// share of the book. This is the single most important visual element on
+// the page (founder brief) — reused unchanged between the macro landing
+// state and the enlarged center node of a producer drill-in, so the same
+// glyph a leader clicked in the macro view is recognizably still there
+// once zoomed.
+function compositeGlyph(g, cx, cy, rOuter, vertShares) {
+  const total = vertShares.reduce((s, v) => s + v.amount, 0);
+  const ringW = Math.max(5, rOuter * 0.17);
+  const r1 = rOuter, r0 = rOuter - ringW;
+  if (total <= 0) {
+    g.appendChild(RingEngine.svgEl('circle', { cx, cy, r: r1, fill: 'var(--surface3)', stroke: 'var(--border2)', 'stroke-width': 1.5 }));
+  } else {
+    const shares = vertShares.filter(v => v.amount > 0);
+    const pad = shares.length > 1 ? 1.6 : 0;
+    let cursor = 0;
+    shares.forEach(v => {
+      const span = (v.amount / total) * 360;
+      const a0 = cursor + pad / 2, a1 = cursor + span - pad / 2;
+      cursor += span;
+      const p = RingEngine.svgEl('path', { d: arcPathDeg(cx, cy, r0, r1, Math.max(0, a0), Math.min(360, a1)), fill: `var(${VERTICAL_META[v.vertical].cssVar})` });
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = VERTICAL_META[v.vertical].label + ' — ' + fmt$(v.amount);
+      p.appendChild(title);
+      g.appendChild(p);
+    });
+  }
+  g.appendChild(RingEngine.svgEl('circle', { cx, cy, r: Math.max(0, r0 - 2), fill: 'var(--surface)', stroke: 'var(--accent)', 'stroke-width': 2 }));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CANVAS — macro (all 5 producers around a regional hub) and producer
+   drill-in (one producer center, ring of their accounts) share one
+   center+ring geometry, deliberately: both states read as the same kind
+   of instrument, only the node set changes.
+   ══════════════════════════════════════════════════════════════════ */
+function showProducerTooltip(ev, agg) {
+  const producer = producerById[agg.producerId];
+  const desc = fmt$(agg.bookValue) + ' total book value · ' + agg.matchCount + ' of ' + agg.totalCount + ' accounts match current filters · ' +
+    agg.unmappedAccounts + ' account' + (agg.unmappedAccounts === 1 ? '' : 's') + ' carr' + (agg.unmappedAccounts === 1 ? 'ies' : 'y') + ' a suspected unmapped vertical.';
+  RingEngine.tooltip.show(ev, producer.name, producer.archetype + ' · ' + producer.region, desc);
+}
+function showAccountTooltip(ev, acc) {
+  const missingTxt = acc.missingVerticals.length
+    ? acc.missingVerticals.length + ' vertical(s) not yet mapped for this account (suspected additional exposure): ' + acc.missingVerticals.map(v => VERTICAL_META[v].label).join(', ') + '.'
+    : 'All five verticals are mapped for this account.';
+  RingEngine.tooltip.show(ev, acc.principal.label, acc.status + ' · ' + fmt$(acc.totalValue) + ' total · ' + acc.gapCount + ' open gap' + (acc.gapCount === 1 ? '' : 's'),
+    missingTxt + ' Click to open in the Whitespace / Gap Engine.');
+}
+
+function renderMacro(scene, cx, cy, W, H) {
+  const items = allProducerAgg;
+  const orbitR = Math.max(150, Math.min(W, H) / 2 - 140);
+
+  scene.appendChild(RingEngine.svgEl('circle', { cx, cy, r: 46, fill: 'var(--surface3)', stroke: 'var(--accent)', 'stroke-width': 2 }));
+  const hubLabel = RingEngine.svgEl('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', 'font-size': 11.5, 'font-weight': 800, fill: 'var(--text)' });
+  hubLabel.textContent = 'REGIONAL';
+  const hubSub = RingEngine.svgEl('text', { x: cx, y: cy + 12, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 600, fill: 'var(--text3)' });
+  hubSub.textContent = 'ROLL-UP';
+  scene.appendChild(hubLabel); scene.appendChild(hubSub);
+
+  const n = items.length;
+  items.forEach((agg, i) => {
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+    const nx = cx + Math.cos(angle) * orbitR, ny = cy + Math.sin(angle) * orbitR;
+    const r = producerRadius(agg.bookValue);
+    const producer = producerById[agg.producerId];
+
+    scene.appendChild(RingEngine.svgEl('line', { x1: cx, y1: cy, x2: nx, y2: ny, stroke: 'var(--border2)', 'stroke-width': 1.4, opacity: 0.7 }));
+
+    const g = RingEngine.svgEl('g', { cursor: 'pointer' });
+    if (agg.matchCount === 0 && hasActiveAccountFilters()) g.setAttribute('opacity', '0.38');
+
+    compositeGlyph(g, nx, ny, r, agg.vertShares);
+
+    const nameT = RingEngine.svgEl('text', { x: nx, y: ny - 3, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 800, fill: 'var(--text)' });
+    nameT.textContent = producer.name;
+    const subT = RingEngine.svgEl('text', { x: nx, y: ny + 13, 'text-anchor': 'middle', 'font-size': 10, 'font-weight': 600, fill: 'var(--text3)', 'font-variant-numeric': 'tabular-nums' });
+    subT.textContent = fmt$(agg.bookValue);
+    g.appendChild(nameT); g.appendChild(subT);
+
+    const archT = RingEngine.svgEl('text', { x: nx, y: ny + r + 18, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 600, fill: 'var(--text3)' });
+    archT.textContent = producer.archetype;
+    scene.appendChild(archT);
+
+    g.addEventListener('click', () => selectProducer(agg.producerId));
+    g.addEventListener('mouseenter', ev => showProducerTooltip(ev, agg));
+    g.addEventListener('mousemove', ev => showProducerTooltip(ev, agg));
+    g.addEventListener('mouseleave', RingEngine.tooltip.hide);
+    scene.appendChild(g);
+  });
+}
+
+function renderProducerDrill(scene, cx, cy, W, H) {
+  const producer = producerById[state.producerId];
+  const agg = computeProducerAgg(state.producerId);
+  const filteredAccts = agg.matched;
+  const n = filteredAccts.length;
+  const orbitR = n > 0 ? Math.max(200, Math.min(0.42 * Math.min(W, H), 165 + n * 3.4)) : 200;
+  const centerR = 68;
+
+  const centerG = RingEngine.svgEl('g', { cursor: 'default' });
+  compositeGlyph(centerG, cx, cy, centerR, agg.vertShares);
+  const nameT = RingEngine.svgEl('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 800, fill: 'var(--text)' });
+  nameT.textContent = producer.name;
+  const subT = RingEngine.svgEl('text', { x: cx, y: cy + 15, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 600, fill: 'var(--text3)' });
+  subT.textContent = producer.archetype;
+  centerG.appendChild(nameT); centerG.appendChild(subT);
+  scene.appendChild(centerG);
+
+  if (n === 0) {
+    const msg = agg.totalCount === 0 ? producer.name + ' has no serviced accounts on record.' : 'No accounts in ' + producer.name + '’s book match the current filters.';
+    const t = RingEngine.svgEl('text', { x: cx, y: cy + orbitR * 0.55, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--text3)' });
+    t.textContent = msg;
+    scene.appendChild(t);
+    return;
+  }
+
+  const sorted = filteredAccts.slice().sort((a, b) => b.totalValue - a.totalValue);
+  const maxVal = Math.max(1, ...sorted.map(a => a.totalValue));
+  const nodeMax = Math.max(16, Math.min(38, (2 * Math.PI * orbitR) / (n * 2.3)));
+  const nodeMin = Math.max(10, nodeMax * 0.44);
+  const sizeFor = v => nodeMin + Math.sqrt(v / maxVal) * (nodeMax - nodeMin);
+  // Same restraint 360 itself uses: bare colored dots by default, labels only
+  // for an active/selected node — a full 22–39-node ring with every label
+  // drawn collides into unreadable text, so persistent labels only render
+  // once the filtered set is small enough to actually hold them (or for the
+  // one node just opened); everything else reads on hover via the tooltip.
+  const showAllLabels = n <= 10;
+
+  sorted.forEach((acc, i) => {
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+    const nx = cx + Math.cos(angle) * orbitR, ny = cy + Math.sin(angle) * orbitR;
+    const r = sizeFor(acc.totalValue);
+    const col = statusColorVar(acc.status);
+    const isLast = state.lastOpenedUbo === acc.id;
+
+    scene.appendChild(RingEngine.svgEl('line', { x1: cx, y1: cy, x2: nx, y2: ny, stroke: 'var(--border2)', 'stroke-width': 1.2, opacity: 0.65 }));
+
+    const g = RingEngine.svgEl('g', { cursor: 'pointer' });
+    g.appendChild(RingEngine.svgEl('circle', { cx: nx, cy: ny, r, fill: col, 'fill-opacity': 0.22, stroke: col, 'stroke-width': isLast ? 3 : 2 }));
+    if (isLast) {
+      g.appendChild(RingEngine.svgEl('circle', { cx: nx, cy: ny, r: r + 6, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2, 'stroke-dasharray': '3 4' }));
+    }
+
+    if (showAllLabels || isLast) {
+      const labelY = ny + r + 14;
+      const nameLbl = RingEngine.svgEl('text', { x: nx, y: labelY, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'var(--text)' });
+      nameLbl.textContent = acc.principal.label.length > 20 ? acc.principal.label.slice(0, 19) + '…' : acc.principal.label;
+      const moneyLbl = RingEngine.svgEl('text', { x: nx, y: labelY + 13, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 600, fill: 'var(--text3)', 'font-variant-numeric': 'tabular-nums' });
+      moneyLbl.textContent = fmt$(acc.totalValue);
+      g.appendChild(nameLbl); g.appendChild(moneyLbl);
+    }
+
+    g.addEventListener('click', () => openAccountInGapEngine(acc.id));
+    g.addEventListener('mouseenter', ev => showAccountTooltip(ev, acc));
+    g.addEventListener('mousemove', ev => showAccountTooltip(ev, acc));
+    g.addEventListener('mouseleave', RingEngine.tooltip.hide);
+    scene.appendChild(g);
+  });
+}
+
+function renderCanvas() {
+  const svg = document.getElementById('cv');
+  svg.innerHTML = '';
+  const W = svg.clientWidth || 900, H = svg.clientHeight || 600;
+  const cx = W / 2, cy = H / 2;
+  const scene = RingEngine.svgEl('g', {});
+  svg.appendChild(scene);
+  if (state.mode === 'macro') renderMacro(scene, cx, cy, W, H);
+  else renderProducerDrill(scene, cx, cy, W, H);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NAVIGATION
+   ══════════════════════════════════════════════════════════════════ */
+function selectProducer(producerId) {
+  state.mode = 'producer';
+  state.producerId = producerId;
+  state.lastOpenedUbo = null;
+  producerSel.value = producerId;
+  renderAll();
+}
+function backToMacro() {
+  state.mode = 'macro';
+  state.producerId = null;
+  state.lastOpenedUbo = null;
+  producerSel.value = '';
+  renderAll();
+}
+// Drilling into an account does not add a Ring 2 here — it opens the
+// actual Dashboard 2 pie for that client in a new tab (ILLUSTRATIONS.md
+// "Design 2 — Leadership Book Rollup"). The highlight ring + panel/rail
+// confirmation below are the visible feedback that the click did something.
+function openAccountInGapEngine(uboId) {
+  state.lastOpenedUbo = uboId;
+  window.open('dashboard2-whitespace-gap-engine.html?account=' + encodeURIComponent(uboId), '_blank');
+  renderCanvas();
+  renderRail();
+  renderPanel();
+}
+producerSel.addEventListener('change', () => {
+  if (producerSel.value === '') backToMacro(); else selectProducer(producerSel.value);
+});
+document.getElementById('btn-back').addEventListener('click', backToMacro);
+
+/* ══════════════════════════════════════════════════════════════════
+   LEFT RAIL
+   ══════════════════════════════════════════════════════════════════ */
+function renderRail() {
+  const crumb = document.getElementById('state-crumb');
+  const body = document.getElementById('lrb');
+  body.innerHTML = '';
+
+  if (state.mode === 'macro') {
+    crumb.style.display = 'none';
+    document.getElementById('lrh-title').textContent = 'All Producers — Regional Roll-Up';
+    const totalBook = allProducerAgg.reduce((s, a) => s + a.bookValue, 0);
+    document.getElementById('lrh-sub').textContent = PRODUCERS.length + ' producers · ' + fmt$(totalBook) + ' combined book';
+
+    allProducerAgg.slice().sort((a, b) => b.bookValue - a.bookValue).forEach(agg => {
+      const producer = producerById[agg.producerId];
+      const row = document.createElement('div');
+      row.className = 'lr-row';
+      row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'; row.style.gap = '6px';
+      row.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+          '<span class="lr-row-label">' + producer.name + '</span>' +
+          '<span class="num" style="font-size:13px;font-weight:800;color:var(--text)">' + fmt$(agg.bookValue) + '</span>' +
+        '</div>' +
+        '<div class="lr-row-sub">' + producer.archetype + ' · ' + producer.region + '</div>' +
+        '<div class="lr-row-sub num" style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<span>' + agg.totalCount + ' accounts</span>' +
+          '<span style="color:var(--status-bound)">' + agg.counts.Active + ' active</span>' +
+          '<span style="color:var(--status-expiring)">' + agg.counts.Expiring + ' expiring</span>' +
+          '<span style="color:var(--status-unbound)">' + agg.counts.Lost + ' lost</span>' +
+        '</div>' +
+        (hasActiveAccountFilters() ? '<div class="open-hint">' + agg.matchCount + ' of ' + agg.totalCount + ' match current filters</div>' : '') +
+        '<div class="open-hint">Open ' + producer.name + '’s book →</div>';
+      row.addEventListener('click', () => selectProducer(agg.producerId));
+      body.appendChild(row);
+    });
+    return;
+  }
+
+  crumb.style.display = 'flex';
+  const producer = producerById[state.producerId];
+  document.getElementById('crumb-label').textContent = producer.name;
+  const agg = computeProducerAgg(state.producerId);
+  document.getElementById('lrh-title').textContent = producer.name + '’s Serviced Accounts';
+  document.getElementById('lrh-sub').textContent = agg.matchCount + ' of ' + agg.totalCount + ' accounts shown, ranked by total book value';
+
+  if (agg.matched.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'lr-empty';
+    empty.style.cssText = 'padding:24px 12px;text-align:center;color:var(--text3);font-size:12px;line-height:1.6';
+    empty.textContent = 'No accounts match the current filters for ' + producer.name + '.';
+    body.appendChild(empty);
+    return;
+  }
+
+  agg.matched.slice().sort((a, b) => b.totalValue - a.totalValue).forEach(acc => {
+    const row = document.createElement('div');
+    row.className = 'lr-row' + (state.lastOpenedUbo === acc.id ? ' active' : '');
+    row.style.flexDirection = 'column'; row.style.alignItems = 'stretch'; row.style.gap = '6px';
+    const missingChipHtml = acc.missingVerticals.length
+      ? '<div class="chips"><span class="chip unmapped-chip" title="Suspected additional exposure — vertical not yet mapped for this account">' +
+          acc.missingVerticals.length + ' vertical' + (acc.missingVerticals.length === 1 ? '' : 's') + ' unmapped</span></div>'
+      : '';
+    row.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+        '<span class="lr-row-label">' + acc.principal.label + '</span>' +
+        '<span class="badge badge-status ' + statusBadgeClass(acc.status) + '">' + acc.status + '</span>' +
+      '</div>' +
+      '<div class="lr-row-sub num">Bound ' + fmt$(acc.boundValue) + ' · Whitespace ' + fmt$(acc.prospectedValue) + ' (' + acc.gapCount + ' gap' + (acc.gapCount === 1 ? '' : 's') + ')</div>' +
+      missingChipHtml +
+      '<div class="open-hint">Open in Whitespace / Gap Engine →</div>';
+    row.addEventListener('click', () => openAccountInGapEngine(acc.id));
+    body.appendChild(row);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RIGHT PANEL
+   ══════════════════════════════════════════════════════════════════ */
+function infoRow(label, val) { return '<div class="info-row"><div class="info-key">' + label + '</div><div class="info-val num">' + val + '</div></div>'; }
+function vbRow(label, amt, pct, colorVar) {
+  return '<div class="vb-row"><div class="vb-label">' + label + '</div><div class="vb-track"><div class="vb-fill" style="width:' + pct + '%;background:' + colorVar + '"></div></div><div class="vb-val num">' + fmt$(amt) + '</div></div>';
+}
+
+function renderPanel() {
+  const panel = document.getElementById('panel');
+
+  if (state.mode === 'macro') {
+    const totalBook = allProducerAgg.reduce((s, a) => s + a.bookValue, 0);
+    const counts = { Active: 0, Expiring: 0, Lost: 0 };
+    allAccounts.forEach(a => counts[a.status]++);
+    const totalUnmapped = allAccounts.filter(a => a.missingVerticals.length > 0).length;
+    const leader = LEADERSHIP[0];
+
+    const vertRows = BREAKDOWN_KEYS.map(v => {
+      const amt = allProducerAgg.reduce((s, a) => { const share = a.vertShares.find(x => x.vertical === v); return s + (share ? share.amount : 0); }, 0);
+      if (v === 'other' && amt <= 0) return ''; // only show "Other" when it's actually carrying dollars
+      const pct = totalBook ? Math.round(amt / totalBook * 100) : 0;
+      return vbRow(VERTICAL_META[v].label, amt, pct, 'var(' + VERTICAL_META[v].cssVar + ')');
+    }).join('');
+
+    panel.innerHTML =
+      '<div class="panel-header"><div class="panel-title">Regional Roll-Up</div>' +
+      '<div class="panel-sub" style="font-size:12px;color:var(--text3);margin-top:4px">' + leader.name + ' — ' + leader.title + ' · ' + leader.scope + '</div></div>' +
+      '<div class="box"><h3>Book Summary</h3><div class="info-table">' +
+        infoRow('Combined book value', '<strong>' + fmt$(totalBook) + '</strong>') +
+        infoRow('Producers', PRODUCERS.length) +
+        infoRow('Accounts', allAccounts.length) +
+        infoRow('Active', counts.Active) +
+        infoRow('Expiring', counts.Expiring) +
+        infoRow('Lost', counts.Lost) +
+      '</div></div>' +
+      '<div class="box"><h3>Book Value by Vertical</h3>' + vertRows + '</div>' +
+      '<div class="box"><h3>Suspected Additional Exposure</h3><p>' + totalUnmapped + ' of ' + allAccounts.length +
+        ' accounts have at least one of the five verticals with no asset on record at all. This is a distinct signal from an unbound coverage line on a known asset — it means we may not yet know this exposure exists, not that we quoted it and lost it.</p></div>' +
+      '<div class="panel-empty"><div class="panel-empty-icon">◎</div>' +
+      '<div class="panel-empty-text">Click a producer — in the ring or the rail — to open their book. Click an account there to open its full coverage picture in the Whitespace / Gap Engine.</div></div>';
+    return;
+  }
+
+  const producer = producerById[state.producerId];
+  const agg = computeProducerAgg(state.producerId);
+  const gwpDelta = producer.gwp_captured_90d - producer.gwp_captured_90d_prior;
+  const touchDelta = producer.touchpoints_90d - producer.touchpoints_90d_prior;
+  const boundSum = agg.accounts.reduce((s, a) => s + a.boundValue, 0);
+  const whitespaceSum = agg.accounts.reduce((s, a) => s + a.prospectedValue, 0);
+
+  const vertRows = BREAKDOWN_KEYS.map(v => {
+    const share = agg.vertShares.find(x => x.vertical === v);
+    const amt = share ? share.amount : 0;
+    if (v === 'other' && amt <= 0) return '';
+    const pct = agg.bookValue ? Math.round(amt / agg.bookValue * 100) : 0;
+    return vbRow(VERTICAL_META[v].label, amt, pct, 'var(' + VERTICAL_META[v].cssVar + ')');
+  }).join('');
+
+  const lastOpened = state.lastOpenedUbo ? accountById.get(state.lastOpenedUbo) : null;
+
+  panel.innerHTML =
+    '<div class="panel-header"><div class="panel-title">' + producer.name + '</div>' +
+    '<div class="panel-sub" style="font-size:12px;color:var(--text3);margin-top:4px">' + producer.archetype + ' — ' + producer.region + '</div></div>' +
+    '<div class="box"><h3>Narrative</h3><p>' + producer.narrative + '</p></div>' +
+    '<div class="box"><h3>Book Roll-Up (' + agg.totalCount + ' accounts)</h3><div class="info-table">' +
+      infoRow('Total book value', '<strong>' + fmt$(agg.bookValue) + '</strong>') +
+      infoRow('Bound premium', fmt$(boundSum)) +
+      infoRow('Whitespace', fmt$(whitespaceSum)) +
+      infoRow('Active / Expiring / Lost', agg.counts.Active + ' / ' + agg.counts.Expiring + ' / ' + agg.counts.Lost) +
+    '</div></div>' +
+    '<div class="box"><h3>Book Value by Vertical</h3>' + vertRows + '</div>' +
+    '<div class="box"><h3>90-Day Activity</h3><div class="info-table">' +
+      infoRow('Touchpoints', producer.touchpoints_90d + (touchDelta >= 0 ? ' (+' : ' (') + touchDelta + ' vs prior)') +
+      infoRow('GWP captured', fmt$(producer.gwp_captured_90d)) +
+      infoRow('GWP Δ vs prior', (gwpDelta >= 0 ? '+' : '') + fmt$(gwpDelta)) +
+      infoRow('Churn risk', producer.churn_risk_score.toFixed(1) + ' / 10') +
+    '</div></div>' +
+    '<div class="box"><h3>Suspected Additional Exposure</h3><p>' + agg.unmappedAccounts + ' of ' + agg.totalCount +
+      ' accounts in this book have at least one vertical with no asset on record — a possible cross-sell blind spot, not a quoted-and-declined gap.</p></div>' +
+    (lastOpened ? '<div class="box"><h3>Last Opened</h3><p><strong>' + lastOpened.principal.label + '</strong> was opened in the Whitespace / Gap Engine, in a new tab.</p></div>' : '') +
+    '<div class="panel-empty"><div class="panel-empty-icon">◎</div>' +
+    '<div class="panel-empty-text">Click an account — in the ring or the rail — to open its full coverage breakdown in the Whitespace / Gap Engine.</div></div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LEGEND
+   ══════════════════════════════════════════════════════════════════ */
+function renderLegend() {
+  const el = document.getElementById('legend');
+  if (state.mode === 'macro') {
+    const totalOther = allProducerAgg.reduce((s, a) => { const share = a.vertShares.find(x => x.vertical === 'other'); return s + (share ? share.amount : 0); }, 0);
+    const keys = totalOther > 0 ? BREAKDOWN_KEYS : VERTICAL_ORDER;
+    el.innerHTML =
+      '<div class="legend-title">Vertical Mix (Outer Ring)</div>' +
+      keys.map(v => '<div class="legend-row"><span class="legend-sw" style="background:var(' + VERTICAL_META[v].cssVar + ')"></span>' + VERTICAL_META[v].label + '</div>').join('') +
+      '<div class="legend-note">Node size = total book value (bound premium + prospected GWP). Ring share = that vertical’s share of the producer’s book.</div>';
+  } else {
+    el.innerHTML =
+      '<div class="legend-title">Account Status</div>' +
+      '<div class="legend-row"><span class="legend-dot" style="background:var(--status-bound)"></span>Active</div>' +
+      '<div class="legend-row"><span class="legend-dot" style="background:var(--status-expiring)"></span>Expiring</div>' +
+      '<div class="legend-row"><span class="legend-dot" style="background:var(--status-unbound)"></span>Lost</div>' +
+      '<div class="legend-note">Node size = account total value. Click an account to open its full coverage picture in the Whitespace / Gap Engine (opens in a new tab).</div>';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FILTER WIRING
+   ══════════════════════════════════════════════════════════════════ */
+document.getElementById('f-missing').addEventListener('change', e => { filters.missing = e.target.value; renderAll(); });
+document.getElementById('f-held').addEventListener('change', e => { filters.held = e.target.value; renderAll(); });
+document.getElementById('f-size').addEventListener('change', e => { filters.size = e.target.value; renderAll(); });
+document.getElementById('f-expiry').addEventListener('change', e => { filters.expiry = e.target.value; renderAll(); });
+document.getElementById('f-vertical').addEventListener('change', e => { filters.vertical = e.target.value; renderAll(); });
+document.getElementById('f-status').addEventListener('change', e => { filters.status = e.target.value; renderAll(); });
+document.getElementById('btn-reset').addEventListener('click', () => {
+  Object.keys(filters).forEach(k => filters[k] = '');
+  ['f-missing', 'f-held', 'f-size', 'f-expiry', 'f-vertical', 'f-status'].forEach(id => document.getElementById(id).value = '');
+  renderAll();
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   COLLAPSIBLE PANELS
+   ══════════════════════════════════════════════════════════════════ */
+(function() {
+  const lrWrap = document.getElementById('lr-wrap'), lrBtn = document.getElementById('lr-toggle');
+  const panWrap = document.getElementById('panel-wrap'), panBtn = document.getElementById('panel-toggle');
+  lrBtn.addEventListener('click', () => { lrWrap.classList.toggle('collapsed'); lrBtn.innerHTML = lrWrap.classList.contains('collapsed') ? '&#8250;' : '&#8249;'; });
+  panBtn.addEventListener('click', () => { panWrap.classList.toggle('collapsed'); panBtn.innerHTML = panWrap.classList.contains('collapsed') ? '&#8249;' : '&#8250;'; });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   MASTER RENDER
+   ══════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  renderCanvas();
+  renderRail();
+  renderPanel();
+  renderLegend();
+}
+window.addEventListener('resize', renderCanvas);
+renderAll();
+RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
+})();
+</script>
+</body>
+</html>

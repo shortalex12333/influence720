@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Executive Command Center</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-6-specific rules only — everything shared lives in engine/style-core.css.
+   This view is the SAME ontology radial wheel every other 720 dashboard uses
+   (RingEngine.render() structurally unmodified) — not a scatter plot, not a
+   custom chart type. It reuses dashboard4-role-macro-view.html's wheel-building
+   code (data loading, RingEngine.render() call, nodeFinancials()/colorScale()/
+   pxRadius(), Producer Gap Skew mechanism) verbatim, and layers two additive
+   post-processing passes on top, the same technique dashboard4's own
+   splitFillNode()/drawHub() already use and dashboard2-whitespace-gap-engine.html's
+   drawSatellitesAndBreaches() already proved out:
+     1. Producer Effort-vs-Yield node coloring (a NEW color mode, real/computed
+        from PRODUCERS.touchpoints_90d + gwp_captured_90d + churn_risk_score —
+        never a fabricated ring/domain value for a producer entity).
+     2. Silent-churn satellites + solid red breach edges (STALE_DAYS=120 against
+        real RELATIONSHIP_WEIGHTS.last_activity_date, crossed with a real
+        BOUND_POLICY_OVERLAY.expiry_date <90 days — both conditions real and
+        traced, never conflating "no relationship on file" with "decayed").
+   render-core.js itself is never edited. */
+:root{--status-deficient:#a15a2e;--pcy-green:#2ec478;--pcy-amber:#e0a640;--pcy-legacy:#8b5cdc}
+body.theme-dark{--status-deficient:#e0916a;--pcy-green:#4ed48a;--pcy-amber:#e0b060;--pcy-legacy:#b699f5}
+
+/* Rail/panel — override the shared engine's default (340px rail / 420px panel, used
+   verbatim by D0/D4) to match D1's REAL measured styling, same fix already proven correct
+   on dashboard2-whitespace-gap-engine.html (300px flat white divided-card rail, 320px
+   panel). Linking the shared stylesheet unchanged is NOT the same as matching D1 — that
+   was the exact mistake caught on D2's first pass; applying the same local override here
+   rather than repeating it. */
+.lr-wrap{width:300px}
+.lr-wrap.collapsed{width:0}
+#lrb{background:#eeeeea}
+body.theme-dark #lrb{background:#1b1e21}
+.lr-group{border:none;border-radius:0;margin-bottom:0;background:transparent}
+.lr-group-body{padding:0}
+.lr-row{width:275px;margin:0 auto 6px;padding:10px;border-radius:2px;background:#fff;border:1px solid transparent;border-bottom:1px solid var(--border)}
+body.theme-dark .lr-row{background:#141618}
+.lr-row:hover{background:var(--surface2);border-color:var(--border2)}
+.lr-row.active{background:var(--btnactive);color:var(--btnactivetext);border-color:var(--btnactive)}
+.lr-row-label{font-size:13px;font-weight:600}
+.panel-wrap{width:320px}
+.panel-wrap:not(.collapsed) #panel{padding:16px}
+#panel .info-row{grid-template-columns:96px 1fr;gap:8px}
+#panel .box{padding:11px}
+
+.rail-block{margin-bottom:18px}
+.rail-total{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-top:4px}
+.rail-total-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
+.vreset{cursor:pointer;color:var(--accent);font-weight:700;text-transform:none;letter-spacing:0;float:right}
+.vcard{border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;background:var(--surface);transition:border-color .15s,opacity .2s}
+.vcard:hover{border-color:var(--accent)}
+.vcard.dim{opacity:.32}
+.vcard.isolated{border-color:var(--accent);background:var(--surface3)}
+.vcard-top{display:flex;justify-content:space-between;align-items:baseline}
+.vcard-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)}
+.vcard-val{font-size:15px;font-weight:800;color:var(--text)}
+.vcard-bar{height:6px;border-radius:999px;background:var(--surface3);overflow:hidden;margin-top:6px;display:flex}
+.vcard-bar-sold{background:var(--status-bound);height:100%}
+.vcard-bar-prospect{background:var(--text3);opacity:.5;height:100%}
+.method-note{font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:4px}
+.churn-summary{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.churn-summary-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text2)}
+.churn-summary-row strong{color:var(--status-unbound);font-size:16px;font-weight:900}
+.color-hint{font-size:10px;color:var(--text3);line-height:1.5;margin-top:5px}
+.churn-row{display:flex;justify-content:space-between;gap:8px;padding:10px;border-radius:2px;cursor:pointer;background:#fff;border:1px solid transparent;border-bottom:1px solid var(--border);margin:0 0 6px;transition:border-color .15s}
+body.theme-dark .churn-row{background:#141618}
+.churn-row:hover{border-color:var(--status-unbound)}
+.churn-row-name{font-size:12.5px;font-weight:700;color:var(--text)}
+.churn-row-sub{font-size:10.5px;color:var(--text3);margin-top:2px;line-height:1.5}
+.churn-row-days{text-align:right;white-space:nowrap;font-size:11px;color:var(--status-unbound);font-weight:800}
+.churn-box{border:1px solid var(--status-unbound);border-radius:8px;padding:12px;background:rgba(177,56,46,0.07);margin-bottom:12px}
+.churn-box h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--status-unbound);margin-bottom:6px}
+.churn-box p{font-size:13px;color:var(--text2);line-height:1.6}
+.legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:5px;max-width:270px;max-height:calc(100% - 28px);overflow:auto}
+.legend-group-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:5px}
+.legend-group-lbl:first-child{margin-top:0}
+.legend-row{display:flex;align-items:center;gap:7px}
+.legend-swatch{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.legend-line{width:18px;height:2.5px;flex-shrink:0}
+.hatch-chip{display:inline-block;width:20px;height:12px;border-radius:3px;flex-shrink:0}
+.prod-table{width:100%;border-collapse:collapse;margin-top:4px}
+.prod-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border2);cursor:pointer;user-select:none}
+.prod-table th:hover{color:var(--accent)}
+.prod-table td{font-size:12px;padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+.prod-name{font-weight:700;color:var(--text)}
+.prod-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.empty-note{color:var(--text3);font-size:12px;line-height:1.5}
+/* Pan/zoom stage — same technique dashboard0/dashboard2 already use: a CSS transform
+   on an inner wrapper div, decoupled from RingEngine's own internal vz/vx/vy (left at
+   default 1/0/0 here) so panning/zooming never re-runs the 60-pass layout, only a
+   selection/mode change redraws the wheel's own content. */
+#zoomstage{position:absolute;inset:0;overflow:hidden;cursor:grab}
+#zoomstage.dragging{cursor:grabbing}
+#wheel-inner{position:absolute;top:0;left:0;transform-origin:0 0}
+#wheel-inner svg{display:block;overflow:visible;width:100%;height:100%}
+.canvas-zoom-ctrl{position:absolute;bottom:14px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
+.fiduciary-breach-line{pointer-events:none}
+.rail-total,.vcard-val,.churn-row-days,.prod-table td{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-left-row">
+      <a href="index.html" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
+      <div class="h-title">Executive Command Center</div>
+    </div>
+    <div class="h-sub">Same authority-ring wheel as every 720 dashboard — ring=authority tier (0-4), 9-segment domain=real lifecycle category, node size=real Epic GWP $ (bound + estimated). Producers have no ring/domain of their own — pick a producer below and switch Node Color Mode to Effort vs Yield to recolor their own touched nodes by a real, computed classification. Red satellites + red edges are real, traced silent-churn risk: a Ring 0/1 signatory contact stale 120+ days with a real coverage line expiring inside 90 days.</div>
+    <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
+      <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D6 Executive Command Center</span>
+    </nav>
+  </div>
+  <div class="h-ctrl">
+    <span class="vtag" id="whole-book-tag">Whole Book —</span>
+    <span class="vtag">Trish · SVP</span>
+    <div class="theme-switch-wrap">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" aria-label="Toggle theme"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid var(--border2);background:var(--surface)">
+  <div class="filter-group"><span class="filter-lbl">Authority / Ring</span>
+    <select class="filter-sel" id="sel-ring">
+      <option value="all">All rings</option>
+      <option value="0">Ring 0 — Apex</option>
+      <option value="1">Ring 1 — Signatory</option>
+      <option value="2">Ring 2 — Conditional</option>
+      <option value="3">Ring 3 — Transaction</option>
+      <option value="4">Ring 4 — Operational</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Producer Gap Skew</span>
+    <select class="filter-sel" id="sel-producer">
+      <option value="">Regional Aggregate</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Node Color Mode</span>
+    <select class="filter-sel" id="sel-colormode">
+      <option value="ratio">Penetration Ratio</option>
+      <option value="effort_yield">Producer Effort vs Yield</option>
+    </select>
+  </div>
+  <div style="flex:1"></div>
+  <div class="filter-group"><span class="filter-lbl">Whole Book Composition</span>
+    <div class="comp-row"><div class="comp-track"><div class="comp-seg-sold" id="comp-sold" style="width:0"></div><div class="comp-seg-prospect" id="comp-prospect" style="width:0"></div></div><span class="comp-num" id="comp-num">—</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh"><div id="lrh-title">Region Book Value</div><div id="lrh-sub">150 UBO accounts · 5 verticals</div></div>
+      <div id="lrb">
+        <div class="rail-block">
+          <div class="filter-lbl">Whole Book, All Verticals</div>
+          <div class="rail-total" id="grand-total">—</div>
+          <div class="rail-total-sub" id="grand-total-sub">—</div>
+        </div>
+        <div class="rail-block">
+          <div class="filter-lbl" style="margin-bottom:6px">Silent Churn Exposure</div>
+          <div class="churn-summary" id="churn-summary"></div>
+        </div>
+        <div class="rail-block">
+          <div class="filter-lbl" style="margin-bottom:8px">Vertical Rollup <span class="vreset" id="vfilter-reset">reset</span></div>
+          <div id="vcards"></div>
+        </div>
+        <div class="method-note">Node dollar value = bound premium (sold) + Salesforce-modeled GWP estimate (prospected), summed only from coverage lines where this exact role is the on-file responsible party. Silent-churn methodology: STALE_DAYS=120 against the most recent RELATIONSHIP_WEIGHTS.last_activity_date any producer has logged with a Ring 0/1 role, crossed with a real BOUND_POLICY_OVERLAY.expiry_date inside 90 days — a role with zero relationship rows on file is untapped, never counted as decayed.</div>
+      </div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <div id="zoomstage">
+      <div id="wheel-inner"><svg id="cv"></svg></div>
+    </div>
+    <div class="canvas-zoom-ctrl">
+      <button id="zoom-in">+</button>
+      <button id="zoom-out">&minus;</button>
+      <button class="wide" id="zoom-reset">Reset view</button>
+    </div>
+    <div class="legend">
+      <div class="legend-group-lbl">Penetration Ratio (default coloring)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#2ec478"></span>Well-penetrated role — mostly bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#e0a640"></span>Partially penetrated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#8b93a3"></span>Untapped beachhead — all estimated</div>
+      <div class="legend-row"><span class="hatch-chip" style="background:repeating-linear-gradient(45deg,var(--text2) 0 2px,transparent 2px 5px)"></span>Hatched share = estimated, not bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-deficient)"></span>Solid rust = bound but under required limit</div>
+      <div class="legend-group-lbl">Producer Effort vs Yield (this producer's touched nodes only)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-green)"></span>High-yield / low-touch — effort-efficient</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-amber)"></span>High-touch / low-yield — effort-heavy</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-legacy)"></span>Legacy book, decaying contact (churn_risk_score &ge; 5)</div>
+      <div class="legend-group-lbl">Silent Churn Risk (always on, any color mode)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-unbound)"></span>Red satellite — 120+ day stale Ring 0/1 contact + coverage expiring &lt;90d</div>
+      <div class="legend-row"><span class="legend-line" style="background:var(--status-unbound)"></span>Solid red edge — at-risk role → its account/principal</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.4"></span>No modeled coverage responsibility</div>
+      <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--text2);background:transparent"></span>Bold outline = account-level (UBO) bubble</div>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+  </div>
+
+</div>
+
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="data/template-ontology.js"></script>
+<script src="data/coverage-corpus.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', RingEngine.theme.toggle);
+
+// ════════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════════
+function escapeXML(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtMoney(v){
+  v = v || 0;
+  if (v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
+  if (v >= 1000) return '$' + Math.round(v/1000) + 'K';
+  return '$' + Math.round(v);
+}
+function fmtPct(v){ return Math.round((v||0)*100) + '%'; }
+
+// ════════════════════════════════════════════════════════════════════
+// PER-VERTICAL DOMAIN MODEL — read live from data/template-ontology.js's
+// TEMPLATE_ONTOLOGY.segments (same object dashboard0/dashboard4 read from),
+// never a re-hand-typed copy. Verbatim from dashboard4-role-macro-view.html.
+// ════════════════════════════════════════════════════════════════════
+const VERTICALS = ['yacht','aviation','real_estate','auto','personal'];
+const VERTICAL_LABELS = { yacht:'Yacht', aviation:'Aviation', real_estate:'Real Estate', auto:'Auto', personal:'Personal' };
+const SEGMENTS = TEMPLATE_ONTOLOGY.segments;
+const DOMAINS_BY_VERTICAL = {};
+VERTICALS.forEach(v => {
+  DOMAINS_BY_VERTICAL[v] = { count: SEGMENTS.length, list: SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col })) };
+});
+function normVertical(v){ return v === 'realestate' ? 'real_estate' : v; }
+
+let _off = 0;
+const vertOffset = {};
+const combinedDomains = [];
+VERTICALS.forEach(v => {
+  vertOffset[v] = _off;
+  DOMAINS_BY_VERTICAL[v].list.forEach(d => { combinedDomains.push({ id: _off + d.id, name: d.name, col: d.col }); });
+  _off += DOMAINS_BY_VERTICAL[v].count;
+});
+const TOTAL_DOMAINS = combinedDomains.length;
+
+function domainName(vertical, localId) {
+  const v = normVertical(vertical);
+  const list = DOMAINS_BY_VERTICAL[v] && DOMAINS_BY_VERTICAL[v].list;
+  const d = list && list.find(x => x.id === localId);
+  return d ? d.name : ('Domain ' + localId);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INDICES over the shared dataset
+// ════════════════════════════════════════════════════════════════════
+const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
+const principalNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+const wheelNodes = roleNodes.concat(principalNodes);
+const producerNameById = new Map(PRODUCERS.map(p => [p.producer_id, p.name]));
+
+const rolesByAccount = new Map();
+roleNodes.forEach(n => { if (!rolesByAccount.has(n.account_ref)) rolesByAccount.set(n.account_ref, []); rolesByAccount.get(n.account_ref).push(n); });
+
+// ════════════════════════════════════════════════════════════════════
+// LIMIT-ADEQUACY CATALOG — verbatim from dashboard4-role-macro-view.html /
+// dashboard2-whitespace-gap-engine.html's own client-side port of
+// pricing_v2.py's baseline_limit_usd_for()/aviation_tier().
+// ════════════════════════════════════════════════════════════════════
+const covNodeById = new Map(ONTOLOGY_NODES.filter(n => n.node_type === 'coverage').map(n => [n.id, n]));
+const assetById = new Map(ONTOLOGY_NODES.filter(n => n.node_type === 'asset').map(n => [n.id, n]));
+const covCatalogByKey = new Map();
+Object.keys((typeof COVERAGE_CORPUS !== 'undefined' && COVERAGE_CORPUS.verticals) || {}).forEach(v => {
+  COVERAGE_CORPUS.verticals[v].forEach(entry => covCatalogByKey.set(v + '|' + entry.coverage_type_id, entry));
+});
+const AVIATION_TIER_KEYWORDS = { light: ['Sikorsky', 'Citation', 'H175'], mid: ['Challenger', 'Falcon'], heavy: ['Gulfstream', 'Global'] };
+const AVIATION_TIERS = ['light', 'mid', 'heavy'];
+function aviationTier(assetLabel) {
+  const label = assetLabel || '';
+  for (const tier of AVIATION_TIERS) { if (AVIATION_TIER_KEYWORDS[tier].some(k => label.includes(k))) return tier; }
+  return 'mid';
+}
+function baselineLimitFor(vertical, coverageTypeId, asset) {
+  const entry = covCatalogByKey.get(vertical + '|' + coverageTypeId);
+  if (!entry) return null;
+  const byTier = entry.baseline_limit_by_tier;
+  if (byTier) {
+    let tier;
+    if (vertical === 'yacht') tier = (asset && asset.size_class) || 'S4';
+    else if (vertical === 'aviation') tier = aviationTier(asset && asset.label);
+    else return null;
+    return byTier[tier] != null ? byTier[tier] : null;
+  }
+  return entry.baseline_limit_usd != null ? entry.baseline_limit_usd : null;
+}
+function overlayGapState(o) {
+  if (o.status !== 'bound' && o.status !== 'expiring') return 'whitespace';
+  const covNode = covNodeById.get(o.coverage_id);
+  if (!covNode) return 'adequate';
+  const asset = covNode.parent_asset_ref ? assetById.get(covNode.parent_asset_ref) : null;
+  const baseline = baselineLimitFor(covNode.vertical, covNode.coverage_type_id, asset);
+  if (baseline != null && o.bound_limit_usd != null && o.bound_limit_usd < baseline) return 'deficient';
+  return 'adequate';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FINANCIALS — verbatim from dashboard4-role-macro-view.html. Every
+// BOUND_POLICY_OVERLAY row carries a real, direct responsible_node_id FK.
+// ════════════════════════════════════════════════════════════════════
+const roleFin = new Map();
+roleNodes.forEach(n => roleFin.set(n.id, { sold: 0, soldAdequate: 0, soldDeficient: 0, deficiencyAmount: 0, prospected: 0, rows: [] }));
+BOUND_POLICY_OVERLAY.forEach(o => {
+  const f = roleFin.get(o.responsible_node_id);
+  if (!f) { console.warn('[Executive Command Center] overlay row references an unresolvable role id', o.responsible_node_id); return; }
+  const gState = overlayGapState(o);
+  o._gapState = gState;
+  f.rows.push(o);
+  if (o.status === 'bound' || o.status === 'expiring') {
+    f.sold += (o.bound_premium || 0);
+    if (gState === 'deficient') {
+      f.soldDeficient += (o.bound_premium || 0);
+      const covNode = covNodeById.get(o.coverage_id);
+      const asset = covNode && covNode.parent_asset_ref ? assetById.get(covNode.parent_asset_ref) : null;
+      const baseline = covNode ? baselineLimitFor(covNode.vertical, covNode.coverage_type_id, asset) : null;
+      if (baseline != null && o.bound_limit_usd != null) { o._deficiencyAmt = baseline - o.bound_limit_usd; f.deficiencyAmount += o._deficiencyAmt; }
+    } else {
+      f.soldAdequate += (o.bound_premium || 0);
+    }
+  } else {
+    f.prospected += (o.gwp_estimate || 0);
+  }
+});
+
+const nodeFinCache = new Map();
+function nodeFinancials(n) {
+  if (nodeFinCache.has(n.id)) return nodeFinCache.get(n.id);
+  const ids = n.node_type === 'principal' ? (rolesByAccount.get(n.id) || []).map(r => r.id) : [n.id];
+  let sold = 0, soldAdequate = 0, soldDeficient = 0, deficiencyAmount = 0, prospected = 0; const rows = [];
+  ids.forEach(id => {
+    const f = roleFin.get(id); if (!f) return;
+    sold += f.sold; soldAdequate += f.soldAdequate; soldDeficient += f.soldDeficient;
+    deficiencyAmount += f.deficiencyAmount; prospected += f.prospected;
+    rows.push.apply(rows, f.rows);
+  });
+  const total = sold + prospected;
+  const result = { sold, soldAdequate, soldDeficient, deficiencyAmount, prospected, total, ratio: total > 0 ? sold / total : null, rows, roleIds: ids };
+  nodeFinCache.set(n.id, result);
+  return result;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PRODUCER GAP SKEW — verbatim from dashboard4-role-macro-view.html. This
+// IS the "producer node-touching mechanism" the Effort/Yield color mode
+// below reuses: a node is "touched" by a producer when this same function
+// returns a non-zero total (real bound premium they wrote, or a real
+// RELATIONSHIP_WEIGHTS foothold).
+// ════════════════════════════════════════════════════════════════════
+const rwByProducerRole = new Map(RELATIONSHIP_WEIGHTS.map(r => [r.producer_id + '|' + r.node_id, r]));
+const producerFinCache = new Map();
+function nodeFinancialsForProducer(n, producerId) {
+  const producerName = producerNameById.get(producerId);
+  const cacheKey = producerId + '|' + n.id;
+  if (producerFinCache.has(cacheKey)) return producerFinCache.get(cacheKey);
+  const ids = n.node_type === 'principal' ? (rolesByAccount.get(n.id) || []).map(r => r.id) : [n.id];
+  let sold = 0, soldAdequate = 0, soldDeficient = 0, deficiencyAmount = 0, prospected = 0; const rows = [];
+  ids.forEach(id => {
+    const f = roleFin.get(id); if (!f) return;
+    f.rows.forEach(r => {
+      if ((r.status === 'bound' || r.status === 'expiring') && r.producer_of_record === producerName) {
+        sold += (r.bound_premium || 0);
+        if (r._gapState === 'deficient') { soldDeficient += (r.bound_premium || 0); deficiencyAmount += (r._deficiencyAmt || 0); }
+        else soldAdequate += (r.bound_premium || 0);
+        rows.push(r);
+      }
+    });
+    if (rwByProducerRole.has(producerId + '|' + id)) {
+      prospected += f.prospected;
+      f.rows.forEach(r => { if (r.status === 'unbound') rows.push(r); });
+    }
+  });
+  const total = sold + prospected;
+  const result = { sold, soldAdequate, soldDeficient, deficiencyAmount, prospected, total, ratio: total > 0 ? sold / total : null, rows, roleIds: ids };
+  producerFinCache.set(cacheKey, result);
+  return result;
+}
+function currentFin(n) { return state.producerId ? nodeFinancialsForProducer(n, state.producerId) : nodeFinancials(n); }
+
+let MAX_NODE_TOTAL = 1;
+function recomputeMaxNodeTotal() {
+  MAX_NODE_TOTAL = 1;
+  wheelNodes.forEach(n => { MAX_NODE_TOTAL = Math.max(MAX_NODE_TOTAL, currentFin(n).total); });
+}
+
+const verticalRollup = {};
+VERTICALS.forEach(v => verticalRollup[v] = { sold: 0, prospected: 0 });
+roleNodes.forEach(n => {
+  const v = normVertical(n.vertical);
+  const f = roleFin.get(n.id);
+  if (!verticalRollup[v]) { console.warn('[Executive Command Center] unexpected role vertical', n.vertical); return; }
+  verticalRollup[v].sold += f.sold;
+  verticalRollup[v].prospected += f.prospected;
+});
+const GRAND_SOLD = VERTICALS.reduce((s, v) => s + verticalRollup[v].sold, 0);
+const GRAND_PROSPECTED = VERTICALS.reduce((s, v) => s + verticalRollup[v].prospected, 0);
+const GRAND_TOTAL = GRAND_SOLD + GRAND_PROSPECTED;
+
+function rwRowsFor(n) {
+  const ids = new Set(nodeFinancials(n).roleIds);
+  return RELATIONSHIP_WEIGHTS.filter(r => ids.has(r.node_id));
+}
+function producerBreakdown(n) {
+  const fin = nodeFinancials(n);
+  const soldMap = new Map();
+  fin.rows.filter(r => r.status === 'bound' || r.status === 'expiring').forEach(r => {
+    const name = r.producer_of_record || 'Unassigned';
+    if (!soldMap.has(name)) soldMap.set(name, { name, qty: 0, val: 0, statusCounts: {} });
+    const e = soldMap.get(name);
+    e.qty += 1; e.val += (r.bound_premium || 0);
+    e.statusCounts[r.status] = (e.statusCounts[r.status] || 0) + 1;
+  });
+  const prospectMap = new Map();
+  rwRowsFor(n).forEach(r => {
+    const name = producerNameById.get(r.producer_id) || r.producer_id;
+    if (!prospectMap.has(name)) prospectMap.set(name, { name, qty: 0, weight: 0, lastActivity: null });
+    const e = prospectMap.get(name);
+    e.qty += 1; e.weight += r.relationship_weight;
+    if (!e.lastActivity || r.last_activity_date > e.lastActivity) e.lastActivity = r.last_activity_date;
+  });
+  return {
+    sold: [...soldMap.values()].sort((a, b) => b.val - a.val),
+    prospected: [...prospectMap.values()].sort((a, b) => b.weight - a.weight),
+    fin
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PRODUCER EFFORT-VS-YIELD CLASSIFICATION — real, computed from
+// PRODUCERS.touchpoints_90d / gwp_captured_90d / churn_risk_score (the
+// same real fields the deleted D5-macro scatter used, per the founder's
+// own directive). Never hand-mapped per producer name — every threshold
+// below is computed live off the PRODUCERS array itself, so it stays
+// correct if the roster ever changes.
+//   1. churn_risk_score >= LEGACY_CHURN_THRESHOLD -> "legacy/decaying"
+//      (purple). Real field, 0-10 scale (rosters.js) — of the 5 real
+//      producers only Jacob's 8.6 clears 5; the rest sit 1.2-3.4.
+//   2. Otherwise: $ captured per touchpoint in the last 90 days
+//      (gwp_captured_90d / touchpoints_90d), ranked against the MEDIAN
+//      of that same ratio across the other non-legacy producers (computed
+//      live, not hardcoded) -> >= median is "effort-efficient" (green),
+//      below is "effort-heavy" (amber).
+// ════════════════════════════════════════════════════════════════════
+const LEGACY_CHURN_THRESHOLD = 5;
+function effortYieldRatio(p) { return p.gwp_captured_90d / Math.max(1, p.touchpoints_90d); }
+const producerClassCache = new Map();
+function producerEffortYieldClass(producerId) {
+  if (producerClassCache.has(producerId)) return producerClassCache.get(producerId);
+  const p = PRODUCERS.find(x => x.producer_id === producerId);
+  if (!p) return null;
+  let cls;
+  if (p.churn_risk_score >= LEGACY_CHURN_THRESHOLD) {
+    cls = { key: 'legacy', label: 'Legacy Book, Decaying Contact', color: 'var(--pcy-legacy)',
+      why: 'churn_risk_score ' + p.churn_risk_score.toFixed(1) + ' / 10 — at or above the ' + LEGACY_CHURN_THRESHOLD + '.0 threshold' };
+  } else {
+    const ratio = effortYieldRatio(p);
+    const peerRatios = PRODUCERS.filter(x => x.churn_risk_score < LEGACY_CHURN_THRESHOLD).map(effortYieldRatio).sort((a, b) => a - b);
+    const mid = peerRatios[Math.floor((peerRatios.length - 1) / 2)];
+    cls = ratio >= mid
+      ? { key: 'green', label: 'High-Yield / Low-Touch — effort-efficient', color: 'var(--pcy-green)',
+          why: fmtMoney(ratio) + ' captured per touchpoint (90d) — at or above the ' + fmtMoney(mid) + ' peer median' }
+      : { key: 'amber', label: 'High-Touch / Low-Yield — effort-heavy', color: 'var(--pcy-amber)',
+          why: fmtMoney(ratio) + ' captured per touchpoint (90d) — below the ' + fmtMoney(mid) + ' peer median' };
+  }
+  producerClassCache.set(producerId, cls);
+  return cls;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SILENT CHURN DETECTION — computed once at load, real data only.
+//   STALE_DAYS=120: a Ring 0/1 role's real RELATIONSHIP_WEIGHTS rows, most
+//   recent last_activity_date across every producer who has ever logged
+//   contact with it. A role with ZERO relationship rows is UNTAPPED, a
+//   different signal, never counted here as decay.
+//   EXPIRY_WINDOW_DAYS=90: that same role must also carry at least one real
+//   BOUND_POLICY_OVERLAY row (status bound/expiring) whose expiry_date
+//   falls inside the next 90 days from the real client clock.
+//   Both conditions true on the SAME role -> silent-churn satellite + red edge.
+// ════════════════════════════════════════════════════════════════════
+const STALE_DAYS = 120;
+const EXPIRY_WINDOW_DAYS = 90;
+const NOW = new Date();
+function daysStaleOf(dateStr) { return (NOW - new Date(dateStr)) / 86400000; }
+function daysUntilOf(dateStr) { return (new Date(dateStr) - NOW) / 86400000; }
+
+const mostRecentContactByRole = new Map();
+RELATIONSHIP_WEIGHTS.forEach(r => {
+  const role = nodeById.get(r.node_id);
+  if (!role || role.node_type !== 'role' || role.ring > 1) return;
+  const cur = mostRecentContactByRole.get(role.id);
+  if (!cur || r.last_activity_date > cur) mostRecentContactByRole.set(role.id, r.last_activity_date);
+});
+const overlaysByRole = new Map();
+BOUND_POLICY_OVERLAY.forEach(o => { if (!overlaysByRole.has(o.responsible_node_id)) overlaysByRole.set(o.responsible_node_id, []); overlaysByRole.get(o.responsible_node_id).push(o); });
+
+const churnRoles = new Map(); // roleId -> { daysStale, lastContact, expiring:[{coverage_id,label,expiry_date,daysUntil,bound_premium}] }
+mostRecentContactByRole.forEach((dateStr, roleId) => {
+  const daysStale = daysStaleOf(dateStr);
+  if (daysStale <= STALE_DAYS) return;
+  const rows = (overlaysByRole.get(roleId) || []).filter(o => (o.status === 'bound' || o.status === 'expiring') && o.expiry_date);
+  const expiring = rows.filter(o => { const du = daysUntilOf(o.expiry_date); return du >= 0 && du <= EXPIRY_WINDOW_DAYS; });
+  if (!expiring.length) return;
+  churnRoles.set(roleId, {
+    daysStale, lastContact: dateStr,
+    expiring: expiring.map(o => ({ coverage_id: o.coverage_id, label: o.coverage_label, expiry_date: o.expiry_date, daysUntil: Math.round(daysUntilOf(o.expiry_date)), bound_premium: o.bound_premium || 0 })),
+  });
+});
+const CHURN_PREMIUM_AT_RISK = Array.from(churnRoles.values()).reduce((s, c) => s + c.expiring.reduce((s2, e) => s2 + e.bound_premium, 0), 0);
+const CHURN_ACCOUNTS_AFFECTED = new Set(Array.from(churnRoles.keys()).map(rid => { const n = nodeById.get(rid); return n && n.account_ref; }).filter(Boolean)).size;
+
+// ════════════════════════════════════════════════════════════════════
+// VISUAL ENCODING
+// ════════════════════════════════════════════════════════════════════
+function colorScale(ratio) {
+  if (ratio == null) return 'var(--text3)';
+  const grey = [139,147,163], amber = [224,166,64], green = [46,196,120];
+  let c;
+  if (ratio <= 0.5) { const k = ratio/0.5; c = grey.map((v,i) => Math.round(v + (amber[i]-v)*k)); }
+  else { const k = (ratio-0.5)/0.5; c = amber.map((v,i) => Math.round(v + (green[i]-v)*k)); }
+  return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+}
+function pxRadius(total, isPrincipal) {
+  const floor = isPrincipal ? 3.2 : 2.2;
+  const range = isPrincipal ? 24 : 19;
+  if (!total) return floor;
+  return floor + Math.sqrt(total / MAX_NODE_TOTAL) * range;
+}
+function nodeColor(n) {
+  const fin = currentFin(n);
+  if (state.colorMode === 'effort_yield' && state.producerId) {
+    if (fin.total > 0) return producerEffortYieldClass(state.producerId).color;
+    return 'var(--text3)';
+  }
+  return fin.total > 0 ? colorScale(fin.ratio) : 'var(--text3)';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════
+const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null, colorMode: 'ratio' };
+function producerGrandTotal(producerId) {
+  let sold = 0, prospected = 0;
+  roleNodes.forEach(n => { const f = nodeFinancialsForProducer(n, producerId); sold += f.sold; prospected += f.prospected; });
+  return { sold, prospected, total: sold + prospected };
+}
+function producerVerticalTotal(vertical, producerId) {
+  let sold = 0, prospected = 0;
+  roleNodes.forEach(n => {
+    if (normVertical(n.vertical) !== vertical) return;
+    const f = nodeFinancialsForProducer(n, producerId); sold += f.sold; prospected += f.prospected;
+  });
+  return sold + prospected;
+}
+const wheelSvg = document.getElementById('cv');
+const panelEl = document.getElementById('panel');
+
+// ════════════════════════════════════════════════════════════════════
+// WHEEL — RingEngine.render() draws layout/rings/domain wedges/tooltip
+// wiring/click wiring exactly as shipped. Everything below is the same
+// additive post-processing pass dashboard4/dashboard2 already use.
+// ════════════════════════════════════════════════════════════════════
+function injectDefs() {
+  wheelSvg.insertAdjacentHTML('afterbegin',
+    '<defs><pattern id="hatch-prospect" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+    '<rect width="5" height="5" fill="none"/>' +
+    '<line x1="0" y1="0" x2="0" y2="5" stroke="var(--text2)" stroke-width="1.6" stroke-opacity="0.85"/>' +
+    '</pattern></defs>'
+  );
+}
+function arcSegPath(cx, cy, r, startAngle, sweep) {
+  const end = startAngle + sweep;
+  const large = sweep > Math.PI ? 1 : 0;
+  const p0x = cx + r * Math.cos(startAngle), p0y = cy + r * Math.sin(startAngle);
+  const p1x = cx + r * Math.cos(end), p1y = cy + r * Math.sin(end);
+  return 'M ' + cx + ' ' + cy + ' L ' + p0x + ' ' + p0y + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + p1x + ' ' + p1y + ' Z';
+}
+
+// Split-fill for Penetration Ratio mode (verbatim from dashboard4) — up to 3
+// wedges (Adequate solid / Deficient rust / Whitespace hatched). In Effort vs
+// Yield mode this collapses to a single flat categorical fill instead: the
+// classification is a real per-producer LABEL, not a $ split, so it is never
+// rendered with the false precision of a proportional wedge.
+function splitFillNode(p) {
+  const n = p.n;
+  const isPrincipal = n.node_type === 'principal';
+  const fin = currentFin(n);
+  const g = wheelSvg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
+  if (!g) return;
+  g.setAttribute('data-ring', n.ring);
+  g.setAttribute('data-vertical', normVertical(n.vertical));
+  g.setAttribute('data-deficient', fin.soldDeficient > 0 ? '1' : '0');
+  g.setAttribute('data-churn', churnRoles.has(n.id) ? '1' : '0');
+  const cx = p.x, cy = p.y, r = p.r;
+  const isActive = state.selectedId === n.id;
+  const effortMode = state.colorMode === 'effort_yield' && !!state.producerId;
+  let inner = '';
+  if (isActive) {
+    const haloCol = effortMode ? (fin.total > 0 ? producerEffortYieldClass(state.producerId).color : 'var(--text3)') : (fin.total > 0 ? colorScale(fin.ratio) : 'var(--text3)');
+    inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 6) + '" fill="' + haloCol + '" fill-opacity="0.18"/>';
+  }
+  if (effortMode) {
+    if (fin.total > 0) {
+      const cls = producerEffortYieldClass(state.producerId);
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + cls.color + '" fill-opacity="0.88" stroke="' + cls.color + '" stroke-width="' + (isPrincipal ? 2 : 1.2) + '"/>';
+    } else {
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="var(--text3)" fill-opacity="0.16" stroke="var(--text3)" stroke-opacity="0.35" stroke-width="1"/>';
+    }
+  } else if (fin.total <= 0) {
+    inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="var(--text3)" fill-opacity="0.28" stroke="var(--text3)" stroke-opacity="0.5" stroke-width="1"/>';
+  } else {
+    const col = colorScale(fin.ratio);
+    const sw = isPrincipal ? 2 : 1.2;
+    const segs = [
+      { frac: fin.soldAdequate / fin.total, fill: col, opacity: 0.92, hatch: false },
+      { frac: fin.soldDeficient / fin.total, fill: 'var(--status-deficient)', opacity: 0.92, hatch: false },
+      { frac: fin.prospected / fin.total, fill: col, opacity: 0.22, hatch: true },
+    ].filter(s => s.frac > 0.0005);
+    if (segs.length <= 1) {
+      const s = segs[0] || { fill: col, opacity: 0.22, hatch: true };
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
+      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="url(#hatch-prospect)"/>';
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.fill + '" stroke-width="' + sw + '"/>';
+    } else {
+      let start = -Math.PI / 2;
+      segs.forEach(s => {
+        const sweep = s.frac * Math.PI * 2;
+        const d = arcSegPath(cx, cy, r, start, sweep);
+        inner += '<path d="' + d + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
+        if (s.hatch) inner += '<path d="' + d + '" fill="url(#hatch-prospect)"/>';
+        start += sweep;
+      });
+      inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"/>';
+    }
+  }
+  g.innerHTML = inner;
+}
+
+function drawHub(scene) {
+  const producer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
+  const label = producer ? (producer.name.toUpperCase() + "'S BOOK") : 'WHOLE BOOK';
+  const total = producer ? producerGrandTotal(state.producerId).total : GRAND_TOTAL;
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.innerHTML =
+    '<text x="0" y="-8" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="0.06em" fill="var(--text3)">' + escapeXML(label) + '</text>' +
+    '<text x="0" y="24" text-anchor="middle" font-size="34" font-weight="900" fill="var(--text)">' + fmtMoney(total) + '</text>';
+  scene.appendChild(g);
+}
+
+function drawVerticalOverlay(scene) {
+  const hubR = RingEngine.DEFAULT_RING.RO[4];
+  VERTICALS.forEach(v => {
+    const startIdx = vertOffset[v] + 1;
+    const count = DOMAINS_BY_VERTICAL[v].count;
+    const a0 = RingEngine.sectorStart(startIdx, TOTAL_DOMAINS);
+    const a1 = RingEngine.sectorStart(startIdx + count, TOTAL_DOMAINS);
+    const mid = (a0 + a1) / 2;
+    const lineR = hubR + 170;
+    const lx0 = Math.cos(a0) * lineR, ly0 = Math.sin(a0) * lineR;
+    const labelR = hubR + 150;
+    const lx = Math.cos(mid) * labelR, ly = Math.sin(mid) * labelR;
+    const roll = verticalRollup[v];
+    const vtot = state.producerId ? producerVerticalTotal(v, state.producerId) : (roll.sold + roll.prospected);
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('data-vertical-overlay', v);
+    g.innerHTML =
+      '<line x1="0" y1="0" x2="' + lx0.toFixed(1) + '" y2="' + ly0.toFixed(1) + '" stroke="var(--accent)" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="1 5"/>' +
+      '<text x="' + lx.toFixed(1) + '" y="' + (ly-10).toFixed(1) + '" text-anchor="middle" font-size="24" font-weight="800" letter-spacing="0.04em" fill="var(--accent)">' + VERTICAL_LABELS[v].toUpperCase() + '</text>' +
+      '<text x="' + lx.toFixed(1) + '" y="' + (ly+20).toFixed(1) + '" text-anchor="middle" font-size="28" font-weight="900" fill="var(--text)">' + fmtMoney(vtot) + '</text>';
+    scene.appendChild(g);
+  });
+}
+
+// Silent-churn satellites + solid red breach edges — the same additive
+// technique dashboard2-whitespace-gap-engine.html's drawSatellitesAndBreaches()
+// proved out, adapted for churn risk instead of coverage risk: reads each
+// role's TRUE rendered (x,y,r) straight off the layout RingEngine.render()
+// just returned, and draws the edge directly to that role's OWN real
+// principal node — both already rendered in this same wheel (unlike D2's
+// per-account zoom, D6 never needs a synthetic endpoint).
+function drawChurnSatellitesAndBreaches(scene, layout) {
+  const byId = new Map(layout.map(p => [p.n.id, p]));
+  layout.forEach(p => {
+    const info = churnRoles.get(p.n.id);
+    if (!info) return;
+    const angle = -Math.PI / 2;
+    const orbitR = p.r + 9;
+    const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
+    const dot = RingEngine.svgEl('circle', {
+      cx: sx, cy: sy, r: 6, fill: 'var(--status-unbound)', stroke: 'var(--surface)', 'stroke-width': '1.4', cursor: 'pointer',
+    });
+    dot.addEventListener('click', evt => { evt.stopPropagation(); state.selectedId = p.n.id; renderAll(); });
+    dot.addEventListener('mouseenter', evt => {
+      const nearest = info.expiring.slice().sort((a,b)=>a.daysUntil-b.daysUntil)[0];
+      RingEngine.tooltip.show(evt, 'Silent Churn Risk', p.n.label,
+        Math.round(info.daysStale) + ' days since last logged contact (Ring ' + p.n.ring + ') · ' + info.expiring.length + ' coverage line' + (info.expiring.length>1?'s':'') + ' expiring ≤90d, nearest ' + nearest.label + ' in ' + nearest.daysUntil + 'd');
+    });
+    dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
+    scene.appendChild(dot);
+
+    const acct = byId.get(p.n.account_ref);
+    if (acct) {
+      scene.appendChild(RingEngine.svgEl('line', {
+        class: 'fiduciary-breach-line', x1: p.x, y1: p.y, x2: acct.x, y2: acct.y,
+        stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.85',
+      }));
+    }
+  });
+}
+
+function renderWheel() {
+  recomputeMaxNodeTotal();
+  const { layout } = RingEngine.render(wheelSvg, {
+    nodes: wheelNodes,
+    domains: combinedDomains,
+    colorFn: nodeColor,
+    sizeFn: n => pxRadius(currentFin(n).total, n.node_type === 'principal'),
+    scoreFn: n => currentFin(n).total || 0,
+    ringOf: n => n.ring,
+    domainOf: n => vertOffset[normVertical(n.vertical)] + n.domain,
+    labelFn: n => n.label,
+    edges: [],
+    activeId: state.selectedId,
+    showLabels: false,
+    vz: 1, // pan/zoom handled by the #wheel-inner CSS transform, not RingEngine's own vz/vx/vy
+    onSelect: n => { state.selectedId = n.id; renderAll(); },
+    onHover: (evt, n) => {
+      const f = currentFin(n);
+      const meta = 'RING ' + n.ring + ' · ' + VERTICAL_LABELS[normVertical(n.vertical)];
+      let desc;
+      if (f.total > 0) {
+        desc = fmtMoney(f.total) + ' touching this ' + (n.node_type === 'principal' ? 'account' : 'role') + ' — ' + fmtPct(f.ratio) + ' bound, ' + fmtPct(1 - f.ratio) + ' estimated';
+        if (f.soldDeficient > 0) desc += ' · ' + fmtMoney(f.soldDeficient) + ' of the bound share is under-limit (deficient)';
+      } else {
+        desc = 'No modeled coverage responsibility on file for this ' + (n.node_type === 'principal' ? 'account' : 'role') + ' yet.';
+      }
+      if (churnRoles.has(n.id)) desc += ' · SILENT CHURN RISK — see red satellite';
+      RingEngine.tooltip.show(evt, n.label, meta, desc);
+    },
+    onLeave: RingEngine.tooltip.hide,
+  });
+  const scene = wheelSvg.querySelector('g');
+  injectDefs();
+  layout.forEach(p => splitFillNode(p));
+  drawHub(scene);
+  drawVerticalOverlay(scene);
+  drawChurnSatellitesAndBreaches(scene, layout);
+  applyFilters();
+}
+
+function applyFilters() {
+  document.querySelectorAll('#cv g[data-nid]').forEach(el => {
+    const ring = el.getAttribute('data-ring');
+    const vert = el.getAttribute('data-vertical');
+    const show = (state.ringFilter === 'all' || state.ringFilter === ring) && state.activeVerticals.has(vert);
+    el.style.opacity = show ? '1' : '0.08';
+    el.style.pointerEvents = show ? 'auto' : 'none';
+  });
+  document.querySelectorAll('#cv g[data-vertical-overlay]').forEach(el => {
+    const v = el.getAttribute('data-vertical-overlay');
+    el.style.opacity = state.activeVerticals.has(v) ? '1' : '0.15';
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PAN / ZOOM — same interaction model as every other dashboard in this
+// project (D0/D2): plain scroll wheel zooms, click-drag pans, applied as a
+// CSS transform on #wheel-inner (verbatim technique from
+// dashboard2-whitespace-gap-engine.html) so panning/zooming never re-runs
+// RingEngine's own 60-pass layout — only a selection/mode change redraws
+// the wheel's own content.
+// ════════════════════════════════════════════════════════════════════
+const WHEEL_SIZE = 2700; // fixed internal canvas — comfortably contains RO[4]+vertical-label margin (drawVerticalOverlay reaches hubR+170+label width)
+const zoomState = { zoom: 1, panX: 0, panY: 0 };
+function applyWheelTransform() {
+  document.getElementById('wheel-inner').style.transform = 'translate(' + zoomState.panX + 'px, ' + zoomState.panY + 'px) scale(' + zoomState.zoom + ')';
+}
+function centerWheelView() {
+  const stage = document.getElementById('zoomstage');
+  zoomState.panX = stage.clientWidth / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
+  zoomState.panY = stage.clientHeight / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
+}
+function fitWheelZoom() {
+  const stage = document.getElementById('zoomstage');
+  const visibleR = RingEngine.DEFAULT_RING.RO[4] + 200;
+  const fit = Math.min(stage.clientWidth || 900, stage.clientHeight || 700) / (2 * visibleR);
+  zoomState.zoom = Math.max(0.15, Math.min(2.5, fit));
+}
+function resetWheelView() { fitWheelZoom(); centerWheelView(); applyWheelTransform(); }
+function zoomWheelBy(delta) {
+  const newZoom = Math.max(0.15, Math.min(2.5, zoomState.zoom + delta));
+  if (newZoom === zoomState.zoom) return;
+  const stage = document.getElementById('zoomstage');
+  const vx = stage.clientWidth / 2, vy = stage.clientHeight / 2;
+  const contentX = (vx - zoomState.panX) / zoomState.zoom, contentY = (vy - zoomState.panY) / zoomState.zoom;
+  zoomState.panX = vx - newZoom * contentX; zoomState.panY = vy - newZoom * contentY;
+  zoomState.zoom = newZoom;
+  applyWheelTransform();
+}
+(function(){
+  document.getElementById('wheel-inner').style.width = WHEEL_SIZE + 'px';
+  document.getElementById('wheel-inner').style.height = WHEEL_SIZE + 'px';
+  const stage = document.getElementById('zoomstage');
+  stage.addEventListener('wheel', e => { e.preventDefault(); zoomWheelBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+  let drag = null;
+  stage.addEventListener('mousedown', e => { drag = { x: e.clientX, y: e.clientY, panX: zoomState.panX, panY: zoomState.panY, moved: false }; stage.classList.add('dragging'); });
+  stage.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    if (drag.moved) { zoomState.panX = drag.panX + dx; zoomState.panY = drag.panY + dy; applyWheelTransform(); }
+  });
+  function endDrag() { drag = null; stage.classList.remove('dragging'); }
+  stage.addEventListener('mouseup', endDrag);
+  stage.addEventListener('mouseleave', endDrag);
+})();
+document.getElementById('zoom-in').addEventListener('click', () => zoomWheelBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomWheelBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', resetWheelView);
+window.addEventListener('resize', resetWheelView);
+
+// ════════════════════════════════════════════════════════════════════
+// LEFT RAIL
+// ════════════════════════════════════════════════════════════════════
+document.getElementById('whole-book-tag').textContent = 'Whole Book — ' + fmtMoney(GRAND_TOTAL);
+
+function renderCompBar() {
+  const pct = GRAND_TOTAL > 0 ? (GRAND_SOLD / GRAND_TOTAL * 100) : 0;
+  document.getElementById('comp-sold').style.width = pct + '%';
+  document.getElementById('comp-prospect').style.width = (100 - pct) + '%';
+  document.getElementById('comp-num').textContent = fmtPct(GRAND_SOLD/GRAND_TOTAL) + ' bound · ' + fmtPct(GRAND_PROSPECTED/GRAND_TOTAL) + ' estimated, whole book';
+}
+
+function renderChurnSummary() {
+  document.getElementById('churn-summary').innerHTML =
+    '<div class="churn-summary-row"><span>At-risk roles</span><strong>' + churnRoles.size + '</strong></div>' +
+    '<div class="churn-summary-row"><span>Accounts affected</span><strong>' + CHURN_ACCOUNTS_AFFECTED + '</strong></div>' +
+    '<div class="churn-summary-row"><span>Bound premium at risk</span><strong>' + fmtMoney(CHURN_PREMIUM_AT_RISK) + '</strong></div>';
+}
+
+function renderVCards() {
+  const wrap = document.getElementById('vcards');
+  wrap.innerHTML = VERTICALS.map(v => {
+    const roll = verticalRollup[v];
+    const total = roll.sold + roll.prospected;
+    const pct = total > 0 ? (roll.sold/total*100) : 0;
+    const isolated = state.activeVerticals.size === 1 && state.activeVerticals.has(v);
+    const dim = state.activeVerticals.size < VERTICALS.length && !state.activeVerticals.has(v);
+    return '<div class="vcard' + (dim?' dim':'') + (isolated?' isolated':'') + '" data-vertical="' + v + '">' +
+      '<div class="vcard-top"><span class="vcard-name">' + VERTICAL_LABELS[v] + '</span><span class="vcard-val">' + fmtMoney(total) + '</span></div>' +
+      '<div class="vcard-bar"><div class="vcard-bar-sold" style="width:' + pct + '%"></div><div class="vcard-bar-prospect" style="width:' + (100-pct) + '%"></div></div>' +
+    '</div>';
+  }).join('');
+  wrap.querySelectorAll('.vcard').forEach(el => {
+    el.addEventListener('click', () => {
+      const v = el.dataset.vertical;
+      if (state.activeVerticals.size === 1 && state.activeVerticals.has(v)) state.activeVerticals = new Set(VERTICALS);
+      else state.activeVerticals = new Set([v]);
+      renderVCards(); applyFilters();
+    });
+  });
+}
+
+function renderRail() {
+  document.getElementById('grand-total').textContent = fmtMoney(GRAND_TOTAL);
+  document.getElementById('grand-total-sub').textContent = fmtMoney(GRAND_SOLD) + ' bound · ' + fmtMoney(GRAND_PROSPECTED) + ' estimated whitespace across ' + principalNodes.length + ' UBO accounts, ' + VERTICALS.length + ' verticals';
+  renderChurnSummary();
+  renderVCards();
+}
+
+document.getElementById('vfilter-reset').addEventListener('click', () => { state.activeVerticals = new Set(VERTICALS); renderVCards(); applyFilters(); });
+document.getElementById('sel-ring').addEventListener('change', e => { state.ringFilter = e.target.value; applyFilters(); });
+document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+
+// Producer Gap Skew — same 5 real producers (Alex/Rahul/Jacob/Cristian/Naomi)
+// D1/D4's own producer picker already loads. Selecting one re-colors/re-sizes
+// the whole wheel to THEIR own gap pattern (or, in Effort vs Yield mode, to
+// their real computed classification) instead of the regional aggregate.
+const selProducer = document.getElementById('sel-producer');
+PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name; selProducer.appendChild(o); });
+selProducer.addEventListener('change', e => { state.producerId = e.target.value || null; renderAll(); });
+document.getElementById('sel-colormode').addEventListener('change', e => { state.colorMode = e.target.value; renderAll(); });
+
+// ════════════════════════════════════════════════════════════════════
+// RIGHT PANEL
+// ════════════════════════════════════════════════════════════════════
+function rowsHtmlSold(list) {
+  return list.map(r => '<tr><td><div class="prod-name">' + escapeXML(r.name) + '</div><div class="prod-sub">' + (r.statusCounts.bound||0) + ' bound' + (r.statusCounts.expiring ? ', ' + r.statusCounts.expiring + ' expiring' : '') + '</div></td><td style="text-align:center">' + r.qty + '</td><td style="text-align:right;font-weight:700" class="num">' + fmtMoney(r.val) + '</td></tr>').join('');
+}
+function renderSoldTable(list) {
+  if (!list.length) return '<p class="empty-note">No producer has bound coverage tied to this role yet.</p>';
+  return '<table class="prod-table" data-kind="sold"><thead><tr><th>Producer</th><th data-sort="qty" style="text-align:center;width:44px">Qty</th><th data-sort="val" style="text-align:right;width:90px">$ Bound ▼</th></tr></thead><tbody>' + rowsHtmlSold(list) + '</tbody></table>';
+}
+function rowsHtmlProspect(list) {
+  return list.map(r => '<tr><td><div class="prod-name">' + escapeXML(r.name) + '</div><div class="prod-sub">last active ' + (r.lastActivity||'—') + '</div></td><td style="text-align:center">' + r.qty + '</td><td style="text-align:right;font-weight:700" class="num">' + r.weight.toFixed(1) + '</td></tr>').join('');
+}
+function renderProspectTable(list) {
+  if (!list.length) return '<p class="empty-note">No producer has a logged relationship touching this role yet.</p>';
+  return '<table class="prod-table" data-kind="prospect"><thead><tr><th>Producer</th><th data-sort="qty" style="text-align:center;width:44px">Qty</th><th data-sort="weight" style="text-align:right;width:90px">Σ Weight ▼</th></tr></thead><tbody>' + rowsHtmlProspect(list) + '</tbody></table>';
+}
+function wireSortButtons(bd) {
+  document.querySelectorAll('#panel .prod-table').forEach(table => {
+    const kind = table.dataset.kind;
+    const list = kind === 'sold' ? bd.sold : bd.prospected;
+    table.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const field = th.dataset.sort;
+        if (kind === 'sold') list.sort((a,b) => field==='qty' ? b.qty-a.qty : b.val-a.val);
+        else list.sort((a,b) => field==='qty' ? b.qty-a.qty : b.weight-a.weight);
+        table.querySelector('tbody').innerHTML = kind === 'sold' ? rowsHtmlSold(list) : rowsHtmlProspect(list);
+      });
+    });
+  });
+}
+
+function renderNodePanel(n) {
+  const fin = nodeFinancials(n);
+  const bd = producerBreakdown(n);
+  const isPrincipal = n.node_type === 'principal';
+  const v = normVertical(n.vertical);
+  const ringLabel = RingEngine.DEFAULT_RING.RL[n.ring];
+  const soldPct = fin.total ? (fin.sold/fin.total*100) : 0;
+  const acct = isPrincipal ? null : nodeById.get(n.account_ref);
+  const activeProducer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
+  const churnInfo = !isPrincipal ? churnRoles.get(n.id) : null;
+
+  let html = '' +
+    '<div class="panel-header">' +
+      '<div class="panel-title">' + escapeXML(n.label) + '</div>' +
+      '<div class="panel-meta-row">' +
+        '<span class="badge badge-ring">' + (isPrincipal ? 'Ring 0 · ' + ringLabel : 'Ring ' + n.ring + ' · ' + ringLabel) + '</span>' +
+        (isPrincipal ? '' : '<span class="badge badge-coi ' + n.coi_type + '">' + n.coi_type + '</span>') +
+        '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + VERTICAL_LABELS[v] + ' · ' + escapeXML(domainName(n.vertical, n.domain)) + '</span>' +
+        (churnInfo ? '<span class="badge" style="background:rgba(177,56,46,0.14);color:var(--status-unbound);border-color:rgba(177,56,46,0.4)">SILENT CHURN RISK</span>' : '') +
+      '</div>' +
+    '</div>' +
+    (activeProducer ? '<p class="empty-note" style="margin:-4px 0 10px">Wheel is currently colored/sized to <strong style="color:var(--text2)">' + escapeXML(activeProducer.name) + "'s</strong> own " + (state.colorMode==='effort_yield' ? 'Effort vs Yield classification (<strong style="color:' + producerEffortYieldClass(activeProducer.producer_id).color + '">' + producerEffortYieldClass(activeProducer.producer_id).label + '</strong>)' : 'gap pattern') + " — the figures below are the full regional detail for this node (every producer), the same reference view regardless of the wheel toggle.</p>" : '') +
+    (churnInfo ? '<div class="churn-box"><h3>Silent Churn Risk — Real, Traced</h3><p>Last logged relationship contact on this Ring ' + n.ring + ' role: <strong>' + escapeXML(churnInfo.lastContact) + '</strong> (' + Math.round(churnInfo.daysStale) + ' days stale, past the ' + STALE_DAYS + '-day threshold). ' + churnInfo.expiring.length + ' real coverage line' + (churnInfo.expiring.length>1?'s':'') + ' on file for this role expire' + (churnInfo.expiring.length>1?'':'s') + ' inside ' + EXPIRY_WINDOW_DAYS + ' days:</p>' +
+      churnInfo.expiring.map(e => '<p style="margin-top:6px">&bull; <strong>' + escapeXML(e.label || e.coverage_id) + '</strong> — expires ' + e.expiry_date + ' (' + e.daysUntil + 'd out), ' + fmtMoney(e.bound_premium) + ' bound premium</p>').join('') +
+    '</div>' : '') +
+    '<div class="box">' +
+      '<h3>' + (isPrincipal ? 'Total $ Touching This Account' : 'Total $ Touching This Role') + '</h3>' +
+      '<p class="num" style="font-size:26px;font-weight:900;color:var(--text)">' + fmtMoney(fin.total) + '</p>' +
+      (fin.total > 0 ?
+        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--status-bound)"></div></div></div></div>' +
+        '<div class="info-row" style="grid-template-columns:1fr 1fr;margin-top:5px"><span class="info-val">Bound ' + fmtMoney(fin.sold) + '</span><span class="info-val" style="text-align:right">Estimated whitespace ' + fmtMoney(fin.prospected) + '</span></div>' +
+        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--status-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient)</span></div>' : '')
+        : '<p class="empty-note" style="margin-top:6px">No bound or estimated coverage is currently modeled as this ' + (isPrincipal ? 'account' : "role's") + ' responsibility.</p>') +
+      (acct ? '<div style="margin-top:9px;font-size:11px;color:var(--text3)">Account: <strong style="color:var(--text2)">' + escapeXML(acct.label) + '</strong></div>' : '') +
+    '</div>' +
+    '<div class="box"><h3>Sold / Bound — by Producer</h3>' + renderSoldTable(bd.sold) + '</div>' +
+    '<div class="box"><h3>Prospected — Relationship Foothold by Producer</h3>' + renderProspectTable(bd.prospected) +
+      (fin.prospected > 0 ? '<p class="empty-note" style="margin-top:8px">Total estimated whitespace here: <strong style="color:var(--text)">' + fmtMoney(fin.prospected) + '</strong> — not separable by producer in this dataset; the table above ranks who already has an existing relationship to work it.</p>' : '') +
+    '</div>' +
+    '<div class="box"><h3>' + (isPrincipal ? 'Account Detail' : 'Role Detail') + '</h3><p>' + escapeXML(n.desc || '') + '</p></div>';
+
+  panelEl.innerHTML = html;
+  wireSortButtons(bd);
+}
+
+// Default landing panel — the Silent Churn Risk board, sorted by soonest
+// expiry first (the most urgent real cases). This IS the "executive
+// command center" default view: every row is a real role satisfying both
+// STALE_DAYS=120 and EXPIRY_WINDOW_DAYS=90, click any row (or its red
+// satellite/edge on the wheel) for the full trace.
+function renderChurnPanel() {
+  const rows = Array.from(churnRoles.entries()).map(([roleId, info]) => {
+    const role = nodeById.get(roleId);
+    const acct = role && nodeById.get(role.account_ref);
+    const nearest = info.expiring.slice().sort((a,b)=>a.daysUntil-b.daysUntil)[0];
+    return { roleId, role, acct, info, nearest };
+  }).filter(r => r.role).sort((a,b) => a.nearest.daysUntil - b.nearest.daysUntil);
+
+  let html = '<div class="panel-header">' +
+    '<div class="panel-title">Silent Churn Risk Board</div>' +
+    '<div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5">' + rows.length + ' real Ring 0/1 roles, ' + CHURN_ACCOUNTS_AFFECTED + ' accounts — a signatory contact stale ' + STALE_DAYS + '+ days with a real coverage line expiring inside ' + EXPIRY_WINDOW_DAYS + ' days. Ranked by soonest expiry. Click a row, a red satellite, or a red edge on the wheel for full detail.</div>' +
+  '</div>';
+  if (!rows.length) {
+    html += '<p class="empty-note">No role currently satisfies both conditions.</p>';
+  } else {
+    rows.forEach(r => {
+      html += '<div class="churn-row" data-id="' + r.roleId + '">' +
+        '<div><div class="churn-row-name">' + escapeXML(r.role.label) + '</div><div class="churn-row-sub">' + escapeXML(r.acct ? r.acct.label : '') + ' · ' + Math.round(r.info.daysStale) + 'd stale contact · ' + escapeXML(r.nearest.label || r.nearest.coverage_id) + '</div></div>' +
+        '<div class="churn-row-days">' + r.nearest.daysUntil + 'd<div class="lr-row-sub" style="color:var(--text3);font-weight:400">to expiry</div></div>' +
+      '</div>';
+    });
+  }
+  panelEl.innerHTML = html;
+  panelEl.querySelectorAll('.churn-row').forEach(el => el.addEventListener('click', () => { state.selectedId = el.dataset.id; renderAll(); }));
+}
+
+function renderPanel() {
+  if (!state.selectedId) { renderChurnPanel(); return; }
+  const n = nodeById.get(state.selectedId);
+  if (!n) { renderChurnPanel(); return; }
+  renderNodePanel(n);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════════════
+function renderAll() { renderRail(); renderWheel(); renderPanel(); }
+renderCompBar();
+renderAll();
+resetWheelView();
+RingEngine.showOnboardingHint('Scroll to zoom, drag to pan — try the Producer Gap Skew + Node Color Mode selectors above the wheel');
+</script>
+</body>
+</html>

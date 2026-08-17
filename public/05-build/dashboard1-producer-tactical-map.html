@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Producer's Tactical Map</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-1-specific rules only — everything shared lives in engine/style-core.css */
+#center-avatar{fill:var(--accent);fill-opacity:.16;stroke:var(--accent);stroke-width:2}
+/* Header matches 360's exact single-row pattern (Filters collapsed behind one button,
+   pinned Show/Hide-Names + Reset) instead of a permanent second filter row. */
+.bwi-badge{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--border2);border-radius:999px;background:var(--surface2);font-size:11px;color:var(--text2);white-space:nowrap}
+.bwi-track{width:60px;height:6px;background:var(--surface3);border-radius:999px;overflow:hidden;display:flex}
+.bwi-seg-hi{height:6px;background:var(--status-bound)}
+.bwi-seg-lo{height:6px;background:var(--status-expiring)}
+.bwi-num{font-variant-numeric:tabular-nums}
+#filters-popover{display:none;position:absolute;top:44px;right:0;z-index:50;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.3);flex-direction:column;gap:12px}
+#filters-popover.open{display:flex}
+.state-crumb{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border)}
+.state-crumb button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;padding:0}
+.acct-card-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
+.acct-vtag{font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--surface3);color:var(--text3)}
+.acct-counts{display:flex;gap:10px;font-size:11px;color:var(--text3);margin-top:4px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px}
+.legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:5px;max-width:230px}
+.legend-row{display:flex;align-items:center;gap:7px}
+.legend-swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-line{width:16px;height:0;border-top:1.5px solid;flex-shrink:0}
+.action-btn{width:100%;height:36px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;margin-top:10px}
+.action-btn:hover{opacity:.9}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Producer's Tactical Map</div>
+    <div class="h-sub">Radial relationship graph — who this producer knows, what's structurally reachable, and what still needs an intro.</div>
+  </div>
+  <div class="h-ctrl">
+    <span class="vtag" id="user-lock">USER: —</span>
+    <select class="filter-sel" id="sel-override" style="min-width:190px"></select>
+    <div class="theme-switch-wrap">
+      <span class="theme-switch-lbl">Dark</span>
+      <button class="theme-switch" id="theme-toggle"><span class="theme-switch-thumb"></span></button>
+    </div>
+    <div class="bwi-badge" title="Book Weight Index — live ring distribution of this producer's relationship-weighted book">
+      <span class="bwi-num" id="bwi-text">—</span>
+      <div class="bwi-track"><div class="bwi-seg-hi" id="bwi-hi" style="width:0"></div><div class="bwi-seg-lo" id="bwi-lo" style="width:0"></div></div>
+    </div>
+    <div style="position:relative">
+      <button class="btn" id="btn-filters">Filters &#9662;</button>
+      <div id="filters-popover">
+        <div class="filter-group"><span class="filter-lbl">Ring / Authority</span>
+          <select class="filter-sel" id="sel-ring"><option value="all">All rings</option><option value="0">Ring 0 — Apex</option><option value="1">Ring 1 — Signatory</option><option value="2">Ring 2 — Conditional</option><option value="3">Ring 3 — Transaction</option><option value="4">Ring 4 — Operational</option></select>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Relationship</span>
+          <select class="filter-sel" id="sel-rel"><option value="all">Known + Untapped</option><option value="known">Known only</option><option value="untapped">Untapped only</option></select>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Vertical</span>
+          <select class="filter-sel" id="sel-vertical"><option value="all">All verticals</option></select>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Node Display</span>
+          <div style="display:flex;gap:0;border:1px solid var(--border2);border-radius:6px;overflow:hidden">
+            <button class="btn on" id="btn-mode-person" style="border-radius:0;border:none;min-width:64px;height:30px">Person</button>
+            <button class="btn" id="btn-mode-company" style="border-radius:0;border:none;min-width:80px;height:30px;border-left:1px solid var(--border2)">Company</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn" id="btn-names">Show Names</button>
+    <button class="btn" id="btn-reset">Reset</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh"><div id="lrh-title">Your Accounts</div><div id="lrh-sub"></div></div>
+      <div class="state-crumb" id="state-crumb" style="display:none"><button id="btn-back">&larr; Whole book</button><span id="crumb-label"></span></div>
+      <div id="lrb"></div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <svg id="cv"></svg>
+    <div class="legend">
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-bound)"></span>Known (relationship on file)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.4"></span>Untapped (role exists, no contact)</div>
+      <div class="legend-row"><span class="legend-line" style="border-color:var(--text3)"></span>"Knows" — structural</div>
+      <div class="legend-row"><span class="legend-line" style="border-color:var(--accent);border-top-style:solid;border-top-width:2px"></span>Referred-by — historical</div>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+  </div>
+</div>
+
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', RingEngine.theme.toggle);
+
+// ── Derived indices over the shared v2 ontology — account_ref is a real field on
+//    every role node now (fixed 2026-08-16; the prior build parsed id suffixes
+//    against a hardcoded 7-account alias table that silently dropped all 143 new
+//    accounts' roles — see HANDOVER_360_TO_720.md §2.6 on why that class of bug
+//    matters). ──
+const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+const principals = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
+const rolesByAccount = new Map();
+roleNodes.forEach(n => { if (!rolesByAccount.has(n.account_ref)) rolesByAccount.set(n.account_ref, []); rolesByAccount.get(n.account_ref).push(n); });
+
+const rwKey = (pid, nid) => pid + '|' + nid;
+const rwIndex = new Map(RELATIONSHIP_WEIGHTS.map(r => [rwKey(r.producer_id, r.node_id), r]));
+const referralsByProducer = {};
+REFERRAL_EDGES.forEach(r => { (referralsByProducer[r.producer_id] = referralsByProducer[r.producer_id] || []).push(r); });
+const knowsOut = {}, knowsIn = {};
+EDGES_720.filter(e => e.edge_type === 'knows').forEach(e => { (knowsOut[e.from] = knowsOut[e.from] || []).push(e); (knowsIn[e.to] = knowsIn[e.to] || []).push(e); });
+const crossPollBySource = {};
+EDGES_720.filter(e => e.edge_type === 'cross_pollination').forEach(e => { (crossPollBySource[e.from] = crossPollBySource[e.from] || []).push(e); });
+
+const ACCOUNTS = principals.map(p => {
+  const map = ACCOUNT_PRODUCER_MAP.find(m => m.ubo_id === p.id);
+  const people = rolesByAccount.get(p.id) || [];
+  const verticals = Array.from(new Set(people.map(n => n.vertical)));
+  return { principal: p, people, verticals, producer_id: map ? map.producer_id : null };
+});
+const accountByUbo = new Map(ACCOUNTS.map(a => [a.principal.id, a]));
+
+function isKnown(producerId, nodeId) { return rwIndex.has(rwKey(producerId, nodeId)); }
+
+const CATEGORIES = Array.from(new Set(roleNodes.map(n => n.category))).sort();
+const CATEGORY_COLORS = ['#6a9de0','#3a7fd4','#cc5555','#4488aa','#6aaa44','#aa44aa','#e07a30','#c9a84c','#2a9a8a'];
+const domainsForWholeBook = CATEGORIES.map((c, i) => ({ id: i + 1, name: c, col: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }));
+const categoryDomainId = new Map(domainsForWholeBook.map(d => [d.name, d.id]));
+
+function bookWeightIndex(producerId) {
+  const rows = RELATIONSHIP_WEIGHTS.filter(r => r.producer_id === producerId);
+  const byRing = {0:0,1:0,2:0,3:0,4:0};
+  let total = 0;
+  rows.forEach(r => { const n = nodeById.get(r.node_id); if (!n) return; byRing[n.ring] = (byRing[n.ring]||0) + r.relationship_weight; total += r.relationship_weight; });
+  const pct = ks => total ? Math.round(ks.reduce((s,k)=>s+(byRing[k]||0),0) / total * 100) : 0;
+  return { hi: pct([0,1]), lo: pct([3,4]), count: rows.length, total: total.toFixed(1) };
+}
+
+// ── State ──
+const state = { producerId: PRODUCERS[0].producer_id, view: 'book', accountId: null, selectedNodeId: null,
+  showLabels: false, filters: { ring: 'all', rel: 'all', vertical: 'all', mode: 'person' } };
+
+function currentProducer() { return PRODUCERS.find(p => p.producer_id === state.producerId); }
+function producerAccounts() { return ACCOUNTS.filter(a => a.producer_id === state.producerId); }
+
+// ── Populate static controls ──
+const overrideSel = document.getElementById('sel-override');
+PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = `${p.name} — ${p.archetype}`; overrideSel.appendChild(o); });
+overrideSel.addEventListener('change', () => { state.producerId = overrideSel.value; state.view = 'book'; state.accountId = null; state.selectedNodeId = null; renderAll(); });
+
+const vSel = document.getElementById('sel-vertical');
+Array.from(new Set(roleNodes.map(n => n.vertical))).sort().forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase()); vSel.appendChild(o); });
+vSel.addEventListener('change', () => { state.filters.vertical = vSel.value; renderAll(); });
+document.getElementById('sel-ring').addEventListener('change', e => { state.filters.ring = e.target.value; renderAll(); });
+document.getElementById('sel-rel').addEventListener('change', e => { state.filters.rel = e.target.value; renderAll(); });
+document.getElementById('btn-mode-person').addEventListener('click', () => setMode('person'));
+document.getElementById('btn-mode-company').addEventListener('click', () => setMode('company'));
+function setMode(m) { state.filters.mode = m; document.getElementById('btn-mode-person').classList.toggle('on', m==='person'); document.getElementById('btn-mode-company').classList.toggle('on', m==='company'); renderAll(); }
+document.getElementById('btn-back').addEventListener('click', () => { state.view = 'book'; state.accountId = null; state.selectedNodeId = null; renderAll(); });
+
+// ── 360-pattern header controls: Filters popover, Show/Hide Names, Reset ──
+const filtersBtn = document.getElementById('btn-filters');
+const filtersPopover = document.getElementById('filters-popover');
+filtersBtn.addEventListener('click', evt => { evt.stopPropagation(); filtersPopover.classList.toggle('open'); filtersBtn.classList.toggle('on', filtersPopover.classList.contains('open')); });
+document.addEventListener('click', evt => { if (!filtersPopover.contains(evt.target) && evt.target !== filtersBtn) { filtersPopover.classList.remove('open'); filtersBtn.classList.remove('on'); } });
+
+const namesBtn = document.getElementById('btn-names');
+namesBtn.addEventListener('click', () => { state.showLabels = !state.showLabels; namesBtn.textContent = state.showLabels ? 'Hide Names' : 'Show Names'; namesBtn.classList.toggle('on', state.showLabels); renderGraph(); });
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  state.view = 'book'; state.accountId = null; state.selectedNodeId = null; state.showLabels = false;
+  state.filters = { ring: 'all', rel: 'all', vertical: 'all', mode: 'person' };
+  overrideSel.value = state.producerId;
+  document.getElementById('sel-ring').value = 'all'; document.getElementById('sel-rel').value = 'all'; vSel.value = 'all';
+  namesBtn.textContent = 'Show Names'; namesBtn.classList.remove('on');
+  document.getElementById('btn-mode-person').classList.add('on'); document.getElementById('btn-mode-company').classList.remove('on');
+  renderAll();
+});
+document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+
+// ── Rail ──
+function renderRail() {
+  const lrb = document.getElementById('lrb');
+  lrb.innerHTML = '';
+  document.getElementById('state-crumb').style.display = state.view === 'account' ? 'flex' : 'none';
+
+  if (state.view === 'book') {
+    document.getElementById('lrh-title').textContent = 'Your Accounts';
+    const accts = producerAccounts();
+    document.getElementById('lrh-sub').textContent = `${currentProducer().name} — ${accts.length} accounts`;
+    accts.sort((a,b) => b.people.length - a.people.length).forEach(a => {
+      const known = a.people.filter(n => isKnown(state.producerId, n.id)).length;
+      const untapped = a.people.length - known;
+      const div = document.createElement('div');
+      div.className = 'lr-row'; div.style.flexDirection = 'column'; div.style.alignItems = 'stretch';
+      const vtags = a.verticals.map(v => `<span class="acct-vtag">${v.replace('_',' ')}</span>`).join('');
+      div.innerHTML = `<div class="lr-row-label">${a.principal.label}</div><div class="lr-row-sub">${a.principal.desc}</div><div class="acct-card-tags">${vtags}</div><div class="acct-counts"><span><span class="dot" style="background:var(--status-bound)"></span>${known} known</span><span><span class="dot" style="background:var(--text3);opacity:.4"></span>${untapped} untapped</span></div>`;
+      div.addEventListener('click', () => { state.view = 'account'; state.accountId = a.principal.id; state.selectedNodeId = null; renderAll(); });
+      lrb.appendChild(div);
+    });
+  } else {
+    const acct = accountByUbo.get(state.accountId);
+    document.getElementById('lrh-title').textContent = acct.principal.label;
+    document.getElementById('lrh-sub').textContent = `${acct.people.length} contacts`;
+    document.getElementById('crumb-label').textContent = acct.principal.label;
+    const byCategory = {};
+    acct.people.forEach(n => { (byCategory[n.category] = byCategory[n.category] || []).push(n); });
+    Object.entries(byCategory).forEach(([cat, ppl]) => {
+      const group = document.createElement('div'); group.className = 'lr-group';
+      const head = document.createElement('div'); head.className = 'lr-group-head';
+      head.innerHTML = `<span class="lr-group-name">${cat}</span><span class="lr-group-meta">${ppl.length}</span>`;
+      const body = document.createElement('div'); body.className = 'lr-group-body';
+      ppl.sort((a,b)=>a.ring-b.ring).forEach(n => {
+        const row = document.createElement('div'); row.className = 'lr-row';
+        if (state.selectedNodeId === n.id) row.classList.add('active');
+        const known = isKnown(state.producerId, n.id);
+        row.innerHTML = `<div><div class="lr-row-label">${n.label}</div><div class="lr-row-sub">Ring ${n.ring} · ${n.coi_type}</div></div><span class="dot" style="background:${known?'var(--status-bound)':'var(--text3)'};opacity:${known?1:.4}"></span>`;
+        row.addEventListener('click', () => { state.selectedNodeId = n.id; renderAll(); });
+        body.appendChild(row);
+      });
+      group.appendChild(head); group.appendChild(body); lrb.appendChild(group);
+    });
+  }
+}
+
+// ── Graph ──
+function visibleNodesForBook() {
+  let nodes = producerAccounts().flatMap(a => a.people);
+  if (state.filters.vertical !== 'all') nodes = nodes.filter(n => n.vertical === state.filters.vertical);
+  if (state.filters.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(state.filters.ring));
+  if (state.filters.rel === 'known') nodes = nodes.filter(n => isKnown(state.producerId, n.id));
+  if (state.filters.rel === 'untapped') nodes = nodes.filter(n => !isKnown(state.producerId, n.id));
+  return nodes;
+}
+function visibleNodesForAccount() {
+  const acct = accountByUbo.get(state.accountId);
+  let nodes = acct.people;
+  if (state.filters.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(state.filters.ring));
+  if (state.filters.rel === 'known') nodes = nodes.filter(n => isKnown(state.producerId, n.id));
+  if (state.filters.rel === 'untapped') nodes = nodes.filter(n => !isKnown(state.producerId, n.id));
+  return nodes;
+}
+
+function relColor(n) {
+  const known = isKnown(state.producerId, n.id);
+  return known ? getComputedStyle(document.body).getPropertyValue('--status-bound').trim()
+               : getComputedStyle(document.body).getPropertyValue('--text3').trim();
+}
+function sizeForNode(n) {
+  const rw = rwIndex.get(rwKey(state.producerId, n.id));
+  const w = rw ? rw.relationship_weight : 1.2;
+  const minR = {0:16,1:11,2:8,3:6,4:5}[n.ring] ?? 5;
+  const maxR = {0:32,1:22,2:16,3:12,4:9}[n.ring] ?? 9;
+  return minR + Math.min(1, w / 9) * (maxR - minR);
+}
+
+function renderGraph() {
+  const svg = document.getElementById('cv');
+  const nodes = state.view === 'book' ? visibleNodesForBook() : visibleNodesForAccount();
+
+  // Matching 360's own restraint exactly: relationship lines render ONLY for the
+  // active/selected node, never universally — drawing every edge at once for a
+  // 100+ node whole-book view is noise, not signal (dataviz skill: "recessive
+  // grid/axes"; handover §1: "legible without reading a single label").
+  const edges = [];
+  if (state.selectedNodeId) {
+    const sid = state.selectedNodeId;
+    (knowsOut[sid] || []).forEach(e => { if (nodes.find(x => x.id === e.to)) edges.push({ from: e.from, to: e.to, color: '#8a8a8a', width: '1', opacity: '0.55' }); });
+    (knowsIn[sid] || []).forEach(e => { if (nodes.find(x => x.id === e.from)) edges.push({ from: e.from, to: e.to, color: '#8a8a8a', width: '1', opacity: '0.55' }); });
+    (referralsByProducer[state.producerId] || []).forEach(r => {
+      if ((r.from_node_id === sid || r.to_node_id === sid) && nodes.find(n => n.id === r.from_node_id) && nodes.find(n => n.id === r.to_node_id)) {
+        edges.push({ from: r.from_node_id, to: r.to_node_id, color: '#27b3e3', width: '2', opacity: '0.8' });
+      }
+    });
+  }
+
+  const domains = domainsForWholeBook;
+  // Auto-fit: 360 is a fixed single-vertical canvas; ours spans a whole book with
+  // no natural upper bound on node count, so the initial zoom must fit the actual
+  // ring radius to the actual viewport rather than assuming vz=1 fits (it doesn't
+  // once RO[4]=1020 exceeds the panel's pixel width).
+  const W = svg.clientWidth || 1200, H = svg.clientHeight || 900;
+  const fitZoom = Math.min(W, H) / (2 * (RingEngine.DEFAULT_RING.RO[4] + 110));
+  const { byId } = RingEngine.render(svg, {
+    nodes, domains, colorFn: relColor, sizeFn: sizeForNode, scoreFn: n => (rwIndex.get(rwKey(state.producerId,n.id))||{}).relationship_weight || 1,
+    ringOf: n => n.ring, domainOf: n => categoryDomainId.get(n.category) || 1,
+    labelFn: n => n.label, edges, activeId: state.selectedNodeId, showLabels: state.showLabels,
+    vz: fitZoom,
+    onSelect: n => { state.selectedNodeId = n.id; if (state.view==='book') { state.view='account'; state.accountId = n.account_ref; } renderAll(); },
+    onHover: (evt, n) => RingEngine.tooltip.show(evt, n.label, `Ring ${n.ring} · ${n.category}`, n.desc),
+    onLeave: RingEngine.tooltip.hide,
+  });
+}
+
+// ── Panel ──
+function renderPanel() {
+  const panel = document.getElementById('panel');
+  const n = state.selectedNodeId ? nodeById.get(state.selectedNodeId) : null;
+  if (!n) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">&#9673;</div><div class="panel-empty-text">Select a contact — from the rail or the graph — to see relationship detail, the structural knows-chain, and a next-best-action.</div></div>`;
+    return;
+  }
+  const rw = rwIndex.get(rwKey(state.producerId, n.id));
+  const acct = accountByUbo.get(n.account_ref);
+  const refs = (referralsByProducer[state.producerId] || []).filter(r => r.from_node_id === n.id || r.to_node_id === n.id);
+  const knowsChain = (knowsOut[n.id] || []).concat(knowsIn[n.id] || []);
+  panel.innerHTML = `
+    <div class="panel-header"><div class="panel-title">${n.label}</div>
+      <div class="panel-meta-row"><span class="badge badge-ring">Ring ${n.ring}</span><span class="badge badge-coi ${n.coi_type}">${n.coi_type}</span><span class="badge" style="background:var(--surface3);color:var(--text2)">${acct ? acct.principal.label : ''}</span></div>
+    </div>
+    <div class="box"><h3>Description</h3><p>${n.desc || ''}</p></div>
+    ${rw ? `<div class="box"><h3>Relationship</h3><div class="info-table">
+      <div class="info-row"><span class="info-key">Weight</span><span class="info-val num"><strong>${rw.relationship_weight}</strong></span></div>
+      <div class="info-row"><span class="info-key">Activity (90d)</span><span class="info-val num">${rw.activity_count_90d} touches</span></div>
+      <div class="info-row"><span class="info-key">Last contact</span><span class="info-val num">${rw.last_activity_date}</span></div>
+    </div></div>` : `<div class="box"><h3>Relationship</h3><p>Untapped — this role exists structurally but ${currentProducer().name} has no logged contact on file.</p></div>`}
+    ${knowsChain.length ? `<div class="box"><h3>Structural knows-chain</h3><div class="talks-list">${knowsChain.slice(0,6).map(e => `<div class="talks-row"><div class="talks-peer"><span class="talks-dot" style="background:var(--accent)"></span><span class="talks-name">${nodeById.get(e.from===n.id?e.to:e.from)?.label || ''}</span></div><div class="talks-why">${e.why}</div></div>`).join('')}</div></div>` : ''}
+    ${refs.length ? `<div class="box"><h3>Referral history</h3><div class="talks-list">${refs.map(r => `<div class="talks-row"><div class="talks-why">${r.notes} <span style="color:var(--text3)">(${r.referred_date})</span></div></div>`).join('')}</div></div>` : ''}
+    <button class="action-btn">Draft Intro Request</button>
+  `;
+}
+
+function renderHeader() {
+  document.getElementById('user-lock').textContent = `USER: ${currentProducer().name}`;
+  overrideSel.value = state.producerId;
+  const bwi = bookWeightIndex(state.producerId);
+  document.getElementById('bwi-hi').style.width = bwi.hi + '%';
+  document.getElementById('bwi-lo').style.width = bwi.lo + '%';
+  document.getElementById('bwi-text').textContent = `${bwi.hi}% Ring 0/1 · ${bwi.lo}% Ring 3/4 (${bwi.count} known, Σw ${bwi.total})`;
+}
+
+function renderAll() { renderHeader(); renderRail(); renderGraph(); renderPanel(); }
+window.addEventListener('resize', renderGraph);
+renderAll();
+RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
+</script>
+</body>
+</html>

@@ -10,7 +10,30 @@
    This view reuses RingEngine (engine/render-core.js) structurally unmodified for
    layout/theming/tooltip; the split-fill node rendering below is a POST-PROCESSING
    pass layered on top of what RingEngine already drew (see the script block's
-   splitFillNode()) — render-core.js itself is never edited. */
+   splitFillNode()) — render-core.js itself is never edited.
+
+   CANVAS GEOMETRY — 2026-08-17 rebuilt to match D0's real pentagon-of-5-wheels
+   technique (dashboard0-ontology-foundation.html), NOT the old single combined
+   45-sector wheel this file used to render. Five separate <svg> elements, one
+   per vertical, each its own independent RingEngine.render() call against the
+   PLAIN 9-segment domains (TEMPLATE_ONTOLOGY.segments) — no vertOffset, no
+   combinedDomains, no per-vertical sector merging. Founder-confirmed tradeoff:
+   direct side-by-side $ comparison across verticals gets harder since they're
+   now spatially separate wheels — chosen anyway, for visual consistency with
+   D0/D1/D2/D3/D5. Node dollar sizing/coloring, the Deficiency Heatmap, the
+   Carrier Concentration Radar and the whole-book KPI rail are all UNCHANGED —
+   only the canvas geometry moved. */
+.universe-canvas{position:absolute;inset:0;overflow:hidden;cursor:grab}
+.universe-canvas.dragging{cursor:grabbing}
+#canvas-inner{position:relative;transform-origin:0 0}
+.ucluster{position:absolute}
+.ucluster svg{overflow:visible;cursor:pointer;display:block}
+.ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
+.ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ucluster-meta{font-size:11px;font-weight:700;color:var(--accent)}
+.canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
 /* Limit-adequacy hue — same rust used by dashboard2-whitespace-gap-engine.html
    for a coverage that IS bound but whose bound_limit_usd falls below its
    tier's required baseline_limit_usd. Deliberately not the same red as
@@ -88,8 +111,11 @@ body.theme-dark{--status-deficient:#e0916a}
 
 <header>
   <div class="h-left">
-    <div class="h-title">Role Macro View</div>
-    <div class="h-sub">Every domain, every vertical, one wheel. Node size = total $ touching this specific role (bound + estimated whitespace) · fill = solid for bound, diagonal-hatched for estimated — never shown as equally certain. Click a node for the producers already positioned to close it.</div>
+    <div class="h-left-row">
+      <a href="index.html" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
+      <div class="h-title">Role Macro View</div>
+    </div>
+    <div class="h-sub">Five vertical wheels — <strong>yacht, aviation, real estate, auto, personal</strong> — arranged pentagon-style, same layout as D0. Each wheel sized by that vertical's own real GWP. Node size = total $ touching this specific role (bound + estimated whitespace) · fill = solid for bound, diagonal-hatched for estimated — never shown as equally certain. Click a node for the producers already positioned to close it.</div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
       <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D4 Role Macro View</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
     </nav>
@@ -151,7 +177,14 @@ body.theme-dark{--status-deficient:#e0916a}
   </div>
 
   <div id="cv-wrap">
-    <svg id="cv"></svg>
+    <div class="universe-canvas" id="universe-canvas">
+      <div id="canvas-inner"></div>
+      <div class="canvas-zoom-ctrl">
+        <button id="zoom-in" type="button">+</button>
+        <button id="zoom-out" type="button">&minus;</button>
+        <button class="wide" id="zoom-reset" type="button">Reset view</button>
+      </div>
+    </div>
     <div class="legend">
       <div class="legend-row"><span class="legend-swatch" style="background:#2ec478"></span>Well-penetrated role — mostly bound</div>
       <div class="legend-row"><span class="legend-swatch" style="background:#e0a640"></span>Partially penetrated</div>
@@ -241,23 +274,11 @@ VERTICALS.forEach(v => {
 // nodes into a wedge/rollup that doesn't exist.
 function normVertical(v){ return v === 'realestate' ? 'real_estate' : v; }
 
-// Concatenate the 5 verticals' own domain lists into ONE global sequential
-// domain array (ids 1..45 — 9 canonical segments × 5 verticals) so
-// RingEngine.render() — structurally unmodified — draws one continuous
-// wheel spanning all 5 verticals, each vertical's real 9-segment
-// domain segmentation intact, matching "opens something that looks like the
-// exact artifact already shown in the SVP deck."
-let _off = 0;
-const vertOffset = {};
-const combinedDomains = [];
-VERTICALS.forEach(v => {
-  vertOffset[v] = _off;
-  DOMAINS_BY_VERTICAL[v].list.forEach(d => {
-    combinedDomains.push({ id: _off + d.id, name: d.name, col: d.col });
-  });
-  _off += DOMAINS_BY_VERTICAL[v].count;
-});
-const TOTAL_DOMAINS = combinedDomains.length; // 45 (9 segments × 5 verticals)
+// PLAIN_DOMAINS — the same 9-segment list every wheel uses, verbatim, no
+// per-vertical offset. Each vertical gets its OWN <svg>/RingEngine.render()
+// call (see the WHEEL section below), so there is no need to merge 5
+// verticals' domains into one 45-sector ring the way this file used to.
+const PLAIN_DOMAINS = SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col }));
 
 function domainName(vertical, localId) {
   const v = normVertical(vertical);
@@ -273,6 +294,15 @@ const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
 const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
 const principalNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
 const wheelNodes = roleNodes.concat(principalNodes);
+// Split once, by each node's own (normalized) vertical — this is the partition
+// that drives which of the 5 separate <svg> wheels a node renders into. A
+// principal/account node carries exactly one vertical tag even though its own
+// dollar rollup (nodeFinancials) can span every vertical that account touches
+// — same "apex node sits in its home vertical's wheel" placement this file
+// already used inside the old combined wheel, just now a real per-svg split
+// instead of a sector offset.
+const wheelNodesByVertical = {};
+VERTICALS.forEach(v => { wheelNodesByVertical[v] = wheelNodes.filter(n => normVertical(n.vertical) === v); });
 const producerNameById = new Map(PRODUCERS.map(p => [p.producer_id, p.name]));
 
 const rolesByAccount = new Map();
@@ -527,7 +557,7 @@ function pxRadius(total, isPrincipal) {
 // ════════════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════════════
-const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null };
+const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null, zoom: 1, panX: 0, panY: 0 };
 // Regional-aggregate total for one producer's own book (roleNodes only — not
 // principals — matching how GRAND_TOTAL itself sums off roleFin, never wheelNodes,
 // so a role's dollars are never counted twice through its account rollup).
@@ -544,23 +574,89 @@ function producerVerticalTotal(vertical, producerId) {
   });
   return sold + prospected;
 }
-const wheelSvg = document.getElementById('cv');
 const panelEl = document.getElementById('panel');
+const svgByVertical = {};
+const clusterElByVertical = {};
+
+// ════════════════════════════════════════════════════════════════════
+// PENTAGON CANVAS — D0's real technique (dashboard0-ontology-foundation.html),
+// reused verbatim: 5 clusters on a shared coordinate space, each cluster's
+// center on a circle of radius ORBIT_RADIUS, evenly spaced (72° apart),
+// starting at 12 o'clock and going clockwise. CANVAS_SIZE just needs to be
+// big enough that no cluster's absolute box clips outside #canvas-inner.
+// Unlike D0 (which sizes each cluster by role count), D4 sizes each cluster
+// by that vertical's own real $ magnitude — sqrt-scaled between MIN_PX/MAX_PX
+// so area (not radius) tracks $ roughly linearly, same "size communicates the
+// real signal" principle as every other dollar-scaled element in this suite.
+// ════════════════════════════════════════════════════════════════════
+const ORBIT_RADIUS = 700;
+const CANVAS_SIZE = 2700;
+const CLUSTER_MIN_PX = 540, CLUSTER_MAX_PX = 1000;
+function verticalTotal(v) { return verticalRollup[v].sold + verticalRollup[v].prospected; }
+const VERTICAL_TOTAL_LO = Math.min(...VERTICALS.map(verticalTotal));
+const VERTICAL_TOTAL_HI = Math.max(...VERTICALS.map(verticalTotal));
+function verticalPx(v) {
+  if (VERTICAL_TOTAL_HI <= VERTICAL_TOTAL_LO) return Math.round((CLUSTER_MIN_PX + CLUSTER_MAX_PX) / 2);
+  const frac = Math.sqrt((verticalTotal(v) - VERTICAL_TOTAL_LO) / (VERTICAL_TOTAL_HI - VERTICAL_TOTAL_LO));
+  return Math.round(CLUSTER_MIN_PX + frac * (CLUSTER_MAX_PX - CLUSTER_MIN_PX));
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ZOOM & PAN — same interaction model as D0/D1/D2: plain scroll wheel
+// zooms, click-drag pans, zoom is anchored to the viewport CENTER (the
+// content point under the middle of the visible canvas stays put).
+// ════════════════════════════════════════════════════════════════════
+function applyZoom() {
+  document.getElementById('canvas-inner').style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+}
+function zoomBy(delta) {
+  const newZoom = Math.max(0.25, Math.min(2.5, state.zoom + delta));
+  if (newZoom === state.zoom) return;
+  const canvas = document.getElementById('universe-canvas');
+  const vx = canvas.clientWidth / 2, vy = canvas.clientHeight / 2;
+  const contentX = (vx - state.panX) / state.zoom, contentY = (vy - state.panY) / state.zoom;
+  state.panX = vx - newZoom * contentX;
+  state.panY = vy - newZoom * contentY;
+  state.zoom = newZoom;
+  applyZoom();
+}
+function centerView() {
+  const canvas = document.getElementById('universe-canvas');
+  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+(function(){
+  const canvasEl = document.getElementById('universe-canvas');
+  canvasEl.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+  let drag = null;
+  canvasEl.addEventListener('mousedown', (e) => { drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false }; canvasEl.classList.add('dragging'); });
+  canvasEl.addEventListener('mousemove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    if (drag.moved) { state.panX = drag.panX + dx; state.panY = drag.panY + dy; applyZoom(); }
+  });
+  function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
+  canvasEl.addEventListener('mouseup', endDrag);
+  canvasEl.addEventListener('mouseleave', endDrag);
+})();
 
 // ════════════════════════════════════════════════════════════════════
 // WHEEL — RingEngine.render() draws layout/rings/domain wedges/tooltip
-// wiring/click wiring exactly as shipped. Everything below is a
-// post-processing pass on the DOM it produces: (1) inject the shared hatch
-// <defs> pattern once, (2) replace each node's plain circle with a
-// proportional solid/hatched split-fill built from the SAME x/y/r RingEngine
-// already computed, (3) draw the hub total + vertical mega-segment $ labels
-// as extra scene children, (4) tag each node with data-ring/data-vertical so
-// filtering can dim in place without re-running layout (keeps the mental map
-// stable across a filter toggle).
+// wiring/click wiring exactly as shipped, once PER VERTICAL against the
+// plain 9-segment domains. Everything below is a post-processing pass on
+// the DOM each call produces: (1) inject that svg's own hatch <defs>
+// pattern, (2) replace each node's plain circle with a proportional
+// solid/hatched split-fill built from the SAME x/y/r RingEngine already
+// computed, (3) tag each node with data-ring so the ring filter can dim
+// in place without re-running layout.
 // ════════════════════════════════════════════════════════════════════
-function injectDefs() {
-  wheelSvg.insertAdjacentHTML('afterbegin',
-    '<defs><pattern id="hatch-prospect" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+function injectDefs(svg, v) {
+  svg.insertAdjacentHTML('afterbegin',
+    '<defs><pattern id="hatch-prospect-' + v + '" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
     '<rect width="5" height="5" fill="none"/>' +
     '<line x1="0" y1="0" x2="0" y2="5" stroke="var(--text2)" stroke-width="1.6" stroke-opacity="0.85"/>' +
     '</pattern></defs>'
@@ -586,15 +682,15 @@ function arcSegPath(cx, cy, r, startAngle, sweep) {
 // When soldDeficient is 0 (the overwhelming majority of nodes) this collapses
 // to EXACTLY the original 2-wedge sold/prospected rendering — same paths,
 // same opacities — so the pre-existing macro read never regresses.
-function splitFillNode(p) {
+function splitFillNode(p, svg, v) {
   const n = p.n;
   const isPrincipal = n.node_type === 'principal';
   const fin = currentFin(n);
-  const g = wheelSvg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
+  const g = svg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
   if (!g) return;
   g.setAttribute('data-ring', n.ring);
-  g.setAttribute('data-vertical', normVertical(n.vertical));
   g.setAttribute('data-deficient', fin.soldDeficient > 0 ? '1' : '0');
+  const hatchUrl = 'url(#hatch-prospect-' + v + ')';
   const cx = p.x, cy = p.y, r = p.r;
   const isActive = state.selectedId === n.id;
   let inner = '';
@@ -614,7 +710,7 @@ function splitFillNode(p) {
     if (segs.length <= 1) {
       const s = segs[0] || { fill: col, opacity: 0.22, hatch: true };
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
-      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="url(#hatch-prospect)"/>';
+      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + hatchUrl + '"/>';
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.fill + '" stroke-width="' + sw + '"/>';
     } else {
       let start = -Math.PI / 2;
@@ -622,7 +718,7 @@ function splitFillNode(p) {
         const sweep = s.frac * Math.PI * 2;
         const d = arcSegPath(cx, cy, r, start, sweep);
         inner += '<path d="' + d + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
-        if (s.hatch) inner += '<path d="' + d + '" fill="url(#hatch-prospect)"/>';
+        if (s.hatch) inner += '<path d="' + d + '" fill="' + hatchUrl + '"/>';
         start += sweep;
       });
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"/>';
@@ -631,59 +727,38 @@ function splitFillNode(p) {
   g.innerHTML = inner;
 }
 
-function drawHub(scene) {
+// Small floating corner label per cluster — vertical name + a real summary
+// stat (this vertical's own $ total, whole-book or the active producer's own
+// gap pattern). This replaces the old combined-wheel's center hub + mega-
+// segment overlay labels (drawHub()/drawVerticalOverlay(), both retired) —
+// same real numbers, now anchored per-cluster instead of drawn onto one wheel.
+function updateClusterMeta(v) {
+  const meta = document.getElementById('meta-' + v);
+  if (!meta) return;
   const producer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
-  const label = producer ? (producer.name.toUpperCase() + "'S BOOK") : 'WHOLE BOOK';
-  const total = producer ? producerGrandTotal(state.producerId).total : GRAND_TOTAL;
-  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-  g.innerHTML =
-    '<text x="0" y="-8" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="0.06em" fill="var(--text3)">' + escapeXML(label) + '</text>' +
-    '<text x="0" y="24" text-anchor="middle" font-size="34" font-weight="900" fill="var(--text)">' + fmtMoney(total) + '</text>';
-  scene.appendChild(g);
+  const total = producer ? producerVerticalTotal(v, state.producerId) : verticalTotal(v);
+  const roleCount = wheelNodesByVertical[v].filter(n => n.node_type === 'role').length;
+  meta.textContent = fmtMoney(total) + (producer ? " · " + producer.name + "'s book" : ' · Whole Book') + ' · ' + roleCount + ' roles';
 }
 
-function drawVerticalOverlay(scene) {
-  const hubR = RingEngine.DEFAULT_RING.RO[4];
-  VERTICALS.forEach(v => {
-    const startIdx = vertOffset[v] + 1;
-    const count = DOMAINS_BY_VERTICAL[v].count;
-    const a0 = RingEngine.sectorStart(startIdx, TOTAL_DOMAINS);
-    const a1 = RingEngine.sectorStart(startIdx + count, TOTAL_DOMAINS);
-    const mid = (a0 + a1) / 2;
-    const lineR = hubR + 170;
-    const lx0 = Math.cos(a0) * lineR, ly0 = Math.sin(a0) * lineR;
-    const labelR = hubR + 150;
-    const lx = Math.cos(mid) * labelR, ly = Math.sin(mid) * labelR;
-    const roll = verticalRollup[v];
-    const vtot = state.producerId ? producerVerticalTotal(v, state.producerId) : (roll.sold + roll.prospected);
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('data-vertical-overlay', v);
-    g.innerHTML =
-      '<line x1="0" y1="0" x2="' + lx0.toFixed(1) + '" y2="' + ly0.toFixed(1) + '" stroke="var(--accent)" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="1 5"/>' +
-      '<text x="' + lx.toFixed(1) + '" y="' + (ly-10).toFixed(1) + '" text-anchor="middle" font-size="24" font-weight="800" letter-spacing="0.04em" fill="var(--accent)">' + VERTICAL_LABELS[v].toUpperCase() + '</text>' +
-      '<text x="' + lx.toFixed(1) + '" y="' + (ly+20).toFixed(1) + '" text-anchor="middle" font-size="28" font-weight="900" fill="var(--text)">' + fmtMoney(vtot) + '</text>';
-    scene.appendChild(g);
-  });
-}
-
-function renderWheel() {
-  recomputeMaxNodeTotal(); // must run before sizeFn below — reflects the active producer mode
-  const W = wheelSvg.clientWidth || 1200, H = wheelSvg.clientHeight || 900;
+function renderUniverse(v) {
+  const svg = svgByVertical[v];
+  const nodes = wheelNodesByVertical[v];
+  const px = verticalPx(v);
   const HUB_MAX_R = RingEngine.DEFAULT_RING.RO[4] + 200;
-  const fitZoom = Math.min(W, H) / (2 * (HUB_MAX_R + 30));
-  const { layout } = RingEngine.render(wheelSvg, {
-    nodes: wheelNodes,
-    domains: combinedDomains,
+  const fitZoom = px / (2 * (HUB_MAX_R + 30));
+  const { layout } = RingEngine.render(svg, {
+    nodes, domains: PLAIN_DOMAINS,
     colorFn: n => { const f = currentFin(n); return f.total > 0 ? colorScale(f.ratio) : 'var(--text3)'; },
     sizeFn: n => pxRadius(currentFin(n).total, n.node_type === 'principal'),
     scoreFn: n => currentFin(n).total || 0,
     ringOf: n => n.ring,
-    domainOf: n => vertOffset[normVertical(n.vertical)] + n.domain,
+    domainOf: n => n.domain,
     labelFn: n => n.label,
     edges: [],
     activeId: state.selectedId,
     showLabels: false,
-    vz: fitZoom,
+    vz: Math.max(0.12, fitZoom),
     onSelect: n => { state.selectedId = n.id; renderAll(); },
     onHover: (evt, n) => {
       const f = currentFin(n);
@@ -699,25 +774,61 @@ function renderWheel() {
     },
     onLeave: RingEngine.tooltip.hide,
   });
-  const scene = wheelSvg.querySelector('g');
-  injectDefs();
-  layout.forEach(p => splitFillNode(p));
-  drawHub(scene);
-  drawVerticalOverlay(scene);
+  injectDefs(svg, v);
+  layout.forEach(p => splitFillNode(p, svg, v));
+  updateClusterMeta(v);
+}
+
+function renderWheel() {
+  recomputeMaxNodeTotal(); // must run before sizeFn below — reflects the active producer mode, GLOBAL across all 5 wheels (not per-vertical) so node radii stay comparable across verticals
+  const inner = document.getElementById('canvas-inner');
+  inner.innerHTML = '';
+  inner.style.width = CANVAS_SIZE + 'px';
+  inner.style.height = CANVAS_SIZE + 'px';
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  VERTICALS.forEach((v, i) => {
+    const px = verticalPx(v);
+    const angle = (2 * Math.PI * i / VERTICALS.length) - Math.PI / 2;
+    const clusterCx = cx + ORBIT_RADIUS * Math.cos(angle);
+    const clusterCy = cy + ORBIT_RADIUS * Math.sin(angle);
+    // Frameless — no card border, no per-cluster background. Just the wheel
+    // and a small floating label anchored to its corner (D0's own pattern).
+    const cluster = document.createElement('div');
+    cluster.className = 'ucluster';
+    cluster.style.left = (clusterCx - px / 2) + 'px';
+    cluster.style.top = (clusterCy - px / 2) + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', px); svg.setAttribute('height', px);
+    svgByVertical[v] = svg;
+    cluster.appendChild(svg);
+    const label = document.createElement('div');
+    label.className = 'ucluster-label';
+    label.innerHTML = '<span class="ucluster-name">' + VERTICAL_LABELS[v] + '</span><span class="ucluster-meta" id="meta-' + v + '"></span>';
+    cluster.appendChild(label);
+    inner.appendChild(cluster);
+    clusterElByVertical[v] = cluster;
+    renderUniverse(v);
+  });
+  applyZoom();
   applyFilters();
 }
 
 function applyFilters() {
-  document.querySelectorAll('#cv g[data-nid]').forEach(el => {
-    const ring = el.getAttribute('data-ring');
-    const vert = el.getAttribute('data-vertical');
-    const show = (state.ringFilter === 'all' || state.ringFilter === ring) && state.activeVerticals.has(vert);
-    el.style.opacity = show ? '1' : '0.08';
-    el.style.pointerEvents = show ? 'auto' : 'none';
-  });
-  document.querySelectorAll('#cv g[data-vertical-overlay]').forEach(el => {
-    const v = el.getAttribute('data-vertical-overlay');
-    el.style.opacity = state.activeVerticals.has(v) ? '1' : '0.15';
+  VERTICALS.forEach(v => {
+    const cluster = clusterElByVertical[v];
+    const svg = svgByVertical[v];
+    if (!cluster || !svg) return;
+    const activeV = state.activeVerticals.has(v);
+    cluster.style.opacity = activeV ? '1' : '0.12';
+    cluster.style.pointerEvents = activeV ? 'auto' : 'none';
+    if (activeV) {
+      svg.querySelectorAll('g[data-nid]').forEach(el => {
+        const ring = el.getAttribute('data-ring');
+        const show = state.ringFilter === 'all' || state.ringFilter === ring;
+        el.style.opacity = show ? '1' : '0.08';
+        el.style.pointerEvents = show ? 'auto' : 'none';
+      });
+    }
   });
 }
 
@@ -996,9 +1107,15 @@ document.getElementById('carrier-close').addEventListener('click', () => { carri
 // BOOT
 // ════════════════════════════════════════════════════════════════════
 function renderAll() { renderRail(); renderWheel(); renderPanel(); }
+// Each cluster's own <svg> has explicit fixed width/height (verticalPx(v)),
+// not "100%", so a window resize doesn't require refitting content — only
+// the pan/zoom viewport around it changes. Rebuilding on resize is kept
+// anyway (cheap, ~300 nodes total) for parity with D0's own resize handler.
 window.addEventListener('resize', renderWheel);
 renderCompBar();
 renderAll();
+centerView();
+applyZoom();
 RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
 </script>
 </body>

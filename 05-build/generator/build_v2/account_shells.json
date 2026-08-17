@@ -1,0 +1,3492 @@
+[
+  {
+    "account_id": "PRIN.HOLLOWELL",
+    "surname": "Hollowell",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Nantucket Ranch Estate"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.RUTHERGLEN",
+    "surname": "Rutherglen",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Montecito Historic Estate"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DRUMMOND",
+    "surname": "Drummond",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Manhattan Coastal Estate"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.WENTWORTH",
+    "surname": "Wentworth",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Palm Springs Waterfront Estate",
+        "Cap Ferrat Ski Chalet"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 4,
+    "role_instance_target": 21,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.PELHAM",
+    "surname": "Pelham",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Palm Springs Lakefront Residence"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 13,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BEAUMONT",
+    "surname": "Beaumont",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "The Hamptons Historic Estate",
+        "Martha's Vineyard Historic Estate"
+      ],
+      "auto": 12
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.MOREAU",
+    "surname": "Moreau",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Cap Ferrat Mountain Residence"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KIRKBRIDE",
+    "surname": "Kirkbride",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Jackson Hole Lakefront Residence"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.MERRIVALE",
+    "surname": "Merrivale",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Palm Beach Lakefront Residence",
+        "Beverly Hills Historic Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 28,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.HARCOURT",
+    "surname": "Harcourt",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Gulfstream G550",
+      "real_estate": [
+        "Gstaad Penthouse",
+        "Charleston Lakefront Residence"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.NIGHTINGALE",
+    "surname": "Nightingale",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Airbus H175",
+      "real_estate": [
+        "Napa Valley Vineyard Estate",
+        "Miami Villa",
+        "Montecito Commercial Plaza"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 29,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ZAMORA",
+    "surname": "Zamora",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Malibu Lakefront Residence"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ESTERHAZY",
+    "surname": "Esterhazy",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Sun Valley Coastal Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 4,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.TREVELYAN",
+    "surname": "Trevelyan",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Airbus H175",
+      "real_estate": [
+        "Sag Harbor Coastal Estate",
+        "Beverly Hills Penthouse",
+        "Aspen Beachfront Villa"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FARLEIGH",
+    "surname": "Farleigh",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Martha's Vineyard Vineyard Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HALLOWAY",
+    "surname": "Halloway",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Charleston Historic Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CASTELLAN",
+    "surname": "Castellan",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Gstaad Historic Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HARTLEY",
+    "surname": "Hartley",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Palm Beach Historic Estate",
+        "Miami Mountain Residence"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 2,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.ISHERWOOD",
+    "surname": "Isherwood",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Sikorsky S-76",
+      "real_estate": [
+        "Vail Beachfront Villa",
+        "Cap Ferrat Coastal Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FENWICK",
+    "surname": "Fenwick",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Malibu Oceanfront Compound"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LINDQVIST",
+    "surname": "Lindqvist",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Beverly Hills Coastal Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BRAMWELL",
+    "surname": "Bramwell",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Palm Beach Commercial Plaza",
+        "Cap Ferrat Beachfront Villa"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 11,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.THISTLEWOOD",
+    "surname": "Thistlewood",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Cap Ferrat Vineyard Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.STAVROS",
+    "surname": "Stavros",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "auto": 8
+    },
+    "n_verticals": 2,
+    "role_instance_target": 8,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CAVANAUGH",
+    "surname": "Cavanaugh",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Manhattan Oceanfront Compound"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FOXLEIGH",
+    "surname": "Foxleigh",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Montecito Ranch Estate"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DUNMORE",
+    "surname": "Dunmore",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Telluride Penthouse"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LOXLEY",
+    "surname": "Loxley",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Nantucket Lakefront Residence"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.EASTCOTT",
+    "surname": "Eastcott",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Manhattan Penthouse"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.OVERBURY",
+    "surname": "Overbury",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "real_estate": [
+        "Napa Valley Beachfront Villa"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LACHANCE",
+    "surname": "Lachance",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Big Sky Lakefront Residence"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.VERLAINE",
+    "surname": "Verlaine",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Beverly Hills Beachfront Villa",
+        "Sag Harbor Oceanfront Compound"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.THORNBURY",
+    "surname": "Thornbury",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S7",
+      "real_estate": [
+        "Sag Harbor Mountain Residence",
+        "Palm Springs Ski Chalet",
+        "Palm Springs Penthouse"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 21,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BRACKENRIDGE",
+    "surname": "Brackenridge",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S7",
+      "aviation": "Sikorsky S-76",
+      "real_estate": [
+        "Miami Vineyard Estate"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 4,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ELPHINSTONE",
+    "surname": "Elphinstone",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Big Sky Historic Estate",
+        "Aspen Villa"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.UXBRIDGE",
+    "surname": "Uxbridge",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Gstaad Oceanfront Compound"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.SINCLAIR",
+    "surname": "Sinclair",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Charleston Villa"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.IVANOVIC",
+    "surname": "Ivanovic",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Vail Historic Estate"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 11,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.OSGOOD",
+    "surname": "Osgood",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Gstaad Beachfront Villa"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 4,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HEXHAM",
+    "surname": "Hexham",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "auto": 18
+    },
+    "n_verticals": 2,
+    "role_instance_target": 8,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.INGLEBY",
+    "surname": "Ingleby",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Telluride Villa"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.PRENTISS",
+    "surname": "Prentiss",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Charleston Ranch Estate"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.UNDERHILL",
+    "surname": "Underhill",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Montecito Vineyard Estate"
+      ]
+    },
+    "n_verticals": 3,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.PENHALLOW",
+    "surname": "Penhallow",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Jackson Hole Penthouse"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BLACKWOOD",
+    "surname": "Blackwood",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Vail Ranch Estate",
+        "Aspen Penthouse"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 4,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.YARDLEY",
+    "surname": "Yardley",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Gulfstream G650",
+      "real_estate": [
+        "Aspen Oceanfront Compound",
+        "Miami Coastal Estate",
+        "Gstaad Mountain Residence"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ASHWORTH",
+    "surname": "Ashworth",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Sikorsky S-76",
+      "real_estate": [
+        "Malibu Waterfront Estate",
+        "Lake Como Penthouse"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.JARNAC",
+    "surname": "Jarnac",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Gulfstream G650",
+      "real_estate": [
+        "Charleston Oceanfront Compound"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 4,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.IVERSON",
+    "surname": "Iverson",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Greenwich Mountain Residence",
+        "Palm Beach Penthouse"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 4,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.TALBOT",
+    "surname": "Talbot",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Gulfstream G550",
+      "real_estate": [
+        "Jackson Hole Historic Estate"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 4,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LANSDOWNE",
+    "surname": "Lansdowne",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "real_estate": [
+        "Charleston Ski Chalet",
+        "Jackson Hole Coastal Estate"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.RADCLIFFE",
+    "surname": "Radcliffe",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Big Sky Penthouse",
+        "Greenwich Lakefront Residence"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 21,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FITZWILLIAM",
+    "surname": "Fitzwilliam",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Manhattan Lakefront Residence",
+        "Gstaad Commercial Plaza",
+        "Beverly Hills Villa"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.PEMBERTON",
+    "surname": "Pemberton",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Greenwich Vineyard Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.EVERLEIGH",
+    "surname": "Everleigh",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Palm Springs Commercial Plaza",
+        "The Hamptons Oceanfront Compound"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.STANDISH",
+    "surname": "Standish",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "aviation": "Airbus H175",
+      "real_estate": [
+        "Aspen Ranch Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ROTHBURY",
+    "surname": "Rothbury",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Lake Como Historic Estate",
+        "Palm Beach Oceanfront Compound"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.NORWOOD",
+    "surname": "Norwood",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S7",
+      "real_estate": [
+        "Martha's Vineyard Villa"
+      ],
+      "auto": 12
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BALLANTINE",
+    "surname": "Ballantine",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "The Hamptons Ski Chalet"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CHASTAIN",
+    "surname": "Chastain",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Sun Valley Historic Estate",
+        "Miami Oceanfront Compound"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CARRINGTON",
+    "surname": "Carrington",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "yacht": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Airbus H175"
+    },
+    "n_verticals": 2,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.GREVILLE",
+    "surname": "Greville",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Cessna Citation Longitude",
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FAIRWEATHER",
+    "surname": "Fairweather",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 2,
+    "role_instance_target": 10,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KENSINGTON",
+    "surname": "Kensington",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S2"
+    },
+    "n_verticals": 1,
+    "role_instance_target": 5,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.JESSOP",
+    "surname": "Jessop",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Cap Ferrat Oceanfront Compound"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.RAVENSWORTH",
+    "surname": "Ravensworth",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "real_estate": [
+        "Sag Harbor Historic Estate"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.QUINTRELL",
+    "surname": "Quintrell",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "real_estate": [
+        "Cap Ferrat Villa"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.COMBERFORD",
+    "surname": "Comberford",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "The Hamptons Villa",
+        "Palm Springs Villa"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.SEDGEMOOR",
+    "surname": "Sedgemoor",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S7",
+      "aviation": "Gulfstream G650",
+      "real_estate": [
+        "Greenwich Coastal Estate"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.GRANTHAM",
+    "surname": "Grantham",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Gulfstream G650",
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.OGILVIE",
+    "surname": "Ogilvie",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Newport Waterfront Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.KILLIGREW",
+    "surname": "Killigrew",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Lake Como Ranch Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 4,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DEVEREUX",
+    "surname": "Devereux",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "real_estate": [
+        "Miami Lakefront Residence"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.ALDERTON",
+    "surname": "Alderton",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Big Sky Coastal Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.INGLEWOOD",
+    "surname": "Inglewood",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Martha's Vineyard Mountain Residence"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KILBRIDE",
+    "surname": "Kilbride",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Nantucket Historic Estate",
+        "Malibu Villa"
+      ]
+    },
+    "n_verticals": 3,
+    "role_instance_target": 11,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DEVENPORT",
+    "surname": "Devenport",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Palm Beach Vineyard Estate"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ANCASTER",
+    "surname": "Ancaster",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Greenwich Ranch Estate"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.NORTHCOTE",
+    "surname": "Northcote",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Aspen Lakefront Residence"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.VANDERMEER",
+    "surname": "Vandermeer",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Gulfstream G550",
+      "real_estate": [
+        "Newport Ranch Estate"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.WHITMORE",
+    "surname": "Whitmore",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Napa Valley Commercial Plaza"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.MONTFORT",
+    "surname": "Montfort",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Lake Como Ski Chalet",
+        "Newport Lakefront Residence"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 10,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ELLSWORTH",
+    "surname": "Ellsworth",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Beverly Hills Ski Chalet"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.GATTENBY",
+    "surname": "Gattenby",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Miami Penthouse"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.GROSVENOR",
+    "surname": "Grosvenor",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Sag Harbor Ski Chalet"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ASHCOMBE",
+    "surname": "Ashcombe",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "The Hamptons Beachfront Villa"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.GAINSBOROUGH",
+    "surname": "Gainsborough",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Airbus H175",
+      "real_estate": [
+        "Telluride Lakefront Residence"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DELACROIX",
+    "surname": "Delacroix",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Cap Ferrat Lakefront Residence"
+      ]
+    },
+    "n_verticals": 3,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.RADCLIFFE_THISTLEWOOD",
+    "surname": "Radcliffe-Thistlewood",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Vail Penthouse",
+        "Martha's Vineyard Penthouse"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 9,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BRACKENRIDGE_BRAMWELL",
+    "surname": "Brackenridge-Bramwell",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "The Hamptons Mountain Residence"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KENSINGTON_OVERBURY",
+    "surname": "Kensington-Overbury",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Telluride Ski Chalet"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 24,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KENSINGTON_UNDERHILL",
+    "surname": "Kensington-Underhill",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Manhattan Commercial Plaza",
+        "Charleston Vineyard Estate"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.MERRIVALE_ANCASTER",
+    "surname": "Merrivale-Ancaster",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Newport Villa",
+        "Nantucket Commercial Plaza"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 2,
+    "role_instance_target": 10,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.HARCOURT_LACHANCE",
+    "surname": "Harcourt-Lachance",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Telluride Oceanfront Compound"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.FENWICK_TALBOT",
+    "surname": "Fenwick-Talbot",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Martha's Vineyard Ranch Estate"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 10,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.BRAMWELL_ANCASTER",
+    "surname": "Bramwell-Ancaster",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Newport Oceanfront Compound"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.JESSOP_JARNAC",
+    "surname": "Jessop-Jarnac",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "real_estate": [
+        "Charleston Mountain Residence"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HARTLEY_OVERBURY",
+    "surname": "Hartley-Overbury",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Gulfstream G550",
+      "real_estate": [
+        "Charleston Waterfront Estate"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 30,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.MONTFORT_OGILVIE",
+    "surname": "Montfort-Ogilvie",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S7",
+      "aviation": "Gulfstream G650",
+      "real_estate": [
+        "Beverly Hills Waterfront Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.OVERBURY_DRUMMOND",
+    "surname": "Overbury-Drummond",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Manhattan Ski Chalet"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.THORNBURY_RUTHERGLEN",
+    "surname": "Thornbury-Rutherglen",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Palm Springs Mountain Residence",
+        "Nantucket Mountain Residence"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LACHANCE_LANSDOWNE",
+    "surname": "Lachance-Lansdowne",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Aspen Waterfront Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 4,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.ELPHINSTONE_RADCLIFFE",
+    "surname": "Elphinstone-Radcliffe",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Malibu Mountain Residence"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BRAMWELL_NIGHTINGALE",
+    "surname": "Bramwell-Nightingale",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Bombardier Global 6000",
+      "real_estate": [
+        "Nantucket Coastal Estate"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 28,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.STAVROS_RADCLIFFE",
+    "surname": "Stavros-Radcliffe",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Vail Ski Chalet"
+      ],
+      "auto": 12
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.KENSINGTON_ASHWORTH",
+    "surname": "Kensington-Ashworth",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Charleston Coastal Estate",
+        "Manhattan Villa"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.JESSOP_PRENTISS",
+    "surname": "Jessop-Prentiss",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Newport Penthouse"
+      ]
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.GREVILLE_BRACKENRIDGE",
+    "surname": "Greville-Brackenridge",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Miami Commercial Plaza",
+        "The Hamptons Vineyard Estate"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CAVANAUGH_ALDERTON",
+    "surname": "Cavanaugh-Alderton",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Airbus H175",
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HOLLOWELL_DEVENPORT",
+    "surname": "Hollowell-Devenport",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Napa Valley Ranch Estate"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.JARNAC_FOXLEIGH",
+    "surname": "Jarnac-Foxleigh",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Big Sky Oceanfront Compound"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.UNDERHILL_FARLEIGH",
+    "surname": "Underhill-Farleigh",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Aspen Commercial Plaza",
+        "Greenwich Beachfront Villa"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 21,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ELPHINSTONE_JARNAC",
+    "surname": "Elphinstone-Jarnac",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Sikorsky S-76",
+      "real_estate": [
+        "Sun Valley Waterfront Estate"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 17,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.PRENTISS_ESTERHAZY",
+    "surname": "Prentiss-Esterhazy",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Lake Como Waterfront Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.INGLEWOOD_GROSVENOR",
+    "surname": "Inglewood-Grosvenor",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Malibu Historic Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LINDQVIST_PELHAM",
+    "surname": "Lindqvist-Pelham",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "real_estate": [
+        "Telluride Beachfront Villa"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 3,
+    "role_instance_target": 11,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.YARDLEY_OGILVIE",
+    "surname": "Yardley-Ogilvie",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "real_estate": [
+        "Lake Como Villa",
+        "Aspen Coastal Estate",
+        "Vail Villa"
+      ],
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HEXHAM_MERRIVALE",
+    "surname": "Hexham-Merrivale",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Napa Valley Waterfront Estate"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.NORTHCOTE_CASTELLAN",
+    "surname": "Northcote-Castellan",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Greenwich Commercial Plaza"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 13,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.INGLEWOOD_CAVANAUGH",
+    "surname": "Inglewood-Cavanaugh",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Sikorsky S-76",
+      "real_estate": [
+        "Gstaad Coastal Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.PEMBERTON_GATTENBY",
+    "surname": "Pemberton-Gattenby",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Manhattan Waterfront Estate",
+        "Greenwich Penthouse"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ASHCOMBE_YARDLEY",
+    "surname": "Ashcombe-Yardley",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Sun Valley Penthouse"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.TALBOT_QUINTRELL",
+    "surname": "Talbot-Quintrell",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Airbus H175",
+      "real_estate": [
+        "Aspen Mountain Residence",
+        "Charleston Penthouse"
+      ],
+      "auto": 4,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ASHCOMBE_IVANOVIC",
+    "surname": "Ashcombe-Ivanovic",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Miami Waterfront Estate",
+        "Sun Valley Mountain Residence"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.PENHALLOW_JARNAC",
+    "surname": "Penhallow-Jarnac",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Sun Valley Villa"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 3,
+    "role_instance_target": 18,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ESTERHAZY_PRENTISS",
+    "surname": "Esterhazy-Prentiss",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Big Sky Waterfront Estate",
+        "Palm Beach Beachfront Villa"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 4,
+    "role_instance_target": 25,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.TREVELYAN_GATTENBY",
+    "surname": "Trevelyan-Gattenby",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Montecito Ski Chalet"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 23,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.LACHANCE_DUNMORE",
+    "surname": "Lachance-Dunmore",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Aspen Historic Estate"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 15,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.BRAMWELL_JARNAC",
+    "surname": "Bramwell-Jarnac",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Palm Springs Ranch Estate"
+      ],
+      "auto": 18,
+      "personal": true
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.SINCLAIR_STANDISH",
+    "surname": "Sinclair-Standish",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "auto": true
+    },
+    "tiers": {
+      "real_estate": [
+        "Jackson Hole Mountain Residence"
+      ],
+      "auto": 6
+    },
+    "n_verticals": 2,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": true,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.PELHAM_BRAMWELL",
+    "surname": "Pelham-Bramwell",
+    "producer_id": "REP.CRISTIAN",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Cessna Citation Longitude",
+      "real_estate": [
+        "Vail Coastal Estate",
+        "Newport Vineyard Estate"
+      ],
+      "auto": 18
+    },
+    "n_verticals": 4,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": true
+  },
+  {
+    "account_id": "PRIN.TREVELYAN_CARRINGTON",
+    "surname": "Trevelyan-Carrington",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Gulfstream G450",
+      "real_estate": [
+        "Jackson Hole Villa"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 20,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HARCOURT_THORNBURY",
+    "surname": "Harcourt-Thornbury",
+    "producer_id": "REP.JACOB",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S2",
+      "real_estate": [
+        "Sag Harbor Villa",
+        "Cap Ferrat Historic Estate"
+      ],
+      "auto": 8
+    },
+    "n_verticals": 3,
+    "role_instance_target": 13,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.HARCOURT_QUINTRELL",
+    "surname": "Harcourt-Quintrell",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Palm Springs Beachfront Villa",
+        "Napa Valley Lakefront Residence"
+      ],
+      "auto": 8,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.WENTWORTH_GREVILLE",
+    "surname": "Wentworth-Greville",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true
+    },
+    "tiers": {
+      "yacht": "S3",
+      "real_estate": [
+        "Cap Ferrat Ranch Estate",
+        "Nantucket Beachfront Villa"
+      ],
+      "auto": 6,
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 16,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ELLSWORTH_ISHERWOOD",
+    "surname": "Ellsworth-Isherwood",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Sag Harbor Waterfront Estate",
+        "Newport Mountain Residence"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 12,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.CASTELLAN_VANDERMEER",
+    "surname": "Castellan-Vandermeer",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "real_estate": [
+        "Napa Valley Penthouse",
+        "Manhattan Mountain Residence"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 13,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.ESTERHAZY_HALLOWAY",
+    "surname": "Esterhazy-Halloway",
+    "producer_id": "REP.ALEX",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "aviation": "Bombardier Challenger 350",
+      "real_estate": [
+        "Telluride Waterfront Estate"
+      ],
+      "auto": 12,
+      "personal": true
+    },
+    "n_verticals": 5,
+    "role_instance_target": 30,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.STAVROS_COMBERFORD",
+    "surname": "Stavros-Comberford",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Sun Valley Lakefront Residence",
+        "Lake Como Mountain Residence"
+      ]
+    },
+    "n_verticals": 2,
+    "role_instance_target": 11,
+    "cross_pollination_candidate": false,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LINDQVIST_VERLAINE",
+    "surname": "Lindqvist-Verlaine",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S5",
+      "real_estate": [
+        "Sag Harbor Penthouse"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 14,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": true,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.LANSDOWNE_PELHAM",
+    "surname": "Lansdowne-Pelham",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true
+    },
+    "tiers": {
+      "yacht": "S6",
+      "real_estate": [
+        "Vail Oceanfront Compound",
+        "Malibu Beachfront Villa",
+        "Jackson Hole Ranch Estate"
+      ],
+      "auto": 4
+    },
+    "n_verticals": 3,
+    "role_instance_target": 19,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.SINCLAIR_MOREAU",
+    "surname": "Sinclair-Moreau",
+    "producer_id": "REP.NAOMI",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "auto": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S4",
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Beverly Hills Mountain Residence",
+        "Sun Valley Ski Chalet"
+      ],
+      "auto": 12
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  },
+  {
+    "account_id": "PRIN.DELACROIX_HOLLOWELL",
+    "surname": "Delacroix-Hollowell",
+    "producer_id": "REP.RAHUL",
+    "active_verticals": {
+      "real_estate": true,
+      "yacht": true,
+      "personal": true,
+      "aviation": true
+    },
+    "tiers": {
+      "yacht": "S1",
+      "aviation": "Dassault Falcon 8X",
+      "real_estate": [
+        "Sun Valley Commercial Plaza"
+      ],
+      "personal": true
+    },
+    "n_verticals": 4,
+    "role_instance_target": 22,
+    "cross_pollination_candidate": true,
+    "churn_risk_candidate": false,
+    "lost_account_candidate": false,
+    "co_trustee_candidate": false
+  }
+]

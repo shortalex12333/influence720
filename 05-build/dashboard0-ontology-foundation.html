@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Ontology Foundation</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-0-specific rules only — shared chrome/tokens live in engine/style-core.css. This is
+   the "first iteration before D1": a pure structural reference — 5 vertical universes, each its
+   own full 9-segment lifecycle ontology, no accounts, no bound/gap status, no relationship data.
+   Every dashboard downstream (D1-D5) is a personalized mask drawn from THIS foundation.
+
+   All 5 universes render together as ONE continuous canvas, always — no card boxes, no borders,
+   no per-vertical background — five wheel clusters floating in one shared space, not five framed
+   tiles. Each cluster's name is a small floating label over its own corner, not a caption below a
+   box. Structural connection lines stay hidden until a role is clicked, same as 360: the click
+   reveals ONLY that role's own connections, never the full edge web at once. */
+
+.universe-canvas{flex:1;overflow:hidden;position:relative;cursor:grab}
+.universe-canvas.dragging{cursor:grabbing}
+#canvas-inner{position:relative;transform-origin:0 0}
+.ucluster{position:absolute}
+.ucluster svg{overflow:visible;cursor:pointer;display:block}
+.ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
+.ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ucluster-meta{font-size:10.5px;color:var(--text3)}
+#cross-link-overlay{position:absolute;top:0;left:0;pointer-events:none;z-index:5}
+.canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
+
+/* Filter bar — ported from 360's own header filters-popover mechanic (same pattern already
+   reused in dashboard1), not invented fresh: a compact "Filters" button that opens a popover
+   of .filter-group controls, styled with the shared .filter-sel token already in style-core.css.
+   Two new pieces only D0 needs: a range-slider control (.filter-range) and the dim-not-remove
+   note above render-core.js's dimFn. Filters here NEVER remove a node from the DOM or from the
+   nodes array passed to RingEngine.render — only dim it — so the pentagon layout never reflows
+   and drawCrossLinks() always has a live element on both ends, filtered or not. */
+#filters-popover{display:none;position:absolute;top:44px;right:0;z-index:50;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px;min-width:270px;box-shadow:0 8px 24px rgba(0,0,0,.3);flex-direction:column;gap:12px}
+#filters-popover.open{display:flex}
+.filter-range-row{display:flex;align-items:center;gap:8px}
+.filter-range{flex:1;accent-color:var(--accent);height:4px;cursor:pointer}
+.filter-range-val{font-size:11px;font-weight:700;color:var(--text);min-width:20px;text-align:right;font-variant-numeric:tabular-nums}
+.filter-count{font-size:9.5px;font-weight:600;color:var(--accent);letter-spacing:.02em}
+
+/* Size / Scale Band — one mini-select PER vertical, not one shared dropdown like 360 had.
+   360 is a single-vertical (yacht-only) dashboard so one activeBand global made sense; D0
+   shows all 5 verticals on one canvas at once and each vertical's vessel_relevance object
+   uses its OWN tier codes (yacht S1-S7, aviation/auto A1-A7, real_estate R1-R7, personal
+   P1-P7 — verified directly off template-ontology.js, not assumed). Scoping the control
+   per-vertical, wired to a per-vertical sizeBands[v] state slot and a per-vertical
+   renderUniverse(v) call, is what keeps a yacht-band pick from ever touching aviation's
+   (or any other vertical's) node sizes. */
+.band-controls{display:flex;flex-direction:column;gap:5px;margin-top:2px}
+.band-row{display:flex;align-items:center;gap:6px}
+.band-row-lbl{font-size:10px;font-weight:600;color:var(--text3);width:66px;flex-shrink:0}
+.band-row select{flex:1;min-width:0}
+
+.rationale{font-size:12.5px;color:var(--text2);line-height:1.6;font-style:italic;border-left:3px solid var(--accent);padding-left:10px;margin-top:8px}
+.conn-row{padding:10px 12px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer}
+.conn-row:hover{border-color:var(--accent)}
+.conn-name{font-size:12.5px;font-weight:700;color:var(--text)}
+.conn-why{font-size:11.5px;color:var(--text2);line-height:1.5;margin-top:3px}
+.conn-freq{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.back-link{font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;background:none;border:none;padding:0}
+.back-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Ontology Foundation</div>
+    <div class="h-sub">Five vertical universes — <strong>yacht, aviation, real estate, auto, personal</strong> — one continuous canvas, not five tiles. Structural, not personalized: no accounts, no bound/gap status, no relationship recency. Click any role to reveal its own connections — just like 360, lines stay hidden until you ask for them.</div>
+    <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
+      <span class="suite-nav-current">D0 Ontology Foundation</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+    </nav>
+  </div>
+  <div class="h-ctrl">
+    <div style="position:relative">
+      <button class="btn" id="btn-filters">Filters &#9662;</button>
+      <div id="filters-popover">
+        <div class="filter-group"><span class="filter-lbl">Proximity to Owner</span>
+          <select class="filter-sel" id="sel-ring">
+            <option value="all">All Rings</option>
+            <option value="0">Apex (0)</option>
+            <option value="1">Innermost Circle (1)</option>
+            <option value="2">Close Advisors (2)</option>
+            <option value="3">Transaction Parties (3)</option>
+            <option value="4">Outer Ecosystem (4)</option>
+          </select>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Conflict Type</span>
+          <select class="filter-sel" id="sel-coitype">
+            <option value="all">All Types</option>
+            <option value="signatory">Signatory — Binding Authority</option>
+            <option value="conditional">Conditional — Approval-Gated</option>
+            <option value="transaction">Transaction — Deal-Specific</option>
+            <option value="regulatory">Regulatory — Compliance/Filing</option>
+            <option value="operational">Operational — Day-to-Day</option>
+            <option value="adjacent">Adjacent — Indirect Exposure</option>
+          </select>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Conflict Severity &ge; <span class="filter-range-val" id="val-weight">2</span></span>
+          <div class="filter-range-row"><input class="filter-range" type="range" id="sel-weight" min="2" max="10" step="1" value="2" /></div>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Contact Frequency &ge; <span class="filter-range-val" id="val-freq">2</span></span>
+          <div class="filter-range-row"><input class="filter-range" type="range" id="sel-freq" min="2" max="10" step="1" value="2" /></div>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Steps From Owner &le; <span class="filter-range-val" id="val-dist">3</span></span>
+          <div class="filter-range-row"><input class="filter-range" type="range" id="sel-dist" min="1" max="3" step="1" value="3" /></div>
+        </div>
+        <div class="filter-group"><span class="filter-lbl">Size / Scale Band</span>
+          <div class="band-controls" id="band-controls"></div>
+        </div>
+        <div class="filter-group" style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px">
+          <span class="filter-count" id="filter-count-lbl">All 175 roles shown</span>
+          <button class="back-link" id="btn-filters-reset">Reset filters</button>
+        </div>
+      </div>
+    </div>
+    <div class="theme-switch-wrap" title="Switch between light and dark mode">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="universe-canvas" id="universe-canvas">
+    <div id="canvas-inner"></div>
+    <div class="canvas-zoom-ctrl">
+      <button id="zoom-in">+</button>
+      <button id="zoom-out">&minus;</button>
+      <button class="wide" id="zoom-reset">Reset view</button>
+    </div>
+  </div>
+  <div class="panel-wrap" id="panel-wrap">
+    <button id="panel-toggle">▸</button>
+    <div id="panel"></div>
+  </div>
+</div>
+
+<script src="data/template-ontology.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+(function(){
+'use strict';
+
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', () => { RingEngine.theme.toggle(); renderAll(); });
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA — TEMPLATE_ONTOLOGY has {segments: [9], verticals: {v: {roles, edges}}}.
+   Every role gets a synthetic id (vertical:title) since the source data is pure
+   taxonomy, not instantiated account nodes.
+   ══════════════════════════════════════════════════════════════════ */
+const SEGMENTS = TEMPLATE_ONTOLOGY.segments;
+const segIdByName = new Map(SEGMENTS.map(s => [s.name, s.id]));
+const VERTICAL_LABEL = { yacht: 'Yacht', aviation: 'Aviation', real_estate: 'Real Estate', auto: 'Auto', personal: 'Personal' };
+const VERTICAL_ORDER = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
+
+/* ══════════════════════════════════════════════════════════════════
+   SIZE / SCALE BAND LABELS — one 7-tier scale PER vertical, each with its
+   own code prefix (verified directly off every role's vessel_relevance keys
+   in template-ontology.js: yacht=S1-S7, aviation=A1-A7, real_estate=R1-R7,
+   auto=A1-A7, personal=P1-P7 — aviation and auto share the "A" prefix, which
+   is exactly why band state below is keyed per-vertical, never by code alone).
+   Yacht's labels are 360's own real ones (influence360-yachts.html ~line
+   154-160). The other four verticals have no equivalent source labels in the
+   template data, so their tier descriptions below are this pass's own
+   authored placeholders — generic small-to-large phrasing, not a sourced
+   fact — good enough to make the control legible, not a claim of real-world
+   precision the way yacht's LOA bands are.
+   ══════════════════════════════════════════════════════════════════ */
+const BAND_LABELS = {
+  yacht: {
+    S1: 'Under 15m — Day boat', S2: '15–24m — Small yacht', S3: '24–40m — Mid-range',
+    S4: '40–60m — Entry superyacht', S5: '60–80m — Full-code superyacht',
+    S6: '80–100m — Large superyacht', S7: 'Over 100m — Gigayacht',
+  },
+  aviation: {
+    A1: 'Tier 1 — Piston / turboprop', A2: 'Tier 2 — Light jet', A3: 'Tier 3 — Midsize jet',
+    A4: 'Tier 4 — Super-midsize jet', A5: 'Tier 5 — Heavy jet', A6: 'Tier 6 — Ultra-long-range jet',
+    A7: 'Tier 7 — VVIP widebody',
+  },
+  real_estate: {
+    R1: 'Tier 1 — Single residence', R2: 'Tier 2 — Primary estate', R3: 'Tier 3 — Trophy estate',
+    R4: 'Tier 4 — Multi-property (2-4)', R5: 'Tier 5 — Global portfolio (5-9)',
+    R6: 'Tier 6 — Institutional portfolio (10+)', R7: 'Tier 7 — Family-office real estate arm',
+  },
+  auto: {
+    A1: 'Tier 1 — Single exotic', A2: 'Tier 2 — Small collection', A3: 'Tier 3 — Established collection',
+    A4: 'Tier 4 — Museum-grade collection', A5: 'Tier 5 — Concours-grade collection',
+    A6: 'Tier 6 — Dedicated-facility collection', A7: 'Tier 7 — Institutional collection',
+  },
+  personal: {
+    P1: 'Tier 1 — Individual, no staff', P2: 'Tier 2 — Small household staff',
+    P3: 'Tier 3 — Established household', P4: 'Tier 4 — Multi-property household',
+    P5: 'Tier 5 — Single-family office', P6: 'Tier 6 — Multi-generational family office',
+    P7: 'Tier 7 — Institutional family enterprise',
+  },
+};
+// Size / Scale Band state is per-vertical and starts at 'ALL' (no scaling) everywhere —
+// selecting a band in one vertical's own <select> only ever writes to that vertical's own
+// key here, so nR()'s vessel_relevance lookup for every OTHER vertical is untouched.
+const sizeBands = { yacht: 'ALL', aviation: 'ALL', real_estate: 'ALL', auto: 'ALL', personal: 'ALL' };
+
+const universes = {};
+VERTICAL_ORDER.forEach(v => {
+  const data = TEMPLATE_ONTOLOGY.verticals[v];
+  const roles = data.roles.map(r => ({ ...r, id: v + ':' + r.title, node_type: 'role' }));
+  const roleById = new Map(roles.map(r => [r.id, r]));
+  const edges = data.edges.map(e => ({
+    from: v + ':' + e.from_title, to: v + ':' + e.to_title, why: e.why, freq: e.freq,
+  })).filter(e => roleById.has(e.from) && roleById.has(e.to));
+  const connByRole = new Map();
+  edges.forEach(e => {
+    if (!connByRole.has(e.from)) connByRole.set(e.from, []);
+    if (!connByRole.has(e.to)) connByRole.set(e.to, []);
+    connByRole.get(e.from).push({ other: e.to, why: e.why, freq: e.freq });
+    connByRole.get(e.to).push({ other: e.from, why: e.why, freq: e.freq });
+  });
+  universes[v] = { vertical: v, roles, roleById, edges, connByRole };
+});
+const TOTAL_ROLE_COUNT = VERTICAL_ORDER.reduce((n, v) => n + universes[v].roles.length, 0);
+
+/* ══════════════════════════════════════════════════════════════════
+   FILTERS — dim, never remove. See the CSS comment above #filters-popover
+   and render-core.js's dimFn for why: this canvas's pentagon layout and
+   its cross-vertical-link mechanic both depend on every node staying a
+   real, present, clickable element regardless of filter state. A filter
+   only changes an SVG group's opacity attribute after RingEngine.render
+   has already placed every node exactly where it always goes.
+
+   coi_weight/coi_freq bounds (2-10) are 720's real per-account data range
+   (verified against the master workbook, not the template's own narrower
+   2-8/6-9 spread). decision_dist bounds are read directly off the actual
+   template data below rather than assumed — the per-instance floor is 1,
+   but the template-level BFS the prior enrichment pass ran produces its
+   own range over a smaller graph, so it is not safe to assume it matches.
+   ══════════════════════════════════════════════════════════════════ */
+const COI_WEIGHT_BOUNDS = { min: 2, max: 10 };
+const COI_FREQ_BOUNDS = { min: 2, max: 10 };
+const DECISION_DIST_BOUNDS = (() => {
+  let lo = Infinity, hi = -Infinity;
+  VERTICAL_ORDER.forEach(v => universes[v].roles.forEach(r => {
+    if (typeof r.decision_dist === 'number') { lo = Math.min(lo, r.decision_dist); hi = Math.max(hi, r.decision_dist); }
+  }));
+  return (lo <= hi) ? { min: lo, max: hi } : { min: 1, max: 3 };
+})();
+
+const filters = {
+  ring: 'all', coiType: 'all',
+  minWeight: COI_WEIGHT_BOUNDS.min, minFreq: COI_FREQ_BOUNDS.min, maxDist: DECISION_DIST_BOUNDS.max,
+};
+function filtersAreDefault() {
+  return filters.ring === 'all' && filters.coiType === 'all'
+    && filters.minWeight === COI_WEIGHT_BOUNDS.min && filters.minFreq === COI_FREQ_BOUNDS.min
+    && filters.maxDist === DECISION_DIST_BOUNDS.max;
+}
+function roleMatchesFilters(n) {
+  if (filters.ring !== 'all' && String(n.ring) !== filters.ring) return false;
+  if (filters.coiType !== 'all' && n.coi_type !== filters.coiType) return false;
+  if ((n.coi_weight ?? COI_WEIGHT_BOUNDS.min) < filters.minWeight) return false;
+  if ((n.coi_freq ?? COI_FREQ_BOUNDS.min) < filters.minFreq) return false;
+  if ((n.decision_dist ?? DECISION_DIST_BOUNDS.max) > filters.maxDist) return false;
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CROSS-VERTICAL GATEKEEPERS — the same real-world function, reused
+   under different titles by different verticals' own taxonomy research
+   (each vertical was researched independently). Verified against the
+   actual data (3 exact title matches + fuzzy-token cross-check), then
+   hand-curated to drop coincidental word overlaps that are NOT the same
+   function (e.g. "Captain / Master" vs "Chief Pilot / PIC-Captain" share
+   the word "captain" but are unrelated professions — excluded).
+   ══════════════════════════════════════════════════════════════════ */
+const CROSS_VERTICAL_GROUPS = [
+  { label: "Owner's Representative", members: [
+    ['yacht', "Owner's Representative"],
+    ['real_estate', "Owner's Representative (Construction/Renovation)"],
+    ['personal', "Construction Project Manager / Owner's Representative"],
+  ]},
+  { label: 'Trustee', members: [
+    ['real_estate', 'Trustee (Real Property Holding Trust)'],
+    ['personal', 'Trustee (Individual or Corporate)'],
+  ]},
+  { label: 'Chief of Staff', members: [
+    ['real_estate', 'Director of Residence / Chief of Staff'],
+    ['personal', 'Chief of Staff'],
+  ]},
+  { label: 'Private Banker', members: [
+    ['real_estate', 'Private Banker / Mortgage Lender Relationship Manager'],
+    ['personal', 'Private Banker'],
+  ]},
+  { label: 'Risk Engineer / Loss Control', members: [
+    ['real_estate', 'Risk Engineer / Loss Control Consultant'],
+    ['auto', 'Risk Engineer / Loss-Control Surveyor'],
+  ]},
+  { label: 'Appraiser / Valuation', members: [
+    ['real_estate', 'Pre-Purchase Property Inspector / Appraiser'],
+    ['auto', 'Appraiser / Valuation Specialist'],
+  ]},
+  { label: 'Interior Designer', members: [
+    ['yacht', 'Interior Designer'],
+    ['real_estate', 'Interior Designer'],
+  ]},
+  { label: 'Estate Manager', members: [
+    ['real_estate', 'Estate Manager'],
+    ['personal', 'Estate Manager'],
+  ]},
+  { label: 'Household Manager', members: [
+    ['real_estate', 'Household Manager'],
+    ['personal', 'Household Manager'],
+  ]},
+  { label: 'Financial Controller', members: [
+    ['yacht', 'Yacht Accountant / Financial Controller'],
+    ['auto', 'Collection Accountant / Financial Controller'],
+  ]},
+  { label: 'Escrow Attorney', members: [
+    ['yacht', 'S&P Attorney / Escrow Agent'],
+    ['auto', 'Transaction Attorney / Escrow Agent'],
+  ]},
+];
+const crossGroupByRoleId = new Map();
+CROSS_VERTICAL_GROUPS.forEach(g => {
+  const ids = g.members.map(([v, title]) => v + ':' + title);
+  ids.forEach(id => crossGroupByRoleId.set(id, { label: g.label, memberIds: ids }));
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   COMPOSITE SCORE + NODE RADIUS — ported VERBATIM from
+   00-source/influence360-yachts.html (~line 1183-1196, 1263-1266). Same
+   weights, same fallbacks, same ring min/max size bands. Not reinvented:
+   node size becomes a function of the composite score within each ring's
+   own size band, optionally scaled further by vessel_relevance when a
+   Size/Scale Band filter is active for that node's own vertical.
+   ══════════════════════════════════════════════════════════════════ */
+function proxScore(d) { return Math.max(0, 10 - ((d ?? 4) - 1) * 2); }
+function compScore(n) {
+  return ((n.coi_weight || 1) * 0.5) + ((n.coi_freq || 1) * 0.3) + (proxScore(n.decision_dist) * 0.2);
+}
+function nR(ring, wt, freq, dd, node, vesselRelevance, activeBand) {
+  const comp = compScore({ coi_weight: wt, coi_freq: freq, decision_dist: dd });
+  const minR = ({ 0: 16, 1: 11, 2: 8, 3: 6, 4: 5 })[ring] ?? 5;
+  const maxR = ({ 0: 32, 1: 22, 2: 16, 3: 12, 4: 9 })[ring] ?? 9;
+  const base = minR + (comp / 10) * (maxR - minR);
+  if (!activeBand || activeBand === 'ALL' || !vesselRelevance) return base;
+  const rel = vesselRelevance[activeBand] !== undefined ? vesselRelevance[activeBand] : 1.0;
+  return base * (0.5 + 0.5 * rel);
+}
+
+function pxFor(u) {
+  // Mildly proportional to role count — same principle as everywhere else in this project
+  // (D2's valuation-scaled asset pies), scaled by richness since there's no dollar figure at
+  // the template level. All 5 stay in the same visual register; this isn't a thumbnail-vs-
+  // full-size split anymore, just a small size differential between universes.
+  return Math.round(420 + Math.max(0, u.roles.length - 30) * 10);
+}
+
+const state = { selectedId: null, zoom: 1, panX: 0, panY: 0 };
+const svgByVertical = {};
+
+/* ══════════════════════════════════════════════════════════════════
+   ZOOM & PAN — same interaction model as every other dashboard in this
+   project (D1/D2/dash3): plain scroll wheel zooms, click-drag pans. No
+   modifier key required — this canvas has no native browser scrolling
+   to protect, so wheel is free to mean zoom directly. The cross-link
+   overlay lives OUTSIDE #canvas-inner (untransformed) precisely so its
+   getBoundingClientRect-based line math never double-scales — see
+   drawCrossLinks() below.
+   ══════════════════════════════════════════════════════════════════ */
+function applyZoom() {
+  document.getElementById('canvas-inner').style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  drawCrossLinks();
+}
+// Zooms around the current viewport CENTER, not the top-left transform-origin datum — the
+// content point sitting at the center of the visible canvas stays put as zoom changes, exactly
+// like a map/design-tool zoom, regardless of how far the user has already panned.
+function zoomBy(delta) {
+  const newZoom = Math.max(0.35, Math.min(2.5, state.zoom + delta));
+  if (newZoom === state.zoom) return;
+  const canvas = document.getElementById('universe-canvas');
+  const vx = canvas.clientWidth / 2, vy = canvas.clientHeight / 2;
+  const contentX = (vx - state.panX) / state.zoom, contentY = (vy - state.panY) / state.zoom;
+  state.panX = vx - newZoom * contentX;
+  state.panY = vy - newZoom * contentY;
+  state.zoom = newZoom;
+  applyZoom();
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+
+/* ══════════════════════════════════════════════════════════════════
+   FILTER CONTROLS — 360's own header Filters-popover mechanic (same
+   pattern dashboard1 already reuses). Every control writes into the
+   shared `filters` state, then re-renders all 5 universes so dimming
+   applies everywhere at once — filters are global, not per-universe.
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+  const distMin = document.getElementById('sel-dist');
+  distMin.min = DECISION_DIST_BOUNDS.min; distMin.max = DECISION_DIST_BOUNDS.max; distMin.value = DECISION_DIST_BOUNDS.max;
+  document.getElementById('val-dist').textContent = DECISION_DIST_BOUNDS.max;
+
+  const filtersBtn = document.getElementById('btn-filters');
+  const filtersPopover = document.getElementById('filters-popover');
+  filtersBtn.addEventListener('click', evt => { evt.stopPropagation(); filtersPopover.classList.toggle('open'); filtersBtn.classList.toggle('on', filtersPopover.classList.contains('open')); });
+  document.addEventListener('click', evt => { if (!filtersPopover.contains(evt.target) && evt.target !== filtersBtn) { filtersPopover.classList.remove('open'); filtersBtn.classList.remove('on'); } });
+
+  document.getElementById('sel-ring').addEventListener('change', e => { filters.ring = e.target.value; renderAll(); });
+  document.getElementById('sel-coitype').addEventListener('change', e => { filters.coiType = e.target.value; renderAll(); });
+  document.getElementById('sel-weight').addEventListener('input', e => { filters.minWeight = Number(e.target.value); document.getElementById('val-weight').textContent = filters.minWeight; renderAll(); });
+  document.getElementById('sel-freq').addEventListener('input', e => { filters.minFreq = Number(e.target.value); document.getElementById('val-freq').textContent = filters.minFreq; renderAll(); });
+  document.getElementById('sel-dist').addEventListener('input', e => { filters.maxDist = Number(e.target.value); document.getElementById('val-dist').textContent = filters.maxDist; renderAll(); });
+
+  document.getElementById('btn-filters-reset').addEventListener('click', () => {
+    filters.ring = 'all'; filters.coiType = 'all';
+    filters.minWeight = COI_WEIGHT_BOUNDS.min; filters.minFreq = COI_FREQ_BOUNDS.min; filters.maxDist = DECISION_DIST_BOUNDS.max;
+    document.getElementById('sel-ring').value = 'all'; document.getElementById('sel-coitype').value = 'all';
+    document.getElementById('sel-weight').value = COI_WEIGHT_BOUNDS.min; document.getElementById('val-weight').textContent = COI_WEIGHT_BOUNDS.min;
+    document.getElementById('sel-freq').value = COI_FREQ_BOUNDS.min; document.getElementById('val-freq').textContent = COI_FREQ_BOUNDS.min;
+    document.getElementById('sel-dist').value = DECISION_DIST_BOUNDS.max; document.getElementById('val-dist').textContent = DECISION_DIST_BOUNDS.max;
+    VERTICAL_ORDER.forEach(v => {
+      sizeBands[v] = 'ALL';
+      const sel = document.getElementById('sel-band-' + v);
+      if (sel) sel.value = 'ALL';
+    });
+    renderAll();
+  });
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   SIZE / SCALE BAND CONTROLS — one <select> per vertical, built from
+   that vertical's own BAND_LABELS entry. Each select writes ONLY to its
+   own sizeBands[v] slot and re-renders ONLY that vertical's own universe
+   (plus the cross-link overlay, since node positions can shift slightly
+   when a size changes) — the other 4 universes never re-render and their
+   sizeBands entries never change, so a yacht-band pick cannot bleed into
+   aviation/real_estate/auto/personal, structurally, not just by convention.
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+  const wrap = document.getElementById('band-controls');
+  VERTICAL_ORDER.forEach(v => {
+    const row = document.createElement('div');
+    row.className = 'band-row';
+    const lbl = document.createElement('span');
+    lbl.className = 'band-row-lbl';
+    lbl.textContent = VERTICAL_LABEL[v];
+    const sel = document.createElement('select');
+    sel.className = 'filter-sel';
+    sel.id = 'sel-band-' + v;
+    const allOpt = document.createElement('option');
+    allOpt.value = 'ALL'; allOpt.textContent = 'All sizes';
+    sel.appendChild(allOpt);
+    Object.keys(BAND_LABELS[v]).forEach(code => {
+      const opt = document.createElement('option');
+      opt.value = code; opt.textContent = BAND_LABELS[v][code];
+      sel.appendChild(opt);
+    });
+    sel.value = sizeBands[v];
+    sel.addEventListener('change', e => {
+      sizeBands[v] = e.target.value;
+      renderUniverse(v);
+      drawCrossLinks();
+    });
+    row.appendChild(lbl); row.appendChild(sel);
+    wrap.appendChild(row);
+  });
+})();
+
+const canvasEl = document.getElementById('universe-canvas');
+canvasEl.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomBy(e.deltaY > 0 ? -0.12 : 0.12);
+}, { passive: false });
+
+let drag = null;
+canvasEl.addEventListener('mousedown', (e) => { drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false }; canvasEl.classList.add('dragging'); });
+canvasEl.addEventListener('mousemove', (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  if (drag.moved) { state.panX = drag.panX + dx; state.panY = drag.panY + dy; applyZoom(); }
+});
+function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
+canvasEl.addEventListener('mouseup', endDrag);
+canvasEl.addEventListener('mouseleave', endDrag);
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — one universe's own SVG. Edges are hidden by default; a
+   click reveals ONLY the selected role's own connections (360's own
+   click-to-reveal pattern, not a permanently-drawn edge web).
+   Color = lifecycle segment. Size = authority rank (ring 0 = Apex,
+   largest; ring 4 = Operational, smallest).
+   ══════════════════════════════════════════════════════════════════ */
+// A clicked role that has cross-vertical counterparts activates ITS OWN universe's node
+// directly; every OTHER universe holding a counterpart gets that counterpart node treated
+// as active too — so clicking one gatekeeper reveals its own within-pie neighborhood in
+// EVERY universe it exists in simultaneously, not just the one that was actually clicked.
+function effectiveActiveId(v) {
+  if (state.selectedId && state.selectedId.startsWith(v + ':')) return state.selectedId;
+  const group = state.selectedId ? crossGroupByRoleId.get(state.selectedId) : null;
+  return group ? (group.memberIds.find(id => id.startsWith(v + ':')) || null) : null;
+}
+function affectedVerticals(id) {
+  if (!id) return new Set();
+  const vs = new Set([id.split(':')[0]]);
+  const group = crossGroupByRoleId.get(id);
+  if (group) group.memberIds.forEach(m => vs.add(m.split(':')[0]));
+  return vs;
+}
+
+function renderUniverse(v) {
+  const svg = svgByVertical[v];
+  const u = universes[v];
+  const domains = SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col }));
+  const px = pxFor(u);
+  const activeId = effectiveActiveId(v);
+  const visibleEdges = activeId ? (u.connByRole.get(activeId) || []).map(c => ({
+    from: activeId, to: c.other, color: '#8a8a8a', width: '1.4', opacity: '0.75',
+  })) : [];
+  const fitZoom = px / (2 * (RingEngine.DEFAULT_RING.RO[4] + 40));
+  const activeBand = sizeBands[v];
+  RingEngine.render(svg, {
+    nodes: u.roles, domains,
+    colorFn: n => SEGMENTS.find(s => s.name === n.segment).col,
+    sizeFn: n => nR(n.ring, n.coi_weight, n.coi_freq, n.decision_dist, n, n.vessel_relevance, activeBand),
+    scoreFn: n => compScore(n),
+    ringOf: n => n.ring, domainOf: n => segIdByName.get(n.segment) || 1,
+    labelFn: n => n.title, edges: visibleEdges,
+    activeId, showLabels: false, vz: Math.max(0.15, fitZoom), vx: 0, vy: 0,
+    dimFn: n => !filtersAreDefault() && !roleMatchesFilters(n),
+    onSelect: n => selectRole(n.id),
+    onHover: (evt, n) => RingEngine.tooltip.show(evt, n.title, `Ring ${n.ring} · ${n.segment}`, n.rationale || ''),
+    onLeave: RingEngine.tooltip.hide,
+  });
+  updateClusterMeta(v);
+}
+function updateClusterMeta(v) {
+  const u = universes[v];
+  const meta = document.getElementById('meta-' + v);
+  if (!meta) return;
+  if (filtersAreDefault()) {
+    meta.textContent = `${u.roles.length} roles · ${u.edges.length} connections`;
+  } else {
+    const matching = u.roles.filter(roleMatchesFilters).length;
+    meta.textContent = `${u.roles.length} roles (${matching} matching) · ${u.edges.length} connections`;
+  }
+}
+
+// Five universes arranged around a shared center, like petals — not stacked rows. Each
+// cluster's center sits on a circle of radius ORBIT_RADIUS, evenly spaced (72° apart for 5),
+// starting at 12 o'clock and going clockwise. CANVAS_SIZE just needs to be big enough that no
+// cluster's absolute box clips outside #canvas-inner's own bounds.
+const ORBIT_RADIUS = 560;
+const CANVAS_SIZE = 1800;
+
+function renderAll() {
+  const inner = document.getElementById('canvas-inner');
+  inner.innerHTML = '';
+  inner.style.width = CANVAS_SIZE + 'px';
+  inner.style.height = CANVAS_SIZE + 'px';
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  VERTICAL_ORDER.forEach((v, i) => {
+    const u = universes[v];
+    const px = pxFor(u);
+    const angle = (2 * Math.PI * i / VERTICAL_ORDER.length) - Math.PI / 2;
+    const clusterCx = cx + ORBIT_RADIUS * Math.cos(angle);
+    const clusterCy = cy + ORBIT_RADIUS * Math.sin(angle);
+    // A frameless cluster — no border, no background, no padding-box. Just the wheel and a
+    // small floating label anchored to its corner, so five clusters read as one open canvas.
+    const cluster = document.createElement('div');
+    cluster.className = 'ucluster';
+    cluster.style.left = (clusterCx - px / 2) + 'px';
+    cluster.style.top = (clusterCy - px / 2) + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', px); svg.setAttribute('height', px);
+    svgByVertical[v] = svg;
+    cluster.appendChild(svg);
+    const label = document.createElement('div');
+    label.className = 'ucluster-label';
+    label.innerHTML = `<span class="ucluster-name">${VERTICAL_LABEL[v]}</span><span class="ucluster-meta" id="meta-${v}">${u.roles.length} roles · ${u.edges.length} connections</span>`;
+    cluster.appendChild(label);
+    inner.appendChild(cluster);
+    renderUniverse(v);
+  });
+  applyZoom();
+  updateFilterCountLabel();
+}
+function updateFilterCountLabel() {
+  const lbl = document.getElementById('filter-count-lbl');
+  if (!lbl) return;
+  if (filtersAreDefault()) { lbl.textContent = `All ${TOTAL_ROLE_COUNT} roles shown`; return; }
+  let matching = 0;
+  VERTICAL_ORDER.forEach(v => { matching += universes[v].roles.filter(roleMatchesFilters).length; });
+  lbl.textContent = `${matching} of ${TOTAL_ROLE_COUNT} roles match`;
+}
+
+function centerView() {
+  const canvas = document.getElementById('universe-canvas');
+  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+}
+
+function selectRole(id) {
+  const prevAffected = affectedVerticals(state.selectedId);
+  state.selectedId = state.selectedId === id ? null : id;
+  const nextAffected = affectedVerticals(state.selectedId);
+  // Only the universe(s) whose active-edge set actually changed need to re-render — but that
+  // now includes every cross-linked universe, not just the one that was literally clicked.
+  new Set([...prevAffected, ...nextAffected]).forEach(v => renderUniverse(v));
+  drawCrossLinks();
+  renderPanel();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CROSS-PIE LINKS — when the selected role is the same real-world
+   function reused by another vertical, draw a line straight from its
+   node to that node in the OTHER universe's own wheel. This is the
+   whole point of one shared canvas instead of five separate tiles:
+   the connection is only possible because nothing stands between them.
+   ══════════════════════════════════════════════════════════════════ */
+function findNodeEl(id) {
+  const v = id.split(':')[0];
+  const svg = svgByVertical[v];
+  if (!svg) return null;
+  return Array.from(svg.querySelectorAll('[data-nid]')).find(el => el.getAttribute('data-nid') === id) || null;
+}
+function nodeCenterInCanvas(id) {
+  const el = findNodeEl(id);
+  const canvas = document.getElementById('universe-canvas');
+  if (!el || !canvas) return null;
+  const er = el.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+  return { x: er.left + er.width / 2 - cr.left + canvas.scrollLeft, y: er.top + er.height / 2 - cr.top + canvas.scrollTop };
+}
+function drawCrossLinks() {
+  const canvas = document.getElementById('universe-canvas');
+  const old = document.getElementById('cross-link-overlay');
+  if (old) old.remove();
+  if (!state.selectedId) return;
+  const group = crossGroupByRoleId.get(state.selectedId);
+  if (!group) return;
+  const others = group.memberIds.filter(id => id !== state.selectedId);
+  const from = nodeCenterInCanvas(state.selectedId);
+  if (!from || !others.length) return;
+  const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  overlay.id = 'cross-link-overlay';
+  overlay.setAttribute('width', canvas.scrollWidth);
+  overlay.setAttribute('height', canvas.scrollHeight);
+  others.forEach(otherId => {
+    const to = nodeCenterInCanvas(otherId);
+    if (!to) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', from.x); line.setAttribute('y1', from.y);
+    line.setAttribute('x2', to.x); line.setAttribute('y2', to.y);
+    line.setAttribute('stroke', '#dcae5c'); line.setAttribute('stroke-width', '2');
+    line.setAttribute('stroke-dasharray', '6 4'); line.setAttribute('opacity', '0.9');
+    overlay.appendChild(line);
+    [from, to].forEach(p => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', '6');
+      c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#dcae5c'); c.setAttribute('stroke-width', '2');
+      overlay.appendChild(c);
+    });
+  });
+  canvas.appendChild(overlay);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PANEL — score breakdown ported from 00-source/influence360-yachts.html's
+   own scoreBar()/pick() (~line 1466-1525), adapted to style-core.css's
+   already-shared .score-chart/.sc-row/.sc-composite classes.
+   ══════════════════════════════════════════════════════════════════ */
+function scoreBar(label, val, color) {
+  const pct = Math.max(0, Math.min(100, Math.round((val / 10) * 100)));
+  const display = Number.isInteger(val) ? val : val.toFixed(1);
+  return `<div class="sc-row">
+    <div class="sc-label">${label}</div>
+    <div class="sc-track"><div class="sc-fill" style="width:${pct}%;background:${color}"></div></div>
+    <div class="sc-val">${display}</div>
+  </div>`;
+}
+function renderPanel() {
+  const panel = document.getElementById('panel');
+  if (!state.selectedId) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">◎</div><div class="panel-empty-text">Click any role node in any universe to see its rationale and reveal its structural connections.</div></div>`;
+    return;
+  }
+  const v = state.selectedId.split(':')[0];
+  const u = universes[v];
+  const n = u.roleById.get(state.selectedId);
+  const conns = (u.connByRole.get(n.id) || [])
+    .map(c => ({ other: u.roleById.get(c.other), why: c.why, freq: c.freq }))
+    .filter(c => c.other);
+  const crossGroup = crossGroupByRoleId.get(n.id);
+  const crossOthers = crossGroup ? crossGroup.memberIds.filter(id => id !== n.id).map(id => {
+    const ov = id.split(':')[0];
+    return { id, vertical: ov, role: universes[ov].roleById.get(id) };
+  }).filter(c => c.role) : [];
+  const crossBox = crossOthers.length ? `
+    <div class="box" style="border-color:#dcae5c">
+      <h3 style="color:#dcae5c">Gatekeeper Across Universes (${crossOthers.length})</h3>
+      <p style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px">The same real-world function, reused under a different title in another vertical's own taxonomy.</p>
+      ${crossOthers.map(c => `
+        <div class="conn-row" style="border-color:#dcae5c" data-jump="${c.id}">
+          <div class="conn-name">${c.role.title} <span style="color:var(--text3);font-weight:400">— ${VERTICAL_LABEL[c.vertical]}</span></div>
+          <div class="conn-why">${c.role.segment}</div>
+        </div>`).join('')}
+    </div>` : '';
+  const wt = n.coi_weight || 1, freq = n.coi_freq || 1, dd = n.decision_dist;
+  const prox = proxScore(dd);
+  const cs = compScore(n);
+  const scoreBox = `
+    <div class="box">
+      <h3>Composite Score</h3>
+      <div class="score-chart">
+        ${scoreBar('COI Weight', wt, '#c9a84c')}
+        ${scoreBar('COI Frequency', freq, '#e07a30')}
+        ${scoreBar('Proximity', prox, '#9070c0')}
+      </div>
+      <div class="sc-composite">
+        <span class="sc-composite-lbl">Composite Score</span>
+        <span class="sc-composite-val">${cs.toFixed(1)} <span style="font-size:14px;font-weight:400;color:var(--text3)">/ 10</span></span>
+      </div>
+    </div>`;
+  panel.innerHTML = `
+    <div class="panel-header">
+      <button class="back-link" id="back-to-empty">◂ ${VERTICAL_LABEL[v]}</button>
+      <div class="panel-kicker" style="margin-top:8px">${n.segment}</div>
+      <div class="panel-title">${n.title}</div>
+      <div class="panel-meta-row"><span class="badge badge-ring">Ring ${n.ring}</span></div>
+    </div>
+    ${scoreBox}
+    <div class="box"><h3>Why This Role Exists</h3><p>${n.rationale || '—'}</p></div>
+    ${crossBox}
+    <div class="box">
+      <h3>Structural Connections (${conns.length})</h3>
+      ${conns.map(c => `
+        <div class="conn-row" data-jump="${c.other.id}">
+          <div class="conn-name">${c.other.title} <span style="color:var(--text3);font-weight:400">— ${c.other.segment}</span></div>
+          <div class="conn-why">${c.why}</div>
+          <div class="conn-freq">${c.freq}</div>
+        </div>`).join('') || '<p style="font-size:12.5px;color:var(--text3)">No structural connections on file.</p>'}
+    </div>
+  `;
+  document.getElementById('back-to-empty').addEventListener('click', () => selectRole(n.id));
+  panel.querySelectorAll('[data-jump]').forEach(el => el.addEventListener('click', () => selectRole(el.getAttribute('data-jump'))));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Collapsible right panel (reused pattern from the other dashboards)
+   ══════════════════════════════════════════════════════════════════ */
+(function(){
+  const panWrap = document.getElementById('panel-wrap'), panBtn = document.getElementById('panel-toggle');
+  panBtn.addEventListener('click', () => { panWrap.classList.toggle('collapsed'); panBtn.textContent = panWrap.classList.contains('collapsed') ? '◂' : '▸'; });
+})();
+
+window.addEventListener('resize', renderAll);
+
+renderAll();
+centerView();
+applyZoom();
+renderPanel();
+
+})();
+</script>
+</body>
+</html>

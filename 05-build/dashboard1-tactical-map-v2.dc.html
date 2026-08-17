@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- dc-runtime (support.js) requires window.React / window.ReactDOM to already exist — the Claude
+     Design preview iframe injects these itself; a standalone page must load them explicitly. -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Data/engine scripts load here, in the real <head>, exactly once — not inside <helmet> below.
+     <helmet> is an unrecognized custom element to the browser's own parser, so a <script src> placed
+     inside it still executes natively on first pass AND gets re-injected by support.js's own helmet
+     processing, causing "Identifier already declared" SyntaxErrors on the duplicate execution. Loading
+     them here instead avoids the double-load entirely; <helmet> below now carries only CSS. -->
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="engine/render-core.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+#tt{position:fixed;z-index:400;pointer-events:none;background:#1c1e21;border:1px solid #33363a;border-radius:3px;padding:10px 12px;max-width:320px;opacity:0;transition:opacity .1s;font-family:Inter,system-ui,sans-serif}
+.tt-title{font-size:13px;font-weight:600;color:#fff;display:block;margin-bottom:3px}
+.tt-meta{font-size:10px;font-weight:600;color:#9aa0a6;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase;display:block}
+.tt-desc{font-size:12px;font-weight:400;color:#cfd2d5;line-height:1.5}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#b6b3ab;border-radius:0}
+</style>
+</helmet>
+
+<div style="{{ s.root }}">
+
+  <div style="{{ s.identityBar }}">
+    <div style="{{ s.identityLeft }}">
+      <span style="{{ s.mark }}"></span>
+      <span style="{{ s.wordmark }}">PRODUCER TACTICAL MAP</span>
+      <span style="{{ s.dividerV }}"></span>
+      <span style="{{ s.subtitle }}">Radial relationship graph — click any node to inspect the relationship, the structural knows-chain, and the next best action.</span>
+    </div>
+    <div style="{{ s.identityRight }}">
+      <nav style="{{ s.suiteNav }}" aria-label="Influence 720 dashboard suite">
+        <a style="{{ s.suiteNavItem }}" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span style="{{ s.suiteNavSep }}">·</span><span style="{{ s.suiteNavCurrent }}">D1 Producer Tactical Map</span><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+      </nav>
+      <span style="{{ s.dividerV }}"></span>
+      <span style="{{ s.lockTag }}">VIEWING AS <b style="{{ s.lockTagBold }}">{{ producerName }}</b></span>
+      <button style="{{ s.themeBtn }}" onClick="{{ toggleTheme }}"><span style="{{ s.themeThumb }}"></span></button>
+    </div>
+  </div>
+
+  <div style="{{ s.controlBar }}">
+    <select style="{{ s.select }}" value="{{ state.producerId }}" onChange="{{ setProducer }}">
+      <sc-for list="{{ producerOptions }}" as="p" hint-placeholder-count="4">
+        <option value="{{ p.value }}">{{ p.label }}</option>
+      </sc-for>
+    </select>
+    <span style="{{ s.dividerV }}"></span>
+    <div style="{{ s.segWrap }}">
+      <button style="{{ s.segBtnPerson }}" onClick="{{ setModePerson }}">Person</button>
+      <button style="{{ s.segBtnCompany }}" onClick="{{ setModeCompany }}">Company</button>
+    </div>
+    <span style="{{ s.dividerV }}"></span>
+    <div style="{{ s.filtersAnchor }}">
+      <button style="{{ s.filtersBtn }}" onClick="{{ toggleFilters }}">Filters {{ filtersCaret }}</button>
+      <sc-if value="{{ state.filtersOpen }}">
+        <div style="{{ s.backdrop }}" onClick="{{ closeFilters }}"></div>
+        <div style="{{ s.filtersPanel }}">
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">Ring / Authority</span>
+            <select style="{{ s.select2 }}" value="{{ state.ring }}" onChange="{{ setRing }}">
+              <option value="all">All rings</option>
+              <option value="0">Ring 0 — Apex</option>
+              <option value="1">Ring 1 — Signatory</option>
+              <option value="2">Ring 2 — Conditional</option>
+              <option value="3">Ring 3 — Transaction</option>
+              <option value="4">Ring 4 — Operational</option>
+            </select>
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">Relationship</span>
+            <select style="{{ s.select2 }}" value="{{ state.rel }}" onChange="{{ setRel }}">
+              <option value="all">Known + Untapped</option>
+              <option value="known">Known only</option>
+              <option value="untapped">Untapped only</option>
+            </select>
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">Vertical</span>
+            <select style="{{ s.select2 }}" value="{{ state.vertical }}" onChange="{{ setVertical }}">
+              <option value="all">All verticals</option>
+              <sc-for list="{{ verticalOptions }}" as="v" hint-placeholder-count="3">
+                <option value="{{ v.value }}">{{ v.label }}</option>
+              </sc-for>
+            </select>
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">Conflict Type</span>
+            <select style="{{ s.select2 }}" value="{{ state.coiType }}" onChange="{{ setCoiType }}">
+              <option value="all">All Types</option>
+              <option value="signatory">Signs documents</option>
+              <option value="conditional">Conditional interest</option>
+              <option value="transaction">Transaction-driven</option>
+              <option value="regulatory">Regulatory/compliance</option>
+              <option value="operational">Operational role</option>
+              <option value="adjacent">Adjacent/indirect</option>
+            </select>
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">{{ coiWeightLabel }}</span>
+            <input type="range" style="{{ s.rangeSlider }}" min="2" max="10" step="1" value="{{ state.coiWeight }}" onChange="{{ setCoiWeight }}" />
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">{{ coiFreqLabel }}</span>
+            <input type="range" style="{{ s.rangeSlider }}" min="2" max="10" step="1" value="{{ state.coiFreq }}" onChange="{{ setCoiFreq }}" />
+          </div>
+          <div style="{{ s.filterGroup }}">
+            <span style="{{ s.filterLbl }}">{{ decisionDistLabel }}</span>
+            <input type="range" style="{{ s.rangeSlider }}" min="1" max="4" step="1" value="{{ state.decisionDist }}" onChange="{{ setDecisionDist }}" />
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <button style="{{ s.namesBtn }}" onClick="{{ toggleNames }}">{{ namesLabel }}</button>
+    <button style="{{ s.resetBtn }}" onClick="{{ reset }}">Reset</button>
+    <span style="{{ s.spacer }}"></span>
+    <div style="{{ s.bwiWrap }}" title="Book Weight Index — live ring distribution of this producer's relationship-weighted book">
+      <span style="{{ s.bwiText }}">{{ bwi.text }}</span>
+      <div style="{{ s.bwiTrack }}">
+        <div style="{{ bwi.hiStyle }}"></div>
+        <div style="{{ bwi.loStyle }}"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="{{ s.bodyRow }}">
+
+    <div style="{{ s.railWrap }}">
+      <div style="{{ s.railHeader }}">
+        <sc-if value="{{ isAccountView }}" hint-placeholder-val="{{ false }}">
+          <button style="{{ s.crumbBtn }}" onClick="{{ back }}">&larr; Whole Book</button>
+        </sc-if>
+        <div style="{{ s.railTitle }}">{{ railTitle }}</div>
+        <div style="{{ s.railSub }}">{{ railSub }}</div>
+      </div>
+      <div style="{{ s.railBody }}">
+        <sc-if value="{{ isBookView }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ bookRows }}" as="row" hint-placeholder-count="5">
+            <div style="{{ row.wrapStyle }}" onClick="{{ row.onClick }}">
+              <div style="{{ row.nameStyle }}">{{ row.name }}</div>
+              <div style="{{ row.descStyle }}">{{ row.desc }}</div>
+              <div style="{{ row.tagsRowStyle }}">
+                <sc-for list="{{ row.tags }}" as="tag" hint-placeholder-count="2">
+                  <span style="{{ tag.style }}">{{ tag.label }}</span>
+                </sc-for>
+              </div>
+              <div style="{{ row.countsRowStyle }}">
+                <span style="{{ row.knownWrapStyle }}"><span style="{{ row.knownSwatchStyle }}"></span>{{ row.knownCount }} known</span>
+                <span style="{{ row.untappedWrapStyle }}"><span style="{{ row.untappedSwatchStyle }}"></span>{{ row.untappedCount }} untapped</span>
+              </div>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ isAccountView }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ categoryGroups }}" as="grp" hint-placeholder-count="3">
+            <div style="{{ grp.wrapStyle }}">
+              <div style="{{ grp.headStyle }}">
+                <span style="{{ grp.nameStyle }}">{{ grp.name }}</span>
+                <span style="{{ grp.countStyle }}">{{ grp.count }}</span>
+              </div>
+              <div style="{{ grp.bodyStyle }}">
+                <sc-for list="{{ grp.items }}" as="c" hint-placeholder-count="3">
+                  <div style="{{ c.rowStyle }}" onClick="{{ c.onClick }}">
+                    <div>
+                      <div style="{{ c.nameStyle }}">{{ c.name }}</div>
+                      <div style="{{ c.subStyle }}">{{ c.sub }}</div>
+                    </div>
+                    <span style="{{ c.dotStyle }}"></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="{{ s.centerWrap }}">
+      <div style="{{ s.statStrip }}">
+        <sc-for list="{{ statTiles }}" as="tile" hint-placeholder-count="4">
+          <div style="{{ tile.wrapStyle }}">
+            <div style="{{ tile.valStyle }}">{{ tile.value }}</div>
+            <div style="{{ tile.labelStyle }}">{{ tile.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="{{ s.canvasWrap }}" onMouseDown="{{ onCanvasDown }}" onMouseMove="{{ onCanvasMove }}" onMouseUp="{{ onCanvasUp }}" onMouseLeave="{{ onCanvasUp }}" onWheel="{{ onCanvasWheel }}">
+        <svg ref="{{ svgRef }}" style="{{ s.svg }}"></svg>
+        <div style="{{ s.zoomCtrl }}">
+          <button style="{{ s.zoomBtn }}" onClick="{{ zoomIn }}">+</button>
+          <button style="{{ s.zoomBtn }}" onClick="{{ zoomOut }}">&minus;</button>
+          <button style="{{ s.zoomBtnWide }}" onClick="{{ zoomReset }}">Reset view</button>
+        </div>
+        <div style="{{ s.legend }}">
+          <div style="{{ s.legendRow }}"><span style="{{ s.legendGradient }}"></span>Green→red: most recent communication</div>
+          <div style="{{ s.legendRow }}"><span style="{{ s.legendSwatchUntapped }}"></span>Grey — not yet referred in (size still reflects COI value)</div>
+          <div style="{{ s.legendRow }}"><span style="{{ s.legendLineKnows }}"></span>"Knows" — structural</div>
+          <div style="{{ s.legendRow }}"><span style="{{ s.legendLineReferral }}"></span>Referred-by — historical</div>
+          <sc-if value="{{ vesselContextLabel }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.legendRow }}"><span style="{{ s.legendSwatchVessel }}"></span>{{ vesselContextLabel }}</div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="{{ s.panelWrap }}">
+      <div style="{{ s.panel }}">
+        <sc-if value="{{ selected }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ s.panelHeader }}">
+            <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
+              <button style="{{ s.panelCloseBtn }}" onClick="{{ closePanel }}">&times; Close</button>
+            </sc-if>
+            <div style="{{ s.panelTitle }}">{{ selected.name }}</div>
+            <div style="{{ s.panelMetaRow }}">
+              <sc-for list="{{ selected.badges }}" as="b" hint-placeholder-count="3">
+                <span style="{{ b.style }}">{{ b.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="{{ s.box }}">
+            <h3 style="{{ s.boxH }}">Description</h3>
+            <p style="{{ s.boxP }}">{{ selected.desc }}</p>
+          </div>
+          <div style="{{ s.box }}">
+            <h3 style="{{ s.boxH }}">Composite Score</h3>
+            <div style="{{ s.scoreChart }}">
+              <sc-for list="{{ selected.scoreBars }}" as="bar" hint-placeholder-count="3">
+                <div style="{{ s.scRow }}">
+                  <div style="{{ s.scLabel }}">{{ bar.label }}</div>
+                  <div style="{{ s.scTrack }}"><div style="{{ bar.fillStyle }}"></div></div>
+                  <div style="{{ s.scVal }}">{{ bar.valDisplay }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="{{ s.scComposite }}">
+              <span style="{{ s.scCompositeLbl }}">Composite Score</span>
+              <span><span style="{{ s.scCompositeVal }}">{{ selected.compositeVal }}</span><span style="{{ s.scCompositeMax }}"> / 10</span></span>
+            </div>
+          </div>
+          <sc-if value="{{ selected.hasKnows }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.box }}">
+              <h3 style="{{ s.boxH }}">{{ selected.knowsBoxTitle }}</h3>
+              <div style="{{ s.talksList }}">
+                <sc-for list="{{ selected.knows }}" as="k" hint-placeholder-count="2">
+                  <div style="{{ s.talksRow }}">
+                    <div style="{{ s.talksPeer }}"><span style="{{ k.dotStyle }}"></span><span style="{{ s.talksName }}">{{ k.name }}</span><span style="{{ k.tagStyle }}">{{ k.tag }}</span></div>
+                    <div style="{{ s.talksWhy }}">{{ k.why }}</div>
+                    <sc-if value="{{ k.script }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ s.talksScript }}">{{ k.script }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ selected.rw }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ s.box }}">
+              <h3 style="{{ s.boxH }}">Relationship</h3>
+              <div style="{{ s.infoTable }}">
+                <div style="{{ s.infoRow }}"><span style="{{ s.infoKey }}">Weight</span><span style="{{ s.infoVal }}"><b>{{ selected.rw.relationship_weight }}</b></span></div>
+                <div style="{{ s.infoRow }}"><span style="{{ s.infoKey }}">Activity (90d)</span><span style="{{ s.infoVal }}">{{ selected.rw.activity_count_90d }} touches ({{ selected.rw.calls_logged }} calls · {{ selected.rw.emails_sent }} emails · {{ selected.rw.meetings_held }} meetings)</span></div>
+                <div style="{{ s.infoRow }}"><span style="{{ s.infoKey }}">Last contact</span><span style="{{ s.infoVal }}">{{ selected.rw.last_activity_date }} ({{ selected.rw.daysSince }}d ago)</span></div>
+                <sc-if value="{{ selected.expiring }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ s.infoRow }}"><span style="{{ s.infoKey }}">Status</span><span style="{{ s.expiringTag }}">Cooling — 9+ months since contact</span></div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ selected.untappedNote }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.box }}">
+              <h3 style="{{ s.boxH }}">Relationship</h3>
+              <p style="{{ s.boxP }}">{{ selected.untappedNote }}</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ selected.hasRefs }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.box }}">
+              <h3 style="{{ s.boxH }}">Referral history</h3>
+              <div style="{{ s.talksList }}">
+                <sc-for list="{{ selected.refs }}" as="r" hint-placeholder-count="1">
+                  <div style="{{ s.talksRow }}"><div style="{{ s.talksWhy }}">{{ r.notes }} <span style="{{ s.talksRefDate }}">({{ r.referred_date }})</span></div></div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <button style="{{ s.actionBtn }}">Draft Intro Request</button>
+        </sc-if>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.svgRef = React.createRef();
+    this.nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+    this.principals = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+    this.roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
+    this.rolesByAccount = new Map();
+    this.roleNodes.forEach(n => { if (!this.rolesByAccount.has(n.account_ref)) this.rolesByAccount.set(n.account_ref, []); this.rolesByAccount.get(n.account_ref).push(n); });
+    this.rwIndex = new Map(RELATIONSHIP_WEIGHTS.map(r => [r.producer_id + '|' + r.node_id, r]));
+    this.referralsByProducer = {};
+    REFERRAL_EDGES.forEach(r => { (this.referralsByProducer[r.producer_id] = this.referralsByProducer[r.producer_id] || []).push(r); });
+    const edgesSrc = (typeof EDGES_720 !== 'undefined') ? EDGES_720 : [];
+    this.knowsOut = {}; this.knowsIn = {};
+    edgesSrc.filter(e => e.edge_type === 'knows').forEach(e => { (this.knowsOut[e.from] = this.knowsOut[e.from] || []).push(e); (this.knowsIn[e.to] = this.knowsIn[e.to] || []).push(e); });
+    this.ACCOUNTS = this.principals.map(p => {
+      const map = ACCOUNT_PRODUCER_MAP.find(m => m.ubo_id === p.id);
+      const people = this.rolesByAccount.get(p.id) || [];
+      const verticals = Array.from(new Set(people.map(n => n.vertical)));
+      return { principal: p, people, verticals, producer_id: map ? map.producer_id : null };
+    });
+    this.accountByUbo = new Map(this.ACCOUNTS.map(a => [a.principal.id, a]));
+    // Asset index — used ONLY to auto-derive the Vessel Size Band context for the composite-score
+    // node sizing (nR). Ported from Influence 360, which was single-vertical/single-hypothetical
+    // -vessel so it took the band from a manual dropdown. D1 shows a real producer's real book,
+    // so a manual dropdown would either be meaningless (Whole Book spans many accounts/verticals)
+    // or ambiguous (aviation and auto both use the SAME 'A1'..'A7' key namespace in vessel_relevance
+    // — verified against ontology-720.js). Only the yacht vertical has a real, populated size_class
+    // on its asset nodes (S1..S7); every other vertical's asset size_class is the literal string
+    // 'N/A' (verified, not assumed) — those verticals never drive a band, by design, not omission.
+    this.assetNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'asset');
+    this.assetsByOwner = new Map();
+    this.assetNodes.forEach(a => { if (!this.assetsByOwner.has(a.owner_ref)) this.assetsByOwner.set(a.owner_ref, []); this.assetsByOwner.get(a.owner_ref).push(a); });
+    this.CATEGORIES = Array.from(new Set(this.roleNodes.map(n => n.category))).sort();
+    // The canonical 9-segment lifecycle framework (a direct generalization of 360's own 9
+    // domain ids/names/colors — see role_taxonomy_generated.py's SEGMENTS) — every vertical
+    // (yacht/aviation/real_estate/auto/personal) now shares this SAME 9-segment structure with
+    // real, vertical-specific roles populating each segment, not the old 8-category flattened
+    // scheme where each non-yacht vertical had exactly one catch-all bucket. Direct 1:1 name
+    // match now, no more "thematic, not exact" approximation.
+    const CATEGORY_COLOR_BY_NAME = {
+      'Ownership & Structure': '#6a9de0',
+      'Legal & Finance': '#3a7fd4',
+      'Compliance & Certification': '#2a9a8a',
+      'Insurance & Risk Market': '#c9a84c',
+      'Acquisition & Disposal': '#6aaa44',
+      'Build, Fit-Out & Refit': '#e07a30',
+      'Operations & Crew': '#cc5555',
+      'Usage & Experience': '#aa44aa',
+      'Back-Office & Third-Party Management': '#4488aa',
+    };
+    this.domains = this.CATEGORIES.map((c, i) => ({ id: i + 1, name: c, col: CATEGORY_COLOR_BY_NAME[c] || '#6a9de0' }));
+    this.categoryDomainId = new Map(this.domains.map(d => [d.name, d.id]));
+
+    const firstProducerId = PRODUCERS[0].producer_id;
+    this.state = {
+      producerId: firstProducerId, view: 'book', accountId: null, selectedNodeId: null,
+      showLabels: false, theme: 'light', filtersOpen: false, windowWidth: 1440,
+      zoom: 1, panX: 0, panY: 0,
+      ring: 'all', rel: 'all', vertical: 'all', mode: 'person',
+      coiType: 'all', coiWeight: 2, coiFreq: 2, decisionDist: 4,
+    };
+    this.state.selectedNodeId = this.pickDefaultNode(firstProducerId);
+
+    this.toggleTheme = () => this.setState(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark' }));
+    this.toggleFilters = (e) => { e.stopPropagation(); this.setState(s => ({ filtersOpen: !s.filtersOpen })); };
+    this.closeFilters = () => this.setState({ filtersOpen: false });
+    this.setProducer = (e) => { const id = e.target.value; this.setState({ producerId: id, view: 'book', accountId: null, selectedNodeId: this.pickDefaultNode(id) }); };
+    this.setRing = (e) => this.setState({ ring: e.target.value });
+    this.setRel = (e) => this.setState({ rel: e.target.value });
+    this.setVertical = (e) => this.setState({ vertical: e.target.value });
+    this.setCoiType = (e) => this.setState({ coiType: e.target.value });
+    this.setCoiWeight = (e) => this.setState({ coiWeight: Number(e.target.value) });
+    this.setCoiFreq = (e) => this.setState({ coiFreq: Number(e.target.value) });
+    this.setDecisionDist = (e) => this.setState({ decisionDist: Number(e.target.value) });
+    this.setModePerson = () => this.setState({ mode: 'person' });
+    this.setModeCompany = () => this.setState({ mode: 'company' });
+    this.toggleNames = () => this.setState(s => ({ showLabels: !s.showLabels }));
+    this.back = () => this.setState({ view: 'book', accountId: null });
+    this.reset = () => { const id = PRODUCERS[0].producer_id; this.setState({ producerId: id, view: 'book', accountId: null, selectedNodeId: this.pickDefaultNode(id), showLabels: false, ring: 'all', rel: 'all', vertical: 'all', coiType: 'all', coiWeight: 2, coiFreq: 2, decisionDist: 4, mode: 'person', filtersOpen: false, zoom: 1, panX: 0, panY: 0 }); };
+
+    this._drag = null;
+    this.onCanvasDown = (e) => { this._drag = { x: e.clientX, y: e.clientY, panX: this.state.panX, panY: this.state.panY, moved: false }; };
+    this.onCanvasMove = (e) => {
+      if (!this._drag) return;
+      const dx = e.clientX - this._drag.x, dy = e.clientY - this._drag.y;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this._drag.moved = true;
+      if (this._drag.moved) this.setState({ panX: this._drag.panX + dx, panY: this._drag.panY + dy });
+    };
+    this.onCanvasUp = () => { this._drag = null; };
+    this.onCanvasWheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.12 : 0.12;
+      this.setState(s => ({ zoom: Math.min(3.5, Math.max(0.35, (s.zoom || 1) + delta)) }));
+    };
+    this.zoomIn = () => this.setState(s => ({ zoom: Math.min(3.5, (s.zoom || 1) + 0.25) }));
+    this.zoomOut = () => this.setState(s => ({ zoom: Math.max(0.35, (s.zoom || 1) - 0.25) }));
+    this.zoomReset = () => this.setState({ zoom: 1, panX: 0, panY: 0 });
+    this.closePanel = () => this.setState({ selectedNodeId: null });
+  }
+
+  pickDefaultNode(producerId) {
+    const people = this.ACCOUNTS.filter(a => a.producer_id === producerId).flatMap(a => a.people);
+    const known = people.map(n => ({ n, rw: this.rwIndex.get(producerId + '|' + n.id) })).filter(x => x.rw).sort((a, b) => b.rw.relationship_weight - a.rw.relationship_weight);
+    if (known.length) return known[0].n.id;
+    const sorted = people.slice().sort((a, b) => a.ring - b.ring);
+    return sorted.length ? sorted[0].id : null;
+  }
+
+  selectAccount(uboId) {
+    const acct = this.accountByUbo.get(uboId);
+    const known = acct.people.map(n => ({ n, rw: this.rwIndex.get(this.state.producerId + '|' + n.id) })).filter(x => x.rw).sort((a, b) => b.rw.relationship_weight - a.rw.relationship_weight);
+    const sortedByRing = acct.people.slice().sort((a, b) => a.ring - b.ring);
+    const def = known.length ? known[0].n.id : (sortedByRing.length ? sortedByRing[0].id : null);
+    this.setState({ view: 'account', accountId: uboId, selectedNodeId: def });
+  }
+
+  selectNode(id) { this.setState({ selectedNodeId: id }); }
+  isKnown(pid, nid) { return this.rwIndex.has(pid + '|' + nid); }
+
+  // Untapped roles must never show a fabricated person name — only the role itself,
+  // parsed from the curated desc's leading clause ("Captain, M/Y Whisper." -> "Captain").
+  // Every role label in this dataset is built as "Person Name — Role Title" (both the original
+  // flagship accounts and the 143-account rebuild follow this exactly), so the title is reliably
+  // the part after the em-dash. Parsing `desc` instead (the original approach) breaks on the new
+  // dataset: its desc fields are narrative prose ("Coordinates the 8-car collection's transit
+  // logistics...") not a "Title, context." pattern, so that heuristic returned garbled fragments
+  // — a real, verified bug, not a hypothetical one.
+  roleTitle(n) {
+    const label = n.label || '';
+    const parts = label.split(' — ');
+    if (parts.length > 1) return parts.slice(1).join(' — ').trim();
+    return n.coi_type ? n.coi_type.charAt(0).toUpperCase() + n.coi_type.slice(1) : 'Role';
+  }
+  displayLabel(n, pid) { return this.isKnown(pid, n.id) ? n.label : this.roleTitle(n); }
+
+  // Green (strong/active) -> red (known but cooling) gradient for known contacts only;
+  // untapped stays flat grey — that grey IS the white-space signal, never a data point.
+  // Pure recency of most recent communication, decayed to zero (full red) at 6 months stale —
+  // this is the ONLY input to color. Node size is a separate signal (COI value).
+  // Was a 365-day window against archetype-generated last_activity_date data that never exceeds
+  // ~250 days stale for any producer (ARCHETYPE_AFFINITY's widest days_since band) — every known
+  // node scored >=0.32, so hue never left yellow-green and the whole book read as flat green.
+  // 180 days lets the SAME underlying date data span the full green-to-red range.
+  relationshipScore(rw) {
+    const daysSince = (Date.now() - new Date(rw.last_activity_date).getTime()) / 86400000;
+    return Math.max(0, Math.min(1, 1 - daysSince / 180));
+  }
+  activityColor(n, pid, t) {
+    const rw = this.rwIndex.get(pid + '|' + n.id);
+    if (!rw) return t.untapped;
+    const hue = this.relationshipScore(rw) * 120; // 0=red (12mo+ stale) 120=green (recent)
+    return `hsl(${hue}, ${t.dark ? 55 : 60}%, ${t.dark ? 52 : 40}%)`;
+  }
+  producerAccounts(pid) { return this.ACCOUNTS.filter(a => a.producer_id === pid); }
+
+  // ── Composite scoring — ported verbatim from Influence 360 (influence360-yachts.html
+  // lines ~1183-1196, ~1263-1266). Weight dominates (50%), frequency next (30%), proximity
+  // least (20%). Always 0-10. Do not change these weights.
+  proxScore(d) { return Math.max(0, 10 - ((d ?? 4) - 1) * 2); }
+  compScore(n) { return ((n.coi_weight || 1) * 0.5) + ((n.coi_freq || 1) * 0.3) + (this.proxScore(n.decision_dist) * 0.2); }
+
+  // nR() — 360's exact radius formula. Ring still sets the min/max SIZE BAND (apex stays
+  // visually biggest-capable, operational stays smallest-capable); the actual size within
+  // that band is driven by the composite score, then optionally scaled further by
+  // vessel_relevance when a size-band context is active (floor 0.5 so shrunk nodes stay legible).
+  nR(ring, wt, freq, dd, node, activeBand) {
+    const comp = this.compScore({ coi_weight: wt, coi_freq: freq, decision_dist: dd });
+    const minR = ({ 0: 16, 1: 11, 2: 8, 3: 6, 4: 5 })[ring] ?? 5;
+    const maxR = ({ 0: 32, 1: 22, 2: 16, 3: 12, 4: 9 })[ring] ?? 9;
+    const base = minR + (comp / 10) * (maxR - minR);
+    const vesselRelevance = node && node.vessel_relevance;
+    if (!activeBand || activeBand === 'ALL' || !vesselRelevance) return base;
+    const rel = vesselRelevance[activeBand] !== undefined ? vesselRelevance[activeBand] : 1.0;
+    return base * (0.5 + 0.5 * rel);
+  }
+
+  // The one account/vertical currently "in context" that a vessel size band can be honestly
+  // derived from — real data, never a fabricated default. Only fires in Account view, and only
+  // when that account has EXACTLY ONE yacht asset with a real (non-'N/A') size_class (verified:
+  // 0 of 150 asset-owning accounts in this dataset have more than one — so "exactly one" is not
+  // a narrow edge case, it's the shape of the data). Zero or ambiguous (>1) yacht assets, or a
+  // non-yacht account, all resolve to null — no scaling applied, full relevance, true no-op.
+  vesselContextForAccount(uboId) {
+    if (!uboId) return null;
+    const assets = (this.assetsByOwner.get(uboId) || []).filter(a => a.vertical === 'yacht' && a.size_class && a.size_class !== 'N/A');
+    return assets.length === 1 ? assets[0] : null;
+  }
+
+  bookWeightIndex(pid) {
+    const rows = RELATIONSHIP_WEIGHTS.filter(r => r.producer_id === pid);
+    const byRing = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
+    let total = 0;
+    rows.forEach(r => { const n = this.nodeById.get(r.node_id); if (!n) return; byRing[n.ring] = (byRing[n.ring] || 0) + r.relationship_weight; total += r.relationship_weight; });
+    const pct = ks => total ? Math.round(ks.reduce((s, k) => s + (byRing[k] || 0), 0) / total * 100) : 0;
+    return { hi: pct([0, 1]), lo: pct([3, 4]), count: rows.length, total: total.toFixed(1) };
+  }
+
+  visibleNodesForBook() {
+    const st = this.state;
+    let nodes = this.producerAccounts(st.producerId).flatMap(a => a.people);
+    if (st.vertical !== 'all') nodes = nodes.filter(n => n.vertical === st.vertical);
+    if (st.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(st.ring));
+    if (st.rel === 'known') nodes = nodes.filter(n => this.isKnown(st.producerId, n.id));
+    if (st.rel === 'untapped') nodes = nodes.filter(n => !this.isKnown(st.producerId, n.id));
+    if (st.coiType !== 'all') nodes = nodes.filter(n => n.coi_type === st.coiType);
+    if (st.coiWeight > 2) nodes = nodes.filter(n => (n.coi_weight || 0) >= st.coiWeight);
+    if (st.coiFreq > 2) nodes = nodes.filter(n => (n.coi_freq || 0) >= st.coiFreq);
+    if (st.decisionDist < 4) nodes = nodes.filter(n => (n.decision_dist ?? 4) <= st.decisionDist);
+    return nodes;
+  }
+  visibleNodesForAccount() {
+    const st = this.state;
+    const acct = this.accountByUbo.get(st.accountId);
+    let nodes = acct ? acct.people : [];
+    if (st.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(st.ring));
+    if (st.rel === 'known') nodes = nodes.filter(n => this.isKnown(st.producerId, n.id));
+    if (st.rel === 'untapped') nodes = nodes.filter(n => !this.isKnown(st.producerId, n.id));
+    if (st.coiType !== 'all') nodes = nodes.filter(n => n.coi_type === st.coiType);
+    if (st.coiWeight > 2) nodes = nodes.filter(n => (n.coi_weight || 0) >= st.coiWeight);
+    if (st.coiFreq > 2) nodes = nodes.filter(n => (n.coi_freq || 0) >= st.coiFreq);
+    if (st.decisionDist < 4) nodes = nodes.filter(n => (n.decision_dist ?? 4) <= st.decisionDist);
+    return nodes;
+  }
+
+  tokens() {
+    const d = this.state.theme === 'dark';
+    const ch = d ? '255,255,255' : '0,0,0';
+    return {
+      dark: d,
+      bg: d ? '#0b0c0e' : '#f1f1ee', surface: d ? '#141618' : '#ffffff', surface2: d ? '#1b1e21' : '#eeeeea', surface3: d ? '#25282c' : '#e2e2dc',
+      border: d ? '#2a2d31' : '#dddad4', borderStrong: d ? '#3a3e43' : '#c7c4bc',
+      ink: `rgba(${ch},0.92)`, ink2: `rgba(${ch},0.55)`, ink3: `rgba(${ch},0.70)`, inkGhost: `rgba(${ch},0.40)`,
+      shadowDrop: d ? '0 8px 24px rgba(0,0,0,0.50)' : '0 8px 24px rgba(0,0,0,0.12)',
+      accent: d ? '#3ab6e8' : '#1f8fc7', accentSoft: d ? 'rgba(58,182,232,0.16)' : 'rgba(31,143,199,0.10)',
+      good: d ? '#3fd087' : '#166a41', goodSoft: d ? 'rgba(63,208,135,0.16)' : 'rgba(22,106,65,0.10)',
+      warn: d ? '#dcae5c' : '#8a6510', bad: d ? '#f0766e' : '#a12e22',
+      untapped: d ? '#5a5f64' : '#9a9d9f',
+    };
+  }
+
+  drawGraph() {
+    const svg = this.svgRef.current;
+    if (!svg || typeof RingEngine === 'undefined') return;
+    const t = this.tokens();
+    const st = this.state;
+    let nodes = st.view === 'book' ? this.visibleNodesForBook() : this.visibleNodesForAccount();
+    const edges = [];
+    // A selected node's FULL structural neighborhood — including grey/untapped/filtered-out
+    // targets — is where the actual referral opportunity lives, and it must never be hidden by
+    // the active Ring/Relationship/Vertical filters or by account scope. Filters narrow the
+    // ambient population; they never narrow what a selected node is actually connected to.
+    if (st.selectedNodeId) {
+      const sid = st.selectedNodeId;
+      const neighborhoodIds = new Set([sid]);
+      (this.knowsOut[sid] || []).forEach(e => { neighborhoodIds.add(e.to); edges.push({ from: e.from, to: e.to, color: t.ink3, width: '1', opacity: '0.55' }); });
+      (this.knowsIn[sid] || []).forEach(e => { neighborhoodIds.add(e.from); edges.push({ from: e.from, to: e.to, color: t.ink3, width: '1', opacity: '0.55' }); });
+      (this.referralsByProducer[st.producerId] || []).forEach(r => {
+        if (r.from_node_id === sid || r.to_node_id === sid) {
+          neighborhoodIds.add(r.from_node_id); neighborhoodIds.add(r.to_node_id);
+          edges.push({ from: r.from_node_id, to: r.to_node_id, color: t.accent, width: '2', opacity: '0.85' });
+        }
+      });
+      const present = new Set(nodes.map(n => n.id));
+      neighborhoodIds.forEach(id => {
+        if (present.has(id)) return;
+        const n = this.nodeById.get(id);
+        if (n) { nodes = nodes.concat([n]); present.add(id); }
+      });
+    }
+    const W = svg.clientWidth || 1200, H = svg.clientHeight || 900;
+    const fitZoom = Math.max(0.4, Math.min(W, H) / (2 * (RingEngine.DEFAULT_RING.RO[4] + 110))) * (st.zoom || 1);
+    const relColor = (n) => this.activityColor(n, st.producerId, t);
+    // Size is now the FULL composite score (weight 50% / frequency 30% / proximity 20%, via
+    // nR()) — applied identically to known and untapped nodes so grey roles keep their true
+    // structural size. Ring still bounds the min/max size band; vessel-size relevance (when an
+    // account has a single real yacht asset in context) further scales within that bound.
+    const activeBand = st.view === 'account' ? (this.vesselContextForAccount(st.accountId)?.size_class || null) : null;
+    const sizeForNode = (n) => this.nR(n.ring, n.coi_weight, n.coi_freq, n.decision_dist, n, activeBand);
+    RingEngine.render(svg, {
+      nodes, domains: this.domains, colorFn: relColor, sizeFn: sizeForNode,
+      scoreFn: n => this.compScore(n),
+      ringOf: n => n.ring, domainOf: n => this.categoryDomainId.get(n.category) || 1,
+      labelFn: n => this.displayLabel(n, st.producerId), edges, activeId: st.selectedNodeId, showLabels: st.showLabels,
+      vz: fitZoom, vx: st.panX || 0, vy: st.panY || 0, labelColor: t.ink2,
+      onSelect: n => this.selectNode(n.id),
+      onHover: (evt, n) => RingEngine.tooltip.show(evt, this.displayLabel(n, st.producerId), `Ring ${n.ring} · ${n.category}`, n.desc),
+      onLeave: RingEngine.tooltip.hide,
+    });
+  }
+
+  componentDidMount() {
+    this.setState({ windowWidth: window.innerWidth });
+    this.drawGraph();
+    this._onResize = () => { this.setState({ windowWidth: window.innerWidth }); this.drawGraph(); };
+    window.addEventListener('resize', this._onResize);
+  }
+  componentDidUpdate() { this.drawGraph(); }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+
+  renderVals() {
+    const st = this.state;
+    const t = this.tokens();
+    const producer = PRODUCERS.find(p => p.producer_id === st.producerId);
+    const isBookView = st.view === 'book';
+    const isAccountView = st.view === 'account';
+    const font = 'Inter, "Segoe UI", Arial, system-ui, sans-serif';
+
+    const s = {
+      root: { display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', background: t.bg, color: t.ink, fontFamily: font, overflow: 'hidden', fontSize: 13, lineHeight: 1.45 },
+      identityBar: { flexShrink: 0, minHeight: 52, borderBottom: `1px solid ${t.border}`, background: t.surface, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px', gap: 16, flexWrap: 'wrap', rowGap: 6 },
+      identityLeft: { display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 },
+      mark: { width: 10, height: 10, background: t.accent, flexShrink: 0 },
+      wordmark: { fontSize: 13, fontWeight: 800, letterSpacing: '.04em', color: t.ink, whiteSpace: 'nowrap' },
+      dividerV: { width: 1, alignSelf: 'stretch', background: t.border, flexShrink: 0 },
+      subtitle: { fontSize: 11, fontWeight: 400, color: t.ink3, maxWidth: 640, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+      identityRight: { display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, flexWrap: 'wrap', rowGap: 6, justifyContent: 'flex-end' },
+      lockTag: { fontSize: 11, fontWeight: 500, letterSpacing: '.03em', color: t.ink3, border: `1px solid ${t.border}`, background: t.surface2, padding: '6px 10px', borderRadius: 2, whiteSpace: 'nowrap', flexShrink: 0 },
+      lockTagBold: { color: t.ink, fontWeight: 700 },
+      themeBtn: { position: 'relative', width: 36, height: 20, borderRadius: 2, border: `1px solid ${t.borderStrong}`, background: t.dark ? t.accent : t.surface3, cursor: 'pointer', padding: 0 },
+      themeThumb: { position: 'absolute', top: 2, left: t.dark ? 18 : 2, width: 14, height: 14, borderRadius: 1, background: '#fff', transition: 'left .15s' },
+      // Suite nav — same cross-dashboard link row as D0/D2/D4/D5 (.suite-nav in style-core.css),
+      // reimplemented here as inline style objects since this .dc.html template can't reach that
+      // shared stylesheet. Same size/weight/color logic, so it reads as one grammar suite-wide.
+      suiteNav: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, rowGap: 4 },
+      suiteNavItem: { fontSize: 10.5, fontWeight: 500, letterSpacing: '.02em', color: t.ink3, textDecoration: 'none', whiteSpace: 'nowrap' },
+      suiteNavCurrent: { fontSize: 10.5, fontWeight: 700, letterSpacing: '.02em', color: t.accent, whiteSpace: 'nowrap' },
+      suiteNavSep: { fontSize: 10, color: t.border },
+
+      controlBar: { flexShrink: 0, minHeight: 44, borderBottom: `1px solid ${t.border}`, background: t.surface2, display: 'flex', alignItems: 'center', gap: 8, padding: '7px 20px', flexWrap: 'wrap' },
+      select: { height: 36, padding: '0 8px', border: `1px solid ${t.borderStrong}`, borderRadius: 2, background: t.surface, color: t.ink, fontSize: 12, fontWeight: 600, fontFamily: font, cursor: 'pointer', minWidth: 170 },
+      select2: { height: 28, padding: '0 6px', border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface, color: t.ink, fontSize: 12, fontFamily: font, cursor: 'pointer', width: '100%' },
+      segWrap: { display: 'flex', border: `1px solid ${t.borderStrong}`, borderRadius: 2, overflow: 'hidden' },
+      segBtnPerson: { height: 28, padding: '0 12px', border: 'none', borderRight: `1px solid ${t.borderStrong}`, background: st.mode === 'person' ? t.ink : t.surface, color: st.mode === 'person' ? t.bg : t.ink2, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: font },
+      segBtnCompany: { height: 28, padding: '0 12px', border: 'none', background: st.mode === 'company' ? t.ink : t.surface, color: st.mode === 'company' ? t.bg : t.ink2, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: font },
+      filtersAnchor: { position: 'relative' },
+      filtersBtn: { height: 36, padding: '0 12px', border: `1px solid ${t.borderStrong}`, borderRadius: 2, background: st.filtersOpen ? t.ink : t.surface, color: st.filtersOpen ? t.bg : t.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font },
+      backdrop: { position: 'fixed', inset: 0, zIndex: 40 },
+      filtersPanel: { position: 'absolute', top: 40, left: 0, zIndex: 50, background: t.surface, border: `1px solid ${t.borderStrong}`, borderRadius: 2, padding: 16, minWidth: 220, boxShadow: t.shadowDrop, display: 'flex', flexDirection: 'column', gap: 12 },
+      filterGroup: { display: 'flex', flexDirection: 'column', gap: 4 },
+      filterLbl: { fontSize: 10, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: t.ink3 },
+      rangeSlider: { width: '100%', height: 20, accentColor: t.accent, cursor: 'pointer' },
+      namesBtn: { height: 36, padding: '0 12px', border: `1px solid ${t.borderStrong}`, borderRadius: 2, background: st.showLabels ? t.ink : t.surface, color: st.showLabels ? t.bg : t.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font },
+      resetBtn: { height: 36, padding: '0 12px', border: `1px solid ${t.border}`, borderRadius: 2, background: 'transparent', color: t.ink3, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font },
+      spacer: { flex: 1 },
+      bwiWrap: { display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface },
+      bwiText: { fontSize: 11, color: t.ink2, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
+      bwiTrack: { width: 56, height: 5, background: t.surface3, display: 'flex', overflow: 'hidden' },
+
+      bodyRow: { flex: 1, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' },
+      railWrap: { width: 300, minWidth: 300, maxWidth: 300, flexShrink: 0, background: t.surface, borderRight: `1px solid ${t.border}`, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' },
+      railHeader: { padding: '14px 16px', borderBottom: `2px solid ${t.accent}`, background: t.surface, display: 'flex', flexDirection: 'column', gap: 3 },
+      crumbBtn: { alignSelf: 'flex-start', background: 'none', border: 'none', color: t.accent, cursor: 'pointer', fontSize: 11, fontWeight: 700, padding: 0, marginBottom: 4, fontFamily: font },
+      railTitle: { fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: t.ink },
+      railSub: { fontSize: 11, color: t.ink3 },
+      railBody: { flex: 1, overflow: 'auto', padding: 8, background: t.surface2 },
+
+      centerWrap: { flex: '1 1 480px', display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden', position: 'relative' },
+      statStrip: { flexShrink: 0, display: 'flex', gap: 1, background: t.border, borderBottom: `1px solid ${t.border}`, marginRight: st.windowWidth < 1180 ? 340 : 0 },
+      canvasWrap: { flex: 1, position: 'relative', background: t.bg, overflow: 'hidden', cursor: 'grab' },
+      zoomCtrl: { position: 'absolute', bottom: 14, left: 16, display: 'flex', gap: 4, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 2, padding: 4 },
+      zoomBtn: { width: 28, height: 28, border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface2, color: t.ink, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: font, lineHeight: 1 },
+      zoomBtnWide: { height: 28, padding: '0 10px', border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface2, color: t.ink3, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: font },
+      svg: { width: '100%', height: '100%', display: 'block' },
+      legend: { position: 'absolute', top: 14, left: 16, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 2, padding: '10px 12px', fontSize: 11, color: t.ink2, display: 'flex', flexDirection: 'column', gap: 5, maxWidth: 230 },
+      legendRow: { display: 'flex', alignItems: 'center', gap: 7 },
+      legendGradient: { width: 24, height: 9, background: 'linear-gradient(90deg, hsl(0,60%,40%), hsl(60,60%,40%), hsl(120,60%,40%))', borderRadius: 1, flexShrink: 0 },
+      legendSwatchUntapped: { width: 9, height: 9, background: t.untapped, flexShrink: 0, opacity: .6 },
+      legendLineKnows: { width: 16, height: 0, borderTop: `1.5px solid ${t.ink3}`, flexShrink: 0 },
+      legendLineReferral: { width: 16, height: 0, borderTop: `2px solid ${t.accent}`, flexShrink: 0 },
+      legendSwatchVessel: { width: 9, height: 9, background: t.accent, flexShrink: 0, borderRadius: '50%' },
+
+      panelWrap: (st.windowWidth < 1180
+        ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: 340, background: t.surface, borderLeft: `1px solid ${t.border}`, overflow: 'auto', padding: 18, boxSizing: 'border-box', zIndex: 20, boxShadow: t.shadowDrop }
+        : { width: 380, minWidth: 380, maxWidth: 380, flexShrink: 0, background: t.surface, borderLeft: `1px solid ${t.border}`, overflow: 'auto', padding: 18, boxSizing: 'border-box' }),
+      panel: {},
+      panelHeader: { padding: '0 0 14px 0', borderBottom: `2px solid ${t.accent}`, marginBottom: 14 },
+      panelCloseBtn: { display: 'block', marginLeft: 'auto', marginBottom: 8, background: 'none', border: `1px solid ${t.border}`, borderRadius: 2, color: t.ink3, cursor: 'pointer', fontSize: 11, fontWeight: 600, padding: '4px 10px', fontFamily: font, whiteSpace: 'nowrap' },
+      panelTitle: { fontSize: 19, fontWeight: 700, color: t.ink, lineHeight: 1.2, letterSpacing: '-.01em' },
+      panelMetaRow: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, minWidth: 0 },
+      box: { border: `1px solid ${t.border}`, borderRadius: 2, padding: 12, background: t.surface2, marginBottom: 12 },
+      boxH: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.10em', color: t.ink3, marginBottom: 6 },
+      boxP: { fontSize: 13, fontWeight: 400, color: t.ink2, lineHeight: 1.6, margin: 0 },
+      scoreChart: { display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 },
+      scRow: { display: 'grid', gridTemplateColumns: '92px 1fr 32px', alignItems: 'center', gap: 10 },
+      scLabel: { fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.06em', color: t.ink3 },
+      scTrack: { height: 8, background: t.surface3, borderRadius: 999, overflow: 'hidden', position: 'relative' },
+      scFill: { height: 8, borderRadius: 999, transition: 'width .3s ease' },
+      scVal: { fontSize: 13, fontWeight: 800, color: t.ink, textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
+      scComposite: { marginTop: 10, padding: 10, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+      scCompositeLbl: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: t.ink3 },
+      scCompositeVal: { fontSize: 22, fontWeight: 900, color: t.ink, letterSpacing: '-.02em', fontVariantNumeric: 'tabular-nums' },
+      scCompositeMax: { fontSize: 13, fontWeight: 400, color: t.ink3 },
+      infoTable: { display: 'flex', flexDirection: 'column', gap: 8 },
+      infoRow: { display: 'grid', gridTemplateColumns: '120px 1fr', gap: 10 },
+      infoKey: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: t.ink2 },
+      infoVal: { fontSize: 13, color: t.ink2, fontVariantNumeric: 'tabular-nums' },
+      expiringTag: { fontSize: 11, fontWeight: 700, color: t.warn, letterSpacing: '.02em' },
+      talksList: { display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 },
+      talksRow: { padding: '11px 13px', background: t.surface, borderRadius: 2, border: `1px solid ${t.border}` },
+      talksPeer: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 },
+      talksDot: { width: 7, height: 7, borderRadius: '50%', background: t.accent, flexShrink: 0 },
+      talksName: { fontSize: 13, fontWeight: 600, color: t.ink },
+      talksWhy: { fontSize: 12.5, color: t.ink2, lineHeight: 1.6 },
+      talksRefDate: { color: t.ink3 },
+      talksScript: { fontSize: 12, color: t.ink, lineHeight: 1.6, fontStyle: 'italic', marginTop: 6, paddingTop: 8, borderTop: `1px dashed ${t.border}` },
+      talksTagOpp: { fontSize: 9, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', padding: '2px 6px', borderRadius: 2, background: t.goodSoft, color: t.good, marginLeft: 6 },
+      actionBtn: { width: '100%', height: 38, borderRadius: 2, border: `1px solid ${t.accent}`, background: t.accent, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', marginTop: 4, fontFamily: font },
+      tileWrap: { flex: '1 1 0', minWidth: 0, background: t.surface, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 2, overflow: 'hidden' },
+      tileVal: { fontSize: 18, fontWeight: 700, color: t.ink, fontVariantNumeric: 'tabular-nums' },
+      tileLabel: { fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: t.ink3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    };
+
+    const producerOptions = PRODUCERS.map(p => ({ value: p.producer_id, label: `${p.name} — ${p.archetype}` }));
+    const verticalOptions = Array.from(new Set(this.roleNodes.map(n => n.vertical))).sort().map(v => ({ value: v, label: v.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) }));
+    const coiWeightLabel = `Conflict Severity ≥ ${st.coiWeight}`;
+    const coiFreqLabel = `Contact Frequency ≥ ${st.coiFreq}`;
+    const decisionDistLabel = `Steps from Owner ≤ ${st.decisionDist}`;
+
+    const bwiRaw = this.bookWeightIndex(st.producerId);
+    const bwi = {
+      text: `${bwiRaw.hi}% Ring 0/1 · ${bwiRaw.lo}% Ring 3/4 (${bwiRaw.count} known, Σw ${bwiRaw.total})`,
+      hiStyle: { height: 5, background: t.good, width: bwiRaw.hi + '%' },
+      loStyle: { height: 5, background: t.warn, width: bwiRaw.lo + '%' },
+    };
+
+    // Vessel Size Band context — auto-derived (never a manual dropdown, see vesselContextForAccount)
+    // from the single account currently in view. Drives node-size relevance scaling in drawGraph()
+    // and is surfaced here only as a read-only legend line so the sizing isn't unexplained.
+    const vesselCtx = isAccountView ? this.vesselContextForAccount(st.accountId) : null;
+    const vesselContextLabel = vesselCtx
+      ? `Vessel size context: ${vesselCtx.label} (${vesselCtx.asset_class || vesselCtx.size_class}) — roles scaled to relevance, floor 50%`
+      : '';
+
+    const accts = this.producerAccounts(st.producerId);
+    const bookRows = accts.slice().sort((a, b) => b.people.length - a.people.length).map(a => {
+      const known = a.people.filter(n => this.isKnown(st.producerId, n.id)).length;
+      const untapped = a.people.length - known;
+      return {
+        name: a.principal.label, desc: a.principal.desc, knownCount: known, untappedCount: untapped,
+        tags: a.verticals.map(v => ({ label: v.replace(/_/g, ' '), style: { fontSize: 9, fontWeight: 700, letterSpacing: '.04em', padding: '2px 6px', borderRadius: 2, background: t.surface3, color: t.ink3 } })),
+        wrapStyle: { display: 'flex', flexDirection: 'column', gap: 4, padding: 10, marginBottom: 6, cursor: 'pointer', border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface },
+        nameStyle: { fontSize: 13, fontWeight: 600, color: t.ink },
+        descStyle: { fontSize: 11, color: t.ink3 },
+        tagsRowStyle: { display: 'flex', gap: 4, flexWrap: 'wrap' },
+        countsRowStyle: { display: 'flex', gap: 12, fontSize: 11, color: t.ink3, marginTop: 2, alignItems: 'center' },
+        knownWrapStyle: { display: 'flex', alignItems: 'center', gap: 4, fontVariantNumeric: 'tabular-nums' },
+        untappedWrapStyle: { display: 'flex', alignItems: 'center', gap: 4, fontVariantNumeric: 'tabular-nums' },
+        knownSwatchStyle: { width: 7, height: 7, background: t.good, display: 'inline-block' },
+        untappedSwatchStyle: { width: 7, height: 7, background: t.untapped, display: 'inline-block', opacity: .6 },
+        onClick: () => this.selectAccount(a.principal.id),
+      };
+    });
+
+    let categoryGroups = [];
+    if (isAccountView) {
+      const acct = this.accountByUbo.get(st.accountId);
+      if (acct) {
+        const byCat = {};
+        acct.people.forEach(n => { (byCat[n.category] = byCat[n.category] || []).push(n); });
+        categoryGroups = Object.entries(byCat).map(([cat, ppl]) => ({
+          name: cat, count: ppl.length,
+          wrapStyle: { border: `1px solid ${t.border}`, borderRadius: 2, marginBottom: 8, overflow: 'hidden', background: t.surface },
+          headStyle: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', background: t.surface2 },
+          nameStyle: { fontSize: 10, fontWeight: 700, color: t.ink2, letterSpacing: '.06em', textTransform: 'uppercase' },
+          countStyle: { fontSize: 11, color: t.ink3, fontVariantNumeric: 'tabular-nums' },
+          bodyStyle: { display: 'flex', flexDirection: 'column', padding: 4 },
+          items: ppl.slice().sort((a, b) => a.ring - b.ring).map(n => ({
+            name: this.displayLabel(n, st.producerId), sub: `Ring ${n.ring} · ${n.coi_type}`,
+            rowStyle: {
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, padding: 9, borderRadius: 2, cursor: 'pointer',
+              border: `1px solid ${st.selectedNodeId === n.id ? t.ink : 'transparent'}`,
+              background: st.selectedNodeId === n.id ? t.ink : 'transparent', color: st.selectedNodeId === n.id ? t.bg : t.ink,
+            },
+            nameStyle: { fontSize: 13, fontWeight: 600, lineHeight: 1.35 },
+            subStyle: { fontSize: 11, color: st.selectedNodeId === n.id ? t.bg : t.ink3, opacity: st.selectedNodeId === n.id ? .8 : 1 },
+            dotStyle: { width: 7, height: 7, borderRadius: '50%', background: this.activityColor(n, st.producerId, t), opacity: this.isKnown(st.producerId, n.id) ? 1 : .4, flexShrink: 0, marginTop: 3 },
+            onClick: () => this.selectNode(n.id),
+          })),
+        }));
+      }
+    }
+
+    const allPeople = isBookView ? this.visibleNodesForBook() : this.visibleNodesForAccount();
+    const knownCount = allPeople.filter(n => this.isKnown(st.producerId, n.id)).length;
+    const statTiles = [
+      { value: String(knownCount), label: 'Known', wrapStyle: s.tileWrap, valStyle: { ...s.tileVal, color: t.good }, labelStyle: s.tileLabel },
+      { value: String(allPeople.length - knownCount), label: 'Untapped', wrapStyle: s.tileWrap, valStyle: s.tileVal, labelStyle: s.tileLabel },
+    ];
+
+    let selected = null;
+    if (st.selectedNodeId) {
+      const n = this.nodeById.get(st.selectedNodeId);
+      if (n) {
+        const rw = this.rwIndex.get(st.producerId + '|' + n.id);
+        const acct = this.accountByUbo.get(n.account_ref);
+        const refs = (this.referralsByProducer[st.producerId] || []).filter(r => r.from_node_id === n.id || r.to_node_id === n.id);
+        const knowsChain = (this.knowsOut[n.id] || []).concat(this.knowsIn[n.id] || []);
+        const coiBadgeBg = { signatory: t.accentSoft, conditional: t.surface3, transaction: t.surface3, operational: t.surface3, regulatory: t.surface3 }[n.coi_type] || t.surface3;
+        const known = !!rw;
+        // Composite score breakdown — same 3 inputs that drive nR() node sizing above, shown so
+        // the panel explains what the eye already sees on the canvas. fmtScore trims a trailing
+        // ".0" (coi_weight/coi_freq are integers in this dataset; proxScore of an integer
+        // decision_dist is always integer too) without hardcoding an assumption that they always are.
+        const fmtScore = (x) => { const r = Math.round(x * 10) / 10; return Number.isInteger(r) ? String(r) : r.toFixed(1); };
+        const wt = n.coi_weight || 1, freq = n.coi_freq || 1;
+        const prox = this.proxScore(n.decision_dist);
+        const compositeScore = this.compScore(n);
+        const scoreBars = [
+          { label: 'COI Weight', valDisplay: fmtScore(wt), fillStyle: { ...s.scFill, width: `${Math.max(0, Math.min(100, wt / 10 * 100))}%`, background: '#c9a84c' } },
+          { label: 'COI Frequency', valDisplay: fmtScore(freq), fillStyle: { ...s.scFill, width: `${Math.max(0, Math.min(100, freq / 10 * 100))}%`, background: '#e07a30' } },
+          { label: 'Proximity', valDisplay: fmtScore(prox), fillStyle: { ...s.scFill, width: `${Math.max(0, Math.min(100, prox / 10 * 100))}%`, background: '#9070c0' } },
+        ];
+        selected = {
+          scoreBars, compositeVal: fmtScore(compositeScore),
+          name: this.displayLabel(n, st.producerId),
+          desc: known ? (n.desc || '') : `${this.roleTitle(n)} — no named contact on file yet. ${n.desc || ''}`.trim(),
+          badges: [
+            { label: `Ring ${n.ring}`, style: { fontSize: 11, fontWeight: 600, letterSpacing: '.04em', padding: '3px 9px', borderRadius: 2, background: t.surface3, color: t.ink2, border: `1px solid ${t.border}`, whiteSpace: 'nowrap', flexShrink: 0 } },
+            { label: n.coi_type, style: { fontSize: 11, fontWeight: 600, letterSpacing: '.04em', padding: '3px 9px', borderRadius: 2, background: coiBadgeBg, color: t.ink2, border: `1px solid ${t.border}`, whiteSpace: 'nowrap', flexShrink: 0 } },
+            { label: acct ? acct.principal.label : '', style: { fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 2, background: t.surface3, color: t.ink2, border: `1px solid ${t.border}`, whiteSpace: 'nowrap', flexShrink: 0 } },
+          ],
+          rw: rw ? { relationship_weight: rw.relationship_weight, activity_count_90d: rw.activity_count_90d,
+            calls_logged: rw.calls_logged, emails_sent: rw.emails_sent, meetings_held: rw.meetings_held,
+            last_activity_date: rw.last_activity_date,
+            daysSince: Math.round((Date.now() - new Date(rw.last_activity_date).getTime()) / 86400000) } : null,
+          untappedNote: rw ? null : `White space — this ${this.roleTitle(n).toLowerCase()} role exists on this account but ${producer ? producer.name : 'this producer'} has no Salesforce contact for it yet. Likely reachable through a known contact on the same account.`,
+          hasKnows: knowsChain.length > 0,
+          // Every structural neighbor, known or grey — the grey ones ARE the referral
+          // opportunity, never dropped from this list. Each grey neighbor gets a real,
+          // data-grounded talking point built from the edge's own `why`, not an invented script:
+          // this producer already knows `n`, and `n` structurally connects to this untapped
+          // role for a specific, real reason — that reason is the natural, non-pushy opener.
+          knows: knowsChain.slice(0, 8).map(e => {
+            const other = this.nodeById.get(e.from === n.id ? e.to : e.from);
+            if (!other) return null;
+            const otherKnown = this.isKnown(st.producerId, other.id);
+            const why = e.why || '';
+            const whyPunct = why ? (/[.!?]$/.test(why.trim()) ? why.trim() : why.trim() + '.') : 'a direct structural link.';
+            const script = (known && !otherKnown)
+              ? `Ask ${this.displayLabel(n, st.producerId).split(' — ')[0]} — their role connects to ${this.roleTitle(other).toLowerCase()}s like this one for a real reason: ${whyPunct} If they know others in that position, that's a warm intro, not a cold ask.`
+              : '';
+            return {
+              name: this.displayLabel(other, st.producerId), why,
+              tag: otherKnown ? '' : 'Opportunity',
+              tagStyle: otherKnown ? { display: 'none' } : s.talksTagOpp,
+              dotStyle: { width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: this.activityColor(other, st.producerId, t), opacity: otherKnown ? 1 : .5 },
+              script,
+            };
+          }).filter(Boolean),
+          knowsBoxTitle: knowsChain.some(e => { const o = this.nodeById.get(e.from === n.id ? e.to : e.from); return o && !this.isKnown(st.producerId, o.id); })
+            ? 'Referral paths — where the money is' : 'Structural knows-chain',
+          expiring: !!(rw && (Date.now() - new Date(rw.last_activity_date).getTime()) / 86400000 > 270),
+          hasRefs: refs.length > 0,
+          refs: refs.map(r => ({ notes: r.notes, referred_date: r.referred_date })),
+        };
+      }
+    }
+
+    return {
+      s, state: st, producerOptions, verticalOptions, bwi, bookRows, categoryGroups, statTiles, selected,
+      isBookView, isAccountView, svgRef: this.svgRef, vesselContextLabel,
+      producerName: producer ? producer.name : '—',
+      filtersCaret: '▾',
+      coiWeightLabel, coiFreqLabel, decisionDistLabel,
+      namesLabel: st.showLabels ? 'Hide Names' : 'Show Names',
+      railTitle: isBookView ? 'Your Accounts' : (this.accountByUbo.get(st.accountId)?.principal.label || ''),
+      railSub: isBookView ? `${producer ? producer.name : ''} — ${accts.length} accounts` : `${(this.accountByUbo.get(st.accountId)?.people || []).length} contacts`,
+      toggleTheme: this.toggleTheme, toggleFilters: this.toggleFilters, closeFilters: this.closeFilters,
+      setProducer: this.setProducer, setRing: this.setRing, setRel: this.setRel, setVertical: this.setVertical,
+      setCoiType: this.setCoiType, setCoiWeight: this.setCoiWeight, setCoiFreq: this.setCoiFreq, setDecisionDist: this.setDecisionDist,
+      setModePerson: this.setModePerson, setModeCompany: this.setModeCompany, toggleNames: this.toggleNames,
+      back: this.back, reset: this.reset,
+      onCanvasDown: this.onCanvasDown, onCanvasMove: this.onCanvasMove, onCanvasUp: this.onCanvasUp, onCanvasWheel: this.onCanvasWheel,
+      zoomIn: this.zoomIn, zoomOut: this.zoomOut, zoomReset: this.zoomReset,
+      isNarrow: st.windowWidth < 1180, closePanel: this.closePanel,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

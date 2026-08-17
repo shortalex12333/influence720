@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Whitespace / Gap Engine</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Dashboard-2-specific rules only — shared chrome/tokens live in engine/style-core.css.
+   Never redefine a shared class's own tokens here; only add what this dashboard needs
+   that style-core.css doesn't already provide (the gallery grid, the mini-donut cards,
+   the unbound-reason badge trio, the undiscovered-exposure marker). */
+
+.h-filters{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:9px 20px;border-bottom:1px solid var(--border2);background:var(--surface)}
+
+/* Forensic drawer — slimmed to a max 320px, matching D1/D3's narrower right-panel width
+   (300-380px there, denser than style-core.css's shared 420px default). Overriding the shared
+   .panel-wrap width here only, per-dashboard, exactly as style-core.css's own header comment
+   permits ("layers only its own dashboard-specific rules on top") — the shared file itself
+   stays untouched so D0/D4 keep their own 420px. Internal type scale/padding is untouched
+   (already matches D1/D3's box/info-table values almost exactly — box padding 12, boxH 10,
+   infoKey 10, infoVal 13 — the gap was width, not density), only the grid columns inside
+   .info-row are narrowed so a 3-4 digit $ value never wraps awkwardly against a 320px rail. */
+.panel-wrap{width:320px}
+.panel-wrap:not(.collapsed) #panel{padding:16px}
+#panel .info-row{grid-template-columns:96px 1fr;gap:8px}
+#panel .box{padding:11px}
+
+/* Left rail — override the shared engine's default (340px, rounded-chip hover cards, used
+   verbatim by D0/D4) to actually match D1/D3's real measured rail: 300px, white flat cards,
+   2px radius, border-bottom divider list — not just "similar weight." Values below are D1's
+   own live computed CSS (dashboard1-tactical-map-v2.dc.html), not estimated. Founder called
+   the un-overridden version "weak and overbearing"; this is the literal fix, not a re-guess. */
+.lr-wrap{width:300px}
+.lr-wrap.collapsed{width:0}
+#lrb{background:#eeeeea}
+body.theme-dark #lrb{background:#1b1e21}
+.lr-group{border:none;border-radius:0;margin-bottom:0;background:transparent}
+.lr-group-body{padding:0}
+.lr-row{width:275px;margin:0 auto 6px;padding:10px;border-radius:2px;background:#fff;border:1px solid transparent;border-bottom:1px solid var(--border)}
+body.theme-dark .lr-row{background:#141618}
+.lr-row:hover{background:var(--surface2);border-color:var(--border2)}
+.lr-row.active{background:var(--btnactive);color:var(--btnactivetext);border-color:var(--btnactive)}
+.lr-row-label{font-size:13px;font-weight:600}
+
+/* Worklist rows — built on the shared .lr-row container, own internal layout only */
+.wl-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wl-top + .wl-top{margin-top:5px}
+.wl-amt{font-size:14px;font-weight:800;color:var(--status-unbound)}
+.lr-row.active .wl-amt{color:var(--btnactivetext)}
+.wl-meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+
+/* Penetration % — the rail's PRIMARY ranking metric (ascending: lowest penetration = biggest
+   opportunity = top of queue). A compact inline bar reusing the shared .sc-track/.sc-fill
+   mechanics (same primitive the score-chart already uses elsewhere), never a second bar
+   component. Whitespace $ (wl-amt above) stays visible as the real secondary number per row —
+   the directive is explicit that the non-primary metric must still be a real figure, not silent. */
+.wl-pen-row{display:flex;align-items:center;gap:7px;margin-top:6px}
+.wl-pen-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);white-space:nowrap}
+.wl-pen-track{flex:1;height:6px;background:var(--surface3);border-radius:999px;overflow:hidden}
+.lr-row.active .wl-pen-track{background:rgba(255,255,255,.25)}
+.wl-pen-fill{height:6px;border-radius:999px}
+.wl-pen-val{font-size:11.5px;font-weight:800;min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.lr-row.active .wl-pen-val{color:var(--btnactivetext)}
+.wl-rank{font-size:10px;font-weight:800;color:var(--text3);min-width:16px}
+.lr-row.active .wl-rank{color:var(--btnactivetext)}
+
+/* Unbound-reason badge trio — a badge, never a fourth hue on the red/green/amber scale */
+.badge-reason{font-weight:700}
+.badge-reason.never_written{background:rgba(107,107,107,.14);color:#6b6b6b;border-color:rgba(107,107,107,.4)}
+.badge-reason.lapsed_with_us{background:rgba(179,120,31,.14);color:#8a5a15;border-color:rgba(179,120,31,.4)}
+.badge-reason.competitor_held{background:rgba(91,63,174,.14);color:#5b3fae;border-color:rgba(91,63,174,.4)}
+body.theme-dark .badge-reason.never_written{color:#a8a8a8;border-color:rgba(168,168,168,.4)}
+body.theme-dark .badge-reason.lapsed_with_us{color:#d4943a;border-color:rgba(212,148,58,.4)}
+body.theme-dark .badge-reason.competitor_held{color:#a58af0;border-color:rgba(165,138,240,.4)}
+
+/* Undiscovered-exposure marker — deliberately NOT red/green/amber: this is not a known
+   gap on a known asset, it is the absence of any asset record at all for that vertical. */
+.badge-unmapped{background:transparent;border:1px dashed var(--text3);color:var(--text3);font-weight:600}
+.badge-cluster{background:rgba(39,179,227,.10);color:var(--accent);border-color:rgba(39,179,227,.35)}
+
+/* Center canvas: banner / toolbar / gallery-or-zoom / legend, stacked */
+#cv-wrap{display:flex;flex-direction:column;overflow:hidden}
+#cluster-banner{display:none;margin:14px 18px 0;padding:10px 14px;background:rgba(39,179,227,.10);border:1px solid rgba(39,179,227,.4);border-radius:9px;font-size:12.5px;color:var(--text2);flex-shrink:0}
+#cluster-banner strong{color:var(--accent)}
+#cv-toolbar{display:none;align-items:center;gap:10px;padding:12px 18px 0;flex-shrink:0}
+.back-link{font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:4px;background:none;border:none;padding:0}
+.back-link:hover{text-decoration:underline}
+#zoom-crumb{font-size:11px;color:var(--text3)}
+
+#gallery{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:18px;align-content:start}
+.gcard{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:11px 9px;border-radius:11px;border:1px solid var(--border);background:var(--surface)}
+.gcard:hover{border-color:var(--accent);background:var(--surface2)}
+.gcard svg{width:92px;height:92px}
+.gcard-name{font-size:11.5px;font-weight:700;text-align:center;color:var(--text);line-height:1.25}
+.gcard-amt{font-size:12px;font-weight:800;color:var(--status-unbound)}
+.gcard-badges{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:1px}
+.gcard-badges .badge{font-size:9px;padding:2px 6px}
+
+/* Zoomed detail — ONE shared ontology radial wheel per account (same RingEngine.render()
+   geometry as D0/D1/D3/D4: ring = authority tier, 9-segment domain = lifecycle category),
+   never a per-asset pie grid. #wheel-inner carries the pan/zoom CSS transform (same technique
+   dashboard0's #canvas-inner uses) so scroll-wheel zoom / drag-pan never re-run RingEngine's
+   own layout pass — only the content redraw (account change, node click, sim toggle) does. */
+#zoomstage{flex:1;overflow:hidden;display:none;position:relative;cursor:grab;background:var(--surface)}
+#zoomstage.dragging{cursor:grabbing}
+#wheel-inner{position:absolute;top:0;left:0;transform-origin:0 0}
+#wheel-inner svg{display:block;overflow:visible;width:100%;height:100%}
+.fiduciary-breach-line{pointer-events:none}
+/* Structural-connection rows (knows-edges revealed on role click) — ported verbatim from
+   dashboard0-ontology-foundation.html's own .conn-row/.conn-name/.conn-why/.conn-freq. */
+.conn-row{padding:10px 12px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer}
+.conn-row:hover{border-color:var(--accent)}
+.conn-name{font-size:12.5px;font-weight:700;color:var(--text)}
+.conn-why{font-size:11.5px;color:var(--text2);line-height:1.5;margin-top:3px}
+.conn-freq{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+
+#legend{display:flex;gap:16px;flex-wrap:wrap;padding:10px 18px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);background:var(--surface2);flex-shrink:0}
+.leg-item{display:flex;align-items:center;gap:6px}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-ring{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px dashed var(--text3);box-sizing:border-box}
+
+/* Limit-adequacy 4th hue — a coverage that IS bound but whose bound_limit_usd falls below its
+   tier's baseline_limit_usd (from the deepened ~50-type catalog's baseline_limit_usd /
+   baseline_limit_by_tier). Deliberately NOT the same red as a fully-unbound coverage — this is
+   a written, in-force policy with a real limit-adequacy gap, a different remediation (increase
+   the limit at next renewal) from true whitespace (write it for the first time). Scoped as a
+   dashboard-local token, not a style-core.css shared status, since no other dashboard reads
+   bound_limit_usd/baseline_limit_usd yet. */
+:root{--status-deficient:#a15a2e}
+body.theme-dark{--status-deficient:#e0916a}
+
+.badge-deficient{background:rgba(161,90,46,.14);color:var(--status-deficient);border-color:rgba(161,90,46,.4);font-weight:700}
+body.theme-dark .badge-deficient{color:#e0916a;border-color:rgba(224,145,106,.4)}
+.leg-dot.deficient{background:var(--status-deficient)}
+
+/* Forensic audit drawer — additive box(es) appended to the existing coverage panel, never a
+   replacement of statusBox/crossBox/peersBox above it. */
+.forensic-box .info-key{color:var(--text3)}
+.forensic-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.forensic-item{padding:8px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--surface)}
+.forensic-item-head{font-size:11.5px;font-weight:700;color:var(--text)}
+.forensic-item-body{font-size:11.5px;color:var(--text2);margin-top:3px;line-height:1.5}
+.rate-trend-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:999px;background:rgba(39,179,227,.10);color:var(--accent);border:1px solid rgba(39,179,227,.35)}
+.rate-trend-source{font-size:10.5px;color:var(--text3);margin-top:5px;line-height:1.5}
+
+/* Persona & Scale simulation — a hypothetical overlay on the REAL zoomed wheel, never a second
+   view. Anything touched by an active simulation gets a visibly different treatment (dashed
+   violet satellite stroke) so a simulated wedge/number can never be read as this account's real
+   coverage. */
+.sim-control{display:flex;align-items:center;gap:8px}
+.sim-control label{font-size:11px;font-weight:700;color:var(--text3);white-space:nowrap}
+#sim-banner{display:none;margin:0 18px;padding:8px 14px;border-radius:9px;font-size:11.5px;font-weight:600;background:rgba(139,92,220,.12);border:1px dashed #8b5cdc;color:#8b5cdc}
+body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);border-color:#c3a8f7}
+/* A simulated satellite (Persona & Scale slider active, matching this coverage's own vertical)
+   gets a dashed violet stroke drawn inline at satellite-creation time — see
+   drawSatellitesAndBreaches() — same violet the forensic-sim-box below uses, so a hypothetical
+   wedge can never be read as this account's real coverage. No CSS class needed for the dot
+   itself since it's one of only two stroke-dasharray states set directly on the SVG element. */
+.forensic-sim-box{border-color:#8b5cdc;background:rgba(139,92,220,.08)}
+.forensic-sim-box h3{color:#8b5cdc}
+
+/* Right-panel content lists, all built on the shared .box/.info-table primitives */
+.cov-list,.peer-list{display:flex;flex-direction:column;gap:6px}
+.cov-row,.peer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface);border-radius:7px;border:1px solid var(--border);cursor:pointer}
+.cov-row:hover,.peer-row:hover{border-color:var(--accent)}
+.cov-row-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
+.cov-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.narrative-quote{font-size:12.5px;font-style:italic;color:var(--text2);line-height:1.6;border-left:3px solid var(--accent);padding-left:10px;margin:2px 0 8px}
+.exposure-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px dashed var(--border2);border-radius:7px;margin-bottom:6px;background:var(--surface)}
+.exposure-item .ev-name{font-size:12.5px;font-weight:600;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Whitespace / Gap Engine</div>
+    <div class="h-sub">Every account's <strong>unbound</strong> coverage, ranked by opportunity. Red means <strong>unbound with us</strong> — never "uninsured" — the badge on click tells you why.</div>
+    <div class="h-sub" id="h-book-total"></div>
+    <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
+      <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D2 Whitespace Gap Engine</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-executive-command-center.html" target="_blank" rel="noopener noreferrer">D5 Executive Command Center</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+    </nav>
+  </div>
+  <div class="h-ctrl">
+    <span class="vtag" id="user-lock">USER: —</span>
+    <select class="filter-sel" id="sel-override" style="min-width:210px"></select>
+    <div class="theme-switch-wrap" title="Switch between light and dark mode">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+    <button class="btn" id="btn-reset">Reset Filters</button>
+  </div>
+</header>
+
+<div class="h-filters">
+  <div class="filter-group"><span class="filter-lbl">Coverage (Missing)</span>
+    <select id="f-missing" class="filter-sel"><option value="">Any</option></select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Coverage (Held)</span>
+    <select id="f-held" class="filter-sel"><option value="">Any</option></select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Account Size</span>
+    <select id="f-size" class="filter-sel"><option value="">All Sizes</option></select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Expiry Date</span>
+    <select id="f-expiry" class="filter-sel">
+      <option value="">Any Time</option>
+      <option value="30">Within 30 days</option>
+      <option value="60">Within 60 days</option>
+      <option value="90">Within 90 days</option>
+      <option value="180">Within 180 days</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Vertical</span>
+    <select id="f-vertical" class="filter-sel">
+      <option value="">All Verticals</option>
+      <option value="yacht">Yacht</option>
+      <option value="aviation">Aviation</option>
+      <option value="real_estate">Real Estate</option>
+      <option value="auto">Auto</option>
+      <option value="personal">Personal</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Account Status</span>
+    <select id="f-status" class="filter-sel">
+      <option value="">All</option>
+      <option value="Active">Active (has gaps)</option>
+      <option value="Expiring">Expiring</option>
+      <option value="Lost">Lost</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh">
+        <div id="lrh-title">Ranked Target Queue</div>
+        <div id="lrh-sub"></div>
+      </div>
+      <div id="lrb"></div>
+    </div>
+    <button id="lr-toggle">◂</button>
+  </div>
+
+  <div id="cv-wrap">
+    <div id="cluster-banner"></div>
+    <div id="cv-toolbar">
+      <button class="back-link" id="btn-back-gallery">◂ All Accounts</button>
+      <span id="zoom-crumb"></span>
+      <div class="sim-control" id="sim-control" style="display:none;margin-left:auto">
+        <label for="sim-select">Persona &amp; Scale —</label>
+        <select class="filter-sel" id="sim-select" style="min-width:240px"></select>
+      </div>
+    </div>
+    <div id="sim-banner"></div>
+    <div id="gallery"></div>
+    <div id="zoomstage"><div id="wheel-inner"><svg id="zoom-wheel"></svg></div></div>
+    <div id="legend">
+      <div class="leg-item"><span class="leg-dot" style="background:var(--status-bound)"></span>Satellite — Bound, at or above required limit</div>
+      <div class="leg-item"><span class="leg-dot deficient"></span>Satellite — Bound, below required limit (deficient)</div>
+      <div class="leg-item"><span class="leg-dot" style="background:var(--status-unbound)"></span>Satellite — Unbound (with us) — click for reason</div>
+      <div class="leg-item"><span class="leg-dot" style="background:var(--status-expiring)"></span>Satellite — Expiring &lt;90 days</div>
+      <div class="leg-item"><span class="leg-dot" style="border:2px solid var(--text2);background:transparent"></span>Node = structural role (size = authority Ring 0 Apex→4 Operational, color = lifecycle domain)</div>
+      <div class="leg-item"><span style="width:16px;height:2px;background:var(--status-unbound);display:inline-block;flex-shrink:0"></span>Fiduciary breach — signatory-level role (Ring 0/1) with an open coverage gap</div>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <button id="panel-toggle">▸</button>
+    <div id="panel"></div>
+  </div>
+</div>
+
+<script src="data/ontology-720.js"></script>
+<script src="data/overlays.js"></script>
+<script src="data/rosters.js"></script>
+<script src="data/template-ontology.js"></script>
+<script src="data/coverage-corpus.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+(function(){
+'use strict';
+
+RingEngine.theme.apply();
+document.getElementById('theme-toggle').addEventListener('click', RingEngine.theme.toggle);
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA INDEXING — everything below is computed live from the three
+   shared data files. No hardcoded catalog, no id-parsing — account_ref
+   / owner_ref / parent_asset_ref are real FKs, used directly.
+   ══════════════════════════════════════════════════════════════════ */
+const TODAY = new Date('2026-08-15T00:00:00Z');
+
+const nodesById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
+const overlayByCovId = new Map(BOUND_POLICY_OVERLAY.map(o => [o.coverage_id, o]));
+
+const principals = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
+const assetNodes  = ONTOLOGY_NODES.filter(n => n.node_type === 'asset');
+const covNodes    = ONTOLOGY_NODES.filter(n => n.node_type === 'coverage');
+
+const assetsByOwner = new Map();
+assetNodes.forEach(a => { if (!assetsByOwner.has(a.owner_ref)) assetsByOwner.set(a.owner_ref, []); assetsByOwner.get(a.owner_ref).push(a); });
+
+const covsByAsset = new Map();
+covNodes.forEach(c => { if (!covsByAsset.has(c.parent_asset_ref)) covsByAsset.set(c.parent_asset_ref, []); covsByAsset.get(c.parent_asset_ref).push(c); });
+
+const crossPollByCovId = new Map();
+EDGES_720.filter(e => e.edge_type === 'cross_pollination').forEach(e => crossPollByCovId.set(e.to, e));
+
+const producerById = new Map(PRODUCERS.map(p => [p.producer_id, p]));
+const producerIdByUbo = new Map(ACCOUNT_PRODUCER_MAP.map(m => [m.ubo_id, m.producer_id]));
+
+const CORE_VERTICALS = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
+const VERTICAL_LABEL = { yacht: 'Yacht', aviation: 'Aviation', real_estate: 'Real Estate', auto: 'Auto', personal: 'Personal' };
+
+// Live coverage catalog — derived from the coverage nodes themselves. The prior build
+// referenced a COVERAGE_CATALOG global that does not exist anywhere in the data files;
+// this is the same class of bug the id-parsing hack was (an assumed structure that
+// silently produces nothing), so it is derived live instead.
+const coverageCatalog = new Map(); // vertical -> Map(coverage_type_id -> label)
+const covTypeLabel = new Map();
+covNodes.forEach(c => {
+  if (!coverageCatalog.has(c.vertical)) coverageCatalog.set(c.vertical, new Map());
+  coverageCatalog.get(c.vertical).set(c.coverage_type_id, c.label);
+  covTypeLabel.set(c.coverage_type_id, c.label);
+});
+
+// Live size-class catalog — the data actually carries S1..S7 (yacht-only) plus N/A;
+// hardcoding a subset (as the prior build did with S4/S5/S6/NA) silently drops accounts.
+const SIZE_ORDER = ['S1','S2','S3','S4','S5','S6','S7'];
+const sizesPresent = new Set(assetNodes.map(a => a.size_class));
+
+/* ══════════════════════════════════════════════════════════════════
+   ROLE / WHEEL INDEXING — the founder's rejection of per-asset pies and
+   the rebuild onto D0/D1/D3/D4's shared ontology radial wheel geometry.
+   A zoomed account's canvas nodes are its own real structural ROLE
+   instances (ONTOLOGY_NODES role type, filtered to account_ref) plus the
+   account's own principal node as the Ring-0 apex — the exact same
+   {role nodes + principal nodes} wheel shape dashboard4 already draws
+   for the whole book, just scoped to one account_ref instead of all 150.
+   ══════════════════════════════════════════════════════════════════ */
+const SEGMENTS = TEMPLATE_ONTOLOGY.segments; // 9 canonical lifecycle domains — same source D0/D4 read
+const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
+const rolesByAccount = new Map();
+roleNodes.forEach(n => { if (!rolesByAccount.has(n.account_ref)) rolesByAccount.set(n.account_ref, []); rolesByAccount.get(n.account_ref).push(n); });
+
+// Structural "knows" edges (peer-to-peer, e.g. "SPV Director reports to Trustee") — D0's own
+// connByRole pattern, generalized over EDGES_720's real node ids instead of D0's synthetic
+// vertical:title ones. Kept as a flat id->id index; renderZoom() below filters to edges where
+// BOTH ends sit inside the currently-zoomed account's own node set before ever drawing one.
+const knowsEdges = EDGES_720.filter(e => e.edge_type === 'knows');
+const connByRoleId = new Map();
+knowsEdges.forEach(e => {
+  if (!nodesById.has(e.from) || !nodesById.has(e.to)) return;
+  if (!connByRoleId.has(e.from)) connByRoleId.set(e.from, []);
+  if (!connByRoleId.has(e.to)) connByRoleId.set(e.to, []);
+  connByRoleId.get(e.from).push({ other: e.to, why: e.why, freq: e.freq });
+  connByRoleId.get(e.to).push({ other: e.from, why: e.why, freq: e.freq });
+});
+
+// Coverage responsibility rows per role — BOUND_POLICY_OVERLAY.responsible_node_id is a real
+// FK straight to the role that owns it (verified live: all 5,722 overlay rows resolve to a
+// role node, 0 misses, 0 cross-account mismatches against the coverage's own parent asset's
+// owner_ref). This is what a role's orbiting satellites are built from below.
+const overlayRowsByRole = new Map();
+BOUND_POLICY_OVERLAY.forEach(o => {
+  if (!overlayRowsByRole.has(o.responsible_node_id)) overlayRowsByRole.set(o.responsible_node_id, []);
+  overlayRowsByRole.get(o.responsible_node_id).push(o);
+});
+
+// Composite-score / authority-radius formula — ported VERBATIM from
+// dashboard0-ontology-foundation.html (~line 343-355), the same formula every other
+// dashboard's role wheel uses. Role (and principal) nodes here carry the identical
+// coi_weight/coi_freq/decision_dist fields D0 reads; decision_dist is absent on principal
+// nodes, same as D0's own `?? 4` fallback already handles.
+function proxScore(d) { return Math.max(0, 10 - ((d ?? 4) - 1) * 2); }
+function compScore(n) { return ((n.coi_weight || 1) * 0.5) + ((n.coi_freq || 1) * 0.3) + (proxScore(n.decision_dist) * 0.2); }
+function roleRadius(n) {
+  const comp = compScore(n);
+  const minR = ({ 0: 16, 1: 11, 2: 8, 3: 6, 4: 5 })[n.ring] ?? 5;
+  const maxR = ({ 0: 32, 1: 22, 2: 16, 3: 12, 4: 9 })[n.ring] ?? 9;
+  return minR + (comp / 10) * (maxR - minR);
+}
+
+// Satellite radius — sqrt-scaled off the real $ this specific coverage line carries (bound
+// premium if bound/expiring, estimated GWP if unbound), against the single largest such $
+// figure anywhere in the book, so one outlier policy can't blow out every other satellite's
+// scale. Same sqrt-scaling principle the old per-asset pie's node sizing already used.
+let MAX_SAT_VALUE = 1;
+BOUND_POLICY_OVERLAY.forEach(o => { const v = (o.status === 'unbound' ? o.gwp_estimate : o.bound_premium) || 0; if (v > MAX_SAT_VALUE) MAX_SAT_VALUE = v; });
+function satRadius(v) {
+  const MIN = 3, MAX = 9;
+  return MIN + Math.sqrt(Math.max(0, v || 0) / MAX_SAT_VALUE) * (MAX - MIN);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LIMIT-ADEQUACY CATALOG — data/coverage-corpus.js (COVERAGE_CORPUS /
+   GWP_RATE_TREND / GWP_PRICING_METHODOLOGY), regenerated FROM the same
+   master workbook's CovCatalog_<Vertical> + GWP_RateTrend_Table +
+   GWP_Pricing_Methodology sheets. baselineLimitFor() below is a direct
+   client-side port of pricing_v2.py's baseline_limit_usd_for() /
+   aviation_tier() — same tier keys, same fallback ('S4' / 'mid'), so a
+   coverage's real deficiency verdict here matches the one the pricing
+   pass itself computed bound_limit_usd against. ══════════════════════ */
+const covCatalogByKey = new Map(); // "vertical|coverage_type_id" -> corpus entry
+Object.keys((typeof COVERAGE_CORPUS !== 'undefined' && COVERAGE_CORPUS.verticals) || {}).forEach(v => {
+  COVERAGE_CORPUS.verticals[v].forEach(entry => covCatalogByKey.set(v + '|' + entry.coverage_type_id, entry));
+});
+const rateTrendByType = (typeof GWP_RATE_TREND !== 'undefined') ? GWP_RATE_TREND : {};
+const pricingMethodology = (typeof GWP_PRICING_METHODOLOGY !== 'undefined') ? GWP_PRICING_METHODOLOGY : [];
+
+// Mirrors pricing_v2.AVIATION_TIER_KEYWORDS exactly.
+const AVIATION_TIER_KEYWORDS = { light: ['Sikorsky', 'Citation', 'H175'], mid: ['Challenger', 'Falcon'], heavy: ['Gulfstream', 'Global'] };
+const AVIATION_TIERS = ['light', 'mid', 'heavy'];
+function aviationTier(assetLabel) {
+  const label = assetLabel || '';
+  for (const tier of AVIATION_TIERS) {
+    if (AVIATION_TIER_KEYWORDS[tier].some(k => label.includes(k))) return tier;
+  }
+  return 'mid';
+}
+// tierOverride lets the Persona & Scale slider ask "what would apply at THIS tier" without
+// touching the asset's own real size_class / label — same catalog entry, different tier key.
+function baselineLimitFor(vertical, coverageTypeId, asset, tierOverride) {
+  const entry = covCatalogByKey.get(vertical + '|' + coverageTypeId);
+  if (!entry) return null;
+  const byTier = entry.baseline_limit_by_tier;
+  if (byTier) {
+    let tier = tierOverride;
+    if (!tier) {
+      if (vertical === 'yacht') tier = (asset && asset.size_class) || 'S4';
+      else if (vertical === 'aviation') tier = aviationTier(asset && asset.label);
+      else return null;
+    }
+    return byTier[tier] != null ? byTier[tier] : null;
+  }
+  return entry.baseline_limit_usd != null ? entry.baseline_limit_usd : null;
+}
+// Real (never-simulated) gap state for one coverage node — the source of truth for outer-ring
+// satellite coloring. 'expiring' takes the overlay's own status (unchanged existing behavior);
+// 'deficient' is the new limit-adequacy signal; everything else collapses to the existing
+// bound/unbound binary exactly as before.
+function coverageGapState(covNode, asset, tierOverride) {
+  const ov = overlayByCovId.get(covNode.id) || {};
+  if (ov.status === 'expiring') return 'expiring';
+  if (ov.status === 'bound') {
+    const baseline = baselineLimitFor(covNode.vertical, covNode.coverage_type_id, asset, tierOverride);
+    if (baseline != null && ov.bound_limit_usd != null && ov.bound_limit_usd < baseline) return 'deficient';
+    return 'adequate';
+  }
+  return 'unbound';
+}
+function gapStateColorVar(state) {
+  if (state === 'adequate') return 'var(--status-bound)';
+  if (state === 'expiring') return 'var(--status-expiring)';
+  if (state === 'deficient') return 'var(--status-deficient)';
+  return 'var(--status-unbound)';
+}
+function simTierLabel(vertical, tier) {
+  if (vertical === 'yacht') return 'Size Class ' + tier;
+  if (vertical === 'aviation') return tier.charAt(0).toUpperCase() + tier.slice(1) + ' Tier';
+  return tier;
+}
+
+function fmt$(n) {
+  if (n === null || n === undefined) return '—';
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  return Math.round((new Date(dateStr + 'T00:00:00Z') - TODAY) / 86400000);
+}
+function statusColorVar(status) {
+  return status === 'bound' ? 'var(--status-bound)' : status === 'expiring' ? 'var(--status-expiring)' : 'var(--status-unbound)';
+}
+function statusBadgeHTML(status) {
+  if (status === 'Expiring') return '<span class="badge badge-status expiring">Expiring</span>';
+  if (status === 'Lost') return '<span class="badge badge-status unbound">Lost</span>';
+  return '<span class="badge badge-ring">Active</span>';
+}
+// Forensic-drawer status vocabulary — Bound / Expiring<90d / Whitespace Gap, the exact 3-way
+// language the reformation directive asks the drawer to surface at a glance, next to the policy
+// line name itself (panel-title + panel-meta-row), not buried a scroll down inside Policy Detail.
+function policyStatusLabel(status) {
+  if (status === 'bound') return 'Bound';
+  if (status === 'expiring') return 'Expiring <90d';
+  return 'Whitespace Gap';
+}
+const REASON_META = {
+  never_written:   { abbr: 'NW', label: 'Never Written — True Whitespace' },
+  lapsed_with_us:  { abbr: 'LW', label: 'Lapsed With Us — Win-Back' },
+  competitor_held: { abbr: 'CH', label: 'Competitor Held — Displacement' },
+};
+
+/* ── Build one account record per UBO principal ──────────────────── */
+function buildAccount(prin) {
+  const assets = assetsByOwner.get(prin.id) || [];
+  const coverages = [];
+  assets.forEach(a => {
+    (covsByAsset.get(a.id) || []).forEach(c => coverages.push({ node: c, asset: a, overlay: overlayByCovId.get(c.id) || {} }));
+  });
+  const unbound = coverages.filter(c => c.overlay.status === 'unbound');
+  const totalGap = unbound.reduce((s, c) => s + (c.overlay.gwp_estimate || 0), 0);
+  const hasExpiring = coverages.some(c => c.overlay.status === 'expiring');
+  const allLapsed = coverages.length > 0 && coverages.every(c => c.overlay.status === 'unbound' && c.overlay.unbound_reason === 'lapsed_with_us');
+  let status = 'Active';
+  if (hasExpiring) status = 'Expiring';
+  else if (allLapsed) status = 'Lost';
+
+  const presentVerticals = new Set(assets.map(a => a.vertical));
+  const verticals = CORE_VERTICALS.filter(v => presentVerticals.has(v));
+  // The founder's whitespace clarification: a vertical with ZERO asset nodes for this
+  // account is not a "gap on a known asset" — it's an entirely undiscovered exposure.
+  // Kept structurally separate from `unbound`/`totalGap` throughout — never summed in,
+  // never colored red, no invented dollar figure.
+  const missingVerticals = CORE_VERTICALS.filter(v => !presentVerticals.has(v));
+
+  // Penetration % — the rail's PRIMARY ranking metric (per the reformation directive): bound
+  // coverage count ÷ total required coverage types for this account's ACTUAL asset mix. "Required"
+  // is read live off the same coverage-corpus catalog baselineLimitFor() already reads
+  // (COVERAGE_CORPUS.verticals[vertical], never a hand-authored count) — each asset requires its
+  // vertical's full catalog independently, so an account with 2 yachts needs 2× the yacht catalog.
+  // "Bound" = status bound OR expiring (both are written, in-force lines; a deficient-limit line
+  // still counts as bound here — deficiency is a limit-adequacy problem, not a penetration one).
+  let requiredCoverageCount = 0;
+  assets.forEach(a => {
+    const catalog = (typeof COVERAGE_CORPUS !== 'undefined' && COVERAGE_CORPUS.verticals[a.vertical]) || [];
+    requiredCoverageCount += catalog.length;
+  });
+  const boundCoverageCount = coverages.filter(c => c.overlay.status === 'bound' || c.overlay.status === 'expiring').length;
+  const penetrationPct = requiredCoverageCount > 0 ? boundCoverageCount / requiredCoverageCount : null;
+
+  return {
+    id: prin.id, prin, assets, coverages, unbound, totalGap, gapCount: unbound.length,
+    status, verticals, missingVerticals,
+    requiredCoverageCount, boundCoverageCount, penetrationPct,
+    producer_id: producerIdByUbo.get(prin.id) || null,
+  };
+}
+const accounts = principals.map(buildAccount);
+const accountById = new Map(accounts.map(a => [a.id, a]));
+
+/* ── Cluster detection — book-wide (macro layer), independent of which
+   producer is currently selected. Surfaces as a rail/gallery badge and
+   as the "Coverage (missing)" banner. ─────────────────────────────── */
+const clusterGroups = new Map(); // coverage_type_id -> Map(account_id -> account)
+accounts.forEach(acc => {
+  acc.unbound.forEach(c => {
+    const key = c.node.coverage_type_id;
+    if (!clusterGroups.has(key)) clusterGroups.set(key, new Map());
+    clusterGroups.get(key).set(acc.id, acc);
+  });
+});
+accounts.forEach(acc => {
+  const seen = new Set();
+  acc.clusteredTypes = [];
+  acc.unbound.forEach(c => {
+    const key = c.node.coverage_type_id;
+    const group = clusterGroups.get(key);
+    if (group && group.size >= 2 && !seen.has(key)) { seen.add(key); acc.clusteredTypes.push(key); }
+  });
+});
+function peersShareGap(typeId, currentId) {
+  const group = clusterGroups.get(typeId);
+  if (!group) return [];
+  return Array.from(group.values()).filter(a => a.id !== currentId);
+}
+function peerCompFor(typeId, excludeCovId) {
+  const list = covNodes.filter(c => c.coverage_type_id === typeId && c.id !== excludeCovId)
+    .map(c => ({ node: c, overlay: overlayByCovId.get(c.id) || {}, asset: nodesById.get(c.parent_asset_ref) }))
+    .filter(c => c.overlay.status === 'bound');
+  const avg = list.length ? Math.round(list.reduce((s, c) => s + (c.overlay.bound_premium || 0), 0) / list.length) : 0;
+  return { list, avg };
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE + FILTERS — "current user" is a real producer-override
+   selector (Dashboard 1's pattern), defaulting to Alex.
+   ══════════════════════════════════════════════════════════════════ */
+const state = { producerId: (PRODUCERS.find(p => p.name === 'Alex') || PRODUCERS[0]).producer_id, view: 'gallery', selectedAccountId: null, selectedNode: null, sim: null };
+const filters = { missing: '', held: '', size: '', expiry: '', vertical: '', status: '' };
+function currentProducer() { return producerById.get(state.producerId); }
+
+function visibleAccounts() {
+  return accounts.filter(a => {
+    if (a.producer_id !== state.producerId) return false;
+    if (filters.missing && !a.unbound.some(c => c.node.coverage_type_id === filters.missing)) return false;
+    if (filters.held && !a.coverages.some(c => (c.overlay.status === 'bound' || c.overlay.status === 'expiring') && c.node.coverage_type_id === filters.held)) return false;
+    if (filters.size) {
+      if (!a.assets.some(x => x.size_class === filters.size)) return false;
+    }
+    if (filters.expiry) {
+      const win = parseInt(filters.expiry, 10);
+      if (!a.coverages.some(c => { const d = daysUntil(c.overlay.expiry_date); return d !== null && d >= 0 && d <= win; })) return false;
+    }
+    if (filters.vertical && !a.verticals.includes(filters.vertical)) return false;
+    if (filters.status && a.status !== filters.status) return false;
+    return true;
+  }).sort((a, b) => b.totalGap - a.totalGap);
+}
+
+// Ranked Target Queue ordering — the rail's own primary sort, independent of the gallery's
+// whitespace-desc order above (visibleAccounts() is left untouched; the center canvas gallery
+// keeps its existing order). PRIMARY: penetration % ascending — lowest-penetration accounts are
+// the biggest real opportunity and surface first, per the directive's own framing of "queue".
+// SECONDARY (tie-break, and the metric shown per row alongside penetration): whitespace $ desc.
+// An account with zero required coverage types (no assets at all) has no meaningful penetration
+// figure — sorted to the bottom rather than falsely reading as "fully penetrated."
+function rankedForRail(list) {
+  return list.slice().sort((a, b) => {
+    const pa = a.penetrationPct == null ? 2 : a.penetrationPct;
+    const pb = b.penetrationPct == null ? 2 : b.penetrationPct;
+    if (pa !== pb) return pa - pb;
+    return b.totalGap - a.totalGap;
+  });
+}
+function penColorVar(pct) {
+  if (pct == null) return 'var(--text3)';
+  if (pct < 0.4) return 'var(--status-unbound)';
+  if (pct < 0.7) return 'var(--status-expiring)';
+  return 'var(--status-bound)';
+}
+
+/* ── Populate static controls (all live, none hardcoded) ─────────── */
+const overrideSel = document.getElementById('sel-override');
+PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name + ' — ' + p.archetype; overrideSel.appendChild(o); });
+overrideSel.value = state.producerId;
+overrideSel.addEventListener('change', () => {
+  state.producerId = overrideSel.value; state.view = 'gallery'; state.selectedAccountId = null; state.selectedNode = null; renderAll();
+});
+
+function populateCoverageSelect(sel) {
+  const verts = Array.from(coverageCatalog.keys());
+  const ordered = CORE_VERTICALS.filter(v => verts.includes(v)).concat(verts.filter(v => !CORE_VERTICALS.includes(v)));
+  ordered.forEach(v => {
+    const og = document.createElement('optgroup');
+    og.label = VERTICAL_LABEL[v] || (v.charAt(0).toUpperCase() + v.slice(1)).replace('_', ' ');
+    Array.from(coverageCatalog.get(v).entries()).sort((a, b) => a[1].localeCompare(b[1])).forEach(([id, label]) => {
+      const o = document.createElement('option'); o.value = id; o.textContent = label; og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+}
+populateCoverageSelect(document.getElementById('f-missing'));
+populateCoverageSelect(document.getElementById('f-held'));
+
+const sizeSel = document.getElementById('f-size');
+SIZE_ORDER.filter(s => sizesPresent.has(s)).forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s + ' — Yacht Size Class'; sizeSel.appendChild(o); });
+if (sizesPresent.has('N/A')) { const o = document.createElement('option'); o.value = 'N/A'; o.textContent = 'Non-Yacht Asset'; sizeSel.appendChild(o); }
+
+['f-missing','f-held','f-size','f-expiry','f-vertical','f-status'].forEach(id => {
+  document.getElementById(id).addEventListener('change', e => { filters[id.slice(2)] = e.target.value; renderAll(); });
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  Object.keys(filters).forEach(k => filters[k] = '');
+  ['f-missing','f-held','f-size','f-expiry','f-vertical','f-status'].forEach(id => document.getElementById(id).value = '');
+  renderAll();
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   SVG HELPERS — mini-donut gallery cards (deliberately hand-rolled,
+   NOT RingEngine — the landing state is a grid of small multiples,
+   not one radial graph, per the locked spec).
+   ══════════════════════════════════════════════════════════════════ */
+function polar(cx, cy, r, deg) { const rad = (deg - 90) * Math.PI / 180; return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }; }
+function arcPath(cx, cy, r0, r1, a0, a1) {
+  a0 = Math.max(0, Math.min(360, a0)); a1 = Math.max(0, Math.min(360, a1));
+  if (a1 - a0 < 0.01) a1 = a0 + 0.01;
+  const large = (a1 - a0) > 180 ? 1 : 0;
+  const po0 = polar(cx, cy, r1, a0), po1 = polar(cx, cy, r1, a1);
+  const pi0 = polar(cx, cy, r0, a1), pi1 = polar(cx, cy, r0, a0);
+  return `M ${po0.x} ${po0.y} A ${r1} ${r1} 0 ${large} 1 ${po1.x} ${po1.y} L ${pi0.x} ${pi0.y} A ${r0} ${r0} 0 ${large} 0 ${pi1.x} ${pi1.y} Z`;
+}
+function miniDonutSVG(acc) {
+  const n = acc.coverages.length;
+  let svg = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">';
+  if (n === 1) {
+    const c = acc.coverages[0];
+    svg += `<circle cx="50" cy="50" r="33" fill="none" stroke="${statusColorVar(c.overlay.status)}" stroke-width="22"><title>${c.node.label} — ${c.overlay.status}</title></circle>`;
+  } else if (n > 1) {
+    const pad = 2.2, step = 360 / n;
+    acc.coverages.forEach((c, i) => {
+      const a0 = i * step + pad / 2, a1 = (i + 1) * step - pad / 2;
+      svg += `<path d="${arcPath(50, 50, 22, 44, a0, a1)}" fill="${statusColorVar(c.overlay.status)}"><title>${c.node.label} (${c.asset.label}) — ${c.overlay.status}</title></path>`;
+    });
+  } else {
+    svg += `<circle cx="50" cy="50" r="33" fill="none" stroke="var(--border2)" stroke-width="4" stroke-dasharray="3 5"></circle>`;
+  }
+  svg += `<circle cx="50" cy="50" r="20" fill="var(--surface)" stroke="var(--border2)" stroke-width="1"></circle>`;
+  svg += '</svg>';
+  return svg;
+}
+function wrapLabel(label, maxLen) {
+  const words = label.split(' ');
+  const lines = []; let cur = '';
+  words.forEach(w => { if ((cur + ' ' + w).trim().length > maxLen) { lines.push(cur.trim()); cur = w; } else cur = (cur + ' ' + w).trim(); });
+  if (cur) lines.push(cur);
+  return lines.slice(0, 3);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — Left rail (worklist), built on the shared .lr-row
+   ══════════════════════════════════════════════════════════════════ */
+function renderRail(list) {
+  document.getElementById('lrh-sub').textContent = currentProducer().name + ' — ' + list.length + ' account' + (list.length === 1 ? '' : 's') + ', ranked by penetration % ascending (lowest first = biggest opportunity).';
+  const box = document.getElementById('lrb');
+  box.innerHTML = '';
+  list.forEach((acc, i) => {
+    const row = document.createElement('div');
+    row.className = 'lr-row' + (state.selectedAccountId === acc.id ? ' active' : '');
+    let metaHtml = '';
+    if (acc.clusteredTypes.length) {
+      // Truncated to 3 + "N more" — a rail row is a fixed-width card, not a paragraph; the badge
+      // primitive was never meant to hold a full comma list (some accounts share 40+ types with
+      // peers). Full untruncated list stays available via the title attribute and, at full detail,
+      // in the account's own zoomed panel.
+      const shownTypes = acc.clusteredTypes.slice(0, 3).map(t => covTypeLabel.get(t));
+      const moreCount = acc.clusteredTypes.length - shownTypes.length;
+      const fullTitle = acc.clusteredTypes.map(t => covTypeLabel.get(t)).join(', ');
+      metaHtml += `<span class="badge badge-cluster" title="${fullTitle}">⚭ shares: ${shownTypes.join(', ')}${moreCount > 0 ? ` +${moreCount} more` : ''}</span>`;
+    }
+    if (acc.missingVerticals.length) {
+      metaHtml += `<span class="badge badge-unmapped" title="Suspected additional exposure — not a known gap on a known asset">${acc.missingVerticals.length} vertical${acc.missingVerticals.length===1?'':'s'} unmapped</span>`;
+    }
+    const penPct = acc.penetrationPct;
+    const penDisplay = penPct == null ? '—' : Math.round(penPct * 100) + '%';
+    const penColor = penColorVar(penPct);
+    row.innerHTML = `
+      <span class="wl-rank">#${i + 1}</span>
+      <div style="flex:1;min-width:0">
+        <div class="wl-top"><span class="lr-row-label">${acc.prin.label}</span>${statusBadgeHTML(acc.status)}</div>
+        <div class="wl-pen-row" title="${acc.boundCoverageCount} of ${acc.requiredCoverageCount} required coverage types bound, across this account's ${acc.assets.length} asset${acc.assets.length===1?'':'s'}">
+          <span class="wl-pen-label">Penetration</span>
+          <span class="wl-pen-track"><span class="wl-pen-fill" style="width:${penPct == null ? 0 : Math.round(penPct * 100)}%;background:${penColor}"></span></span>
+          <span class="wl-pen-val" style="color:${penColor}">${penDisplay}</span>
+        </div>
+        <div class="wl-top"><span class="wl-amt num">${fmt$(acc.totalGap)}</span><span class="lr-row-sub">whitespace GWP · ${acc.gapCount} gap${acc.gapCount === 1 ? '' : 's'}</span></div>
+        ${metaHtml ? `<div class="wl-meta">${metaHtml}</div>` : ''}
+      </div>`;
+    row.addEventListener('click', () => selectAccount(acc.id));
+    box.appendChild(row);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — cluster banner (macro, book-wide)
+   ══════════════════════════════════════════════════════════════════ */
+function renderClusterBanner() {
+  const banner = document.getElementById('cluster-banner');
+  if (!filters.missing) { banner.style.display = 'none'; return; }
+  const group = clusterGroups.get(filters.missing);
+  if (!group || group.size < 2) { banner.style.display = 'none'; return; }
+  const list = Array.from(group.values());
+  banner.style.display = 'block';
+  banner.innerHTML = `<strong>${list.length} accounts across the book</strong> share this gap — ${covTypeLabel.get(filters.missing)}: ${list.map(a => a.prin.label).join(', ')}.`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — Gallery (default/landing center canvas)
+   ══════════════════════════════════════════════════════════════════ */
+function renderGallery(list) {
+  const gal = document.getElementById('gallery');
+  gal.innerHTML = '';
+  list.forEach(acc => {
+    const card = document.createElement('div');
+    card.className = 'gcard';
+    let badges = '';
+    if (acc.clusteredTypes.length) badges += `<span class="badge badge-cluster" title="Shares this gap with other accounts">⚭</span>`;
+    if (acc.missingVerticals.length) badges += `<span class="badge badge-unmapped" title="Suspected additional exposure — ${acc.missingVerticals.map(v => VERTICAL_LABEL[v]).join(', ')} not yet mapped for this account">${acc.missingVerticals.length} unmapped</span>`;
+    card.innerHTML = `
+      ${miniDonutSVG(acc)}
+      <div class="gcard-name">${acc.prin.label}</div>
+      <div class="gcard-amt num">${fmt$(acc.totalGap)}</div>
+      ${statusBadgeHTML(acc.status)}
+      <div class="gcard-badges">${badges}</div>
+    `;
+    card.addEventListener('click', () => selectAccount(acc.id));
+    gal.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — Zoomed detail: ONE shared ontology radial wheel per account,
+   the exact D0/D1/D3/D4 RingEngine.render() geometry — ring = authority
+   tier (0-4), 9-segment domain = real lifecycle category (n.domain/
+   n.category), node = this account's own real structural ROLE instances
+   plus its principal as the Ring-0 apex. No custom pie system, no
+   per-asset canvas — the founder's explicit, forceful rejection of the
+   prior build. Each role's real coverage responsibilities render as
+   small satellite markers orbiting that role's own RENDERED position —
+   read directly off RingEngine.render()'s returned layout, the same
+   additive technique dashboard4's splitFillNode()/drawHub() already use
+   on top of the engine, never a change to render-core.js itself.
+   ══════════════════════════════════════════════════════════════════ */
+function drawAccountHubLabel(scene, acc) {
+  // The HUB_MARGIN inside RI[0]=80 is empty space no ring-0 node is ever placed in — same spot
+  // dashboard4's drawHub() writes the whole-book total into, here holding this one account's own
+  // name + real whitespace total instead.
+  const g = RingEngine.svgEl('g', {});
+  wrapLabel(acc.prin.label, 13).forEach((line, i, arr) => {
+    const t = RingEngine.svgEl('text', { x: 0, y: (i - (arr.length - 1) / 2) * 15 - 6, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '800', fill: 'var(--text)' });
+    t.textContent = line; g.appendChild(t);
+  });
+  const amt = RingEngine.svgEl('text', { x: 0, y: (Math.max(1, wrapLabel(acc.prin.label, 13).length) - 1) * 7.5 + 22, 'text-anchor': 'middle', 'font-size': '17', 'font-weight': '900', fill: 'var(--accent)' });
+  amt.textContent = fmt$(acc.totalGap) + ' whitespace';
+  g.appendChild(amt);
+  scene.appendChild(g);
+}
+
+// Draws every role's coverage-responsibility satellites AND the fiduciary-breach lines, reading
+// each role's true rendered (x,y,r) straight off the layout RingEngine.render() just returned —
+// never recomputed independently, so a satellite always sits on the node it actually belongs to,
+// including after the 60-pass collision-avoidance RingEngine's own buildLayout() runs.
+function drawSatellitesAndBreaches(scene, layout, simVertical, simTier) {
+  layout.forEach(p => {
+    const role = p.n;
+    if (role.node_type !== 'role') return;
+    const rows = overlayRowsByRole.get(role.id) || [];
+    if (!rows.length) return;
+    const n = rows.length;
+    const orbitBase = p.r + 8;
+    rows.forEach((ov, i) => {
+      const covNode = nodesById.get(ov.coverage_id);
+      if (!covNode) return;
+      const asset = covNode.parent_asset_ref ? nodesById.get(covNode.parent_asset_ref) : null;
+      // Persona & Scale simulation only ever applies to a coverage line of the SAME vertical the
+      // slider is set to (yacht tier vs. aviation tier are different catalogs) — every other
+      // satellite on this same role keeps rendering its real, unsimulated status exactly as before.
+      const isSimRow = !!(simVertical && covNode.vertical === simVertical);
+      const gState = coverageGapState(covNode, asset, isSimRow ? simTier : null);
+      const color = gapStateColorVar(gState);
+      const value = (ov.status === 'unbound' ? ov.gwp_estimate : ov.bound_premium) || 0;
+      const sr = satRadius(value);
+      const angle = n === 1 ? -Math.PI / 2 : (i / n) * Math.PI * 2;
+      const orbitR = orbitBase + sr + 3;
+      const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
+      const dot = RingEngine.svgEl('circle', {
+        cx: sx, cy: sy, r: sr, fill: color, stroke: isSimRow ? '#8b5cdc' : 'var(--surface)',
+        'stroke-width': isSimRow ? 1.6 : 1, 'stroke-dasharray': isSimRow ? '2 1.4' : 'none', cursor: 'pointer',
+      });
+      dot.addEventListener('click', evt => { evt.stopPropagation(); selectNode('coverage', ov.coverage_id); });
+      dot.addEventListener('mouseenter', evt => {
+        let meta = ov.status === 'unbound' && ov.unbound_reason ? (ov.status + ' · ' + REASON_META[ov.unbound_reason].label) : (ov.status || '');
+        if (gState === 'deficient') meta += ' · LIMIT DEFICIENT';
+        if (isSimRow) meta = '[SIMULATED — ' + simTierLabel(covNode.vertical, simTier) + '] ' + meta;
+        RingEngine.tooltip.show(evt, covNode.label, meta, value ? fmt$(value) : '');
+      });
+      dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
+      scene.appendChild(dot);
+
+      // Fiduciary breach line — a real, distinguishable solid red signal for the most severe
+      // case: a Ring 0/1 signatory-level role carrying an open coverage gap (never-written OR
+      // bound-but-deficient), using coverageGapState()'s own real verdict, nothing invented.
+      if (role.ring <= 1 && (gState === 'unbound' || gState === 'deficient')) {
+        const bx = p.x + Math.cos(angle) * (orbitR + sr + 7), by = p.y + Math.sin(angle) * (orbitR + sr + 7);
+        scene.appendChild(RingEngine.svgEl('line', {
+          class: 'fiduciary-breach-line', x1: p.x, y1: p.y, x2: bx, y2: by,
+          stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.9',
+        }));
+      }
+    });
+  });
+}
+
+function renderZoom(acc) {
+  const svg = document.getElementById('zoom-wheel');
+  const nodes = [acc.prin].concat(rolesByAccount.get(acc.id) || []);
+  const nodeIdSet = new Set(nodes.map(n => n.id));
+  const domains = SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col }));
+
+  const selId = state.selectedNode && (state.selectedNode.type === 'principal' || state.selectedNode.type === 'role') ? state.selectedNode.id : null;
+  // Click-to-reveal — same restraint as D0/D1: a role's own structural connections stay hidden
+  // until it's the selected node, and only edges landing on a node actually present in THIS
+  // account's own wheel are ever drawn (37 of 5,205 "knows" edges cross an account boundary and
+  // are correctly dropped here).
+  const visibleEdges = selId ? (connByRoleId.get(selId) || [])
+    .filter(c => nodeIdSet.has(c.other))
+    .map(c => ({ from: selId, to: c.other, color: '#8a8a8a', width: '1.4', opacity: '0.75' })) : [];
+
+  const { layout } = RingEngine.render(svg, {
+    nodes, domains,
+    colorFn: n => (SEGMENTS.find(s => s.id === n.domain) || SEGMENTS[0]).col,
+    sizeFn: n => roleRadius(n),
+    scoreFn: n => compScore(n),
+    ringOf: n => n.ring,
+    domainOf: n => n.domain,
+    labelFn: n => n.label,
+    edges: visibleEdges,
+    activeId: selId,
+    showLabels: false,
+    vz: 1,
+    onSelect: n => selectNode(n.node_type, n.id),
+    onHover: (evt, n) => RingEngine.tooltip.show(evt, n.label, `Ring ${n.ring} · ${n.category}`, n.desc || ''),
+    onLeave: RingEngine.tooltip.hide,
+  });
+
+  const scene = svg.querySelector('g');
+  drawAccountHubLabel(scene, acc);
+  drawSatellitesAndBreaches(scene, layout, state.sim ? state.sim.vertical : null, state.sim ? state.sim.tier : null);
+}
+
+/* ── Pan / zoom — same interaction model as every other dashboard in this project (D0/D1/D3):
+   plain scroll wheel zooms, click-drag pans, applied as a CSS transform on #wheel-inner (same
+   technique D0's #canvas-inner uses) so panning/zooming never re-runs RingEngine's own 60-pass
+   layout — only an account change, node click, or sim toggle redraws the wheel's own content. ── */
+const WHEEL_SIZE = 2300; // fixed internal canvas — comfortably contains RO[4]+domain-label margin
+const zoomState = { zoom: 1, panX: 0, panY: 0 };
+function applyWheelTransform() {
+  document.getElementById('wheel-inner').style.transform = `translate(${zoomState.panX}px, ${zoomState.panY}px) scale(${zoomState.zoom})`;
+}
+function centerWheelView() {
+  const stage = document.getElementById('zoomstage');
+  zoomState.panX = stage.clientWidth / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
+  zoomState.panY = stage.clientHeight / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
+}
+function fitWheelZoom() {
+  const stage = document.getElementById('zoomstage');
+  const visibleR = RingEngine.DEFAULT_RING.RO[4] + 110;
+  const fit = Math.min(stage.clientWidth || 900, stage.clientHeight || 700) / (2 * visibleR);
+  zoomState.zoom = Math.max(0.35, Math.min(2.5, fit));
+}
+// Called only when the ZOOMED ACCOUNT itself changes — never on a plain node click/sim toggle
+// re-render, so a producer's own manual pan/zoom position survives clicking around one account.
+function resetWheelView() { fitWheelZoom(); centerWheelView(); applyWheelTransform(); }
+function zoomWheelBy(delta) {
+  const newZoom = Math.max(0.15, Math.min(2.5, zoomState.zoom + delta));
+  if (newZoom === zoomState.zoom) return;
+  const stage = document.getElementById('zoomstage');
+  const vx = stage.clientWidth / 2, vy = stage.clientHeight / 2;
+  const contentX = (vx - zoomState.panX) / zoomState.zoom, contentY = (vy - zoomState.panY) / zoomState.zoom;
+  zoomState.panX = vx - newZoom * contentX; zoomState.panY = vy - newZoom * contentY;
+  zoomState.zoom = newZoom;
+  applyWheelTransform();
+}
+(function(){
+  document.getElementById('wheel-inner').style.width = WHEEL_SIZE + 'px';
+  document.getElementById('wheel-inner').style.height = WHEEL_SIZE + 'px';
+  const stage = document.getElementById('zoomstage');
+  stage.addEventListener('wheel', e => { e.preventDefault(); zoomWheelBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+  let drag = null;
+  stage.addEventListener('mousedown', e => { drag = { x: e.clientX, y: e.clientY, panX: zoomState.panX, panY: zoomState.panY, moved: false }; stage.classList.add('dragging'); });
+  stage.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    if (drag.moved) { zoomState.panX = drag.panX + dx; zoomState.panY = drag.panY + dy; applyWheelTransform(); }
+  });
+  function endDrag() { drag = null; stage.classList.remove('dragging'); }
+  stage.addEventListener('mouseup', endDrag);
+  stage.addEventListener('mouseleave', endDrag);
+})();
+
+/* ══════════════════════════════════════════════════════════════════
+   CENTER CANVAS SWITCH — gallery ↔ zoomed
+   ══════════════════════════════════════════════════════════════════ */
+/* ── Persona & Scale simulation control — populated per-zoomed-account (only offered for
+   verticals that actually carry a tiered baseline: yacht/aviation), and a standing banner that
+   makes an active simulation impossible to mistake for the account's real coverage. ─────────── */
+function populateSimSelect(acc) {
+  const wrap = document.getElementById('sim-control');
+  const sel = document.getElementById('sim-select');
+  const hasYacht = acc.assets.some(a => a.vertical === 'yacht');
+  const hasAviation = acc.assets.some(a => a.vertical === 'aviation');
+  if (!hasYacht && !hasAviation) { wrap.style.display = 'none'; sel.innerHTML = ''; return; }
+  wrap.style.display = 'flex';
+  sel.innerHTML = '';
+  const real = document.createElement('option'); real.value = ''; real.textContent = 'Real — Actual Bound Coverage'; sel.appendChild(real);
+  if (hasYacht) {
+    const og = document.createElement('optgroup'); og.label = 'Simulate Yacht Size Class';
+    SIZE_ORDER.forEach(s => { const o = document.createElement('option'); o.value = 'yacht:' + s; o.textContent = s; og.appendChild(o); });
+    sel.appendChild(og);
+  }
+  if (hasAviation) {
+    const og = document.createElement('optgroup'); og.label = 'Simulate Aviation Tier';
+    AVIATION_TIERS.forEach(t => { const o = document.createElement('option'); o.value = 'aviation:' + t; o.textContent = t.charAt(0).toUpperCase() + t.slice(1); og.appendChild(o); });
+    sel.appendChild(og);
+  }
+  sel.value = state.sim ? (state.sim.vertical + ':' + state.sim.tier) : '';
+}
+function updateSimBanner() {
+  const banner = document.getElementById('sim-banner');
+  if (!state.sim) { banner.style.display = 'none'; banner.innerHTML = ''; return; }
+  banner.style.display = 'block';
+  banner.innerHTML = `⚠ SIMULATED — showing ${VERTICAL_LABEL[state.sim.vertical] || state.sim.vertical} coverage as if scaled to ${simTierLabel(state.sim.vertical, state.sim.tier)}. Wedge colors and the coverage drawer reflect this HYPOTHETICAL requirement, not the account's real bound coverage. <button class="back-link" id="sim-reset-btn" style="margin-left:8px">Reset to Real ▸</button>`;
+  document.getElementById('sim-reset-btn').addEventListener('click', () => {
+    state.sim = null;
+    document.getElementById('sim-select').value = '';
+    renderZoom(accountById.get(state.selectedAccountId));
+    updateSimBanner();
+    renderPanel();
+  });
+}
+document.getElementById('sim-select').addEventListener('change', e => {
+  const v = e.target.value;
+  state.sim = v ? { vertical: v.split(':')[0], tier: v.split(':')[1] } : null;
+  renderZoom(accountById.get(state.selectedAccountId));
+  updateSimBanner();
+  renderPanel();
+});
+
+let lastRenderedAccountId = null; // pan/zoom is only reset when the ZOOMED ACCOUNT itself changes
+function renderCenter(list) {
+  const gallery = document.getElementById('gallery');
+  const zoomstage = document.getElementById('zoomstage');
+  const toolbar = document.getElementById('cv-toolbar');
+  if (state.view === 'zoomed' && state.selectedAccountId && accountById.has(state.selectedAccountId)) {
+    gallery.style.display = 'none'; zoomstage.style.display = 'block'; toolbar.style.display = 'flex';
+    const acc = accountById.get(state.selectedAccountId);
+    const roleCount = (rolesByAccount.get(acc.id) || []).length;
+    document.getElementById('zoom-crumb').textContent = acc.prin.label + ' — ' + roleCount + ' structural role' + (roleCount === 1 ? '' : 's') + ', ' + acc.coverages.length + ' coverage line' + (acc.coverages.length === 1 ? '' : 's');
+    populateSimSelect(acc);
+    updateSimBanner();
+    renderZoom(acc);
+    if (lastRenderedAccountId !== acc.id) resetWheelView(); else applyWheelTransform();
+    lastRenderedAccountId = acc.id;
+  } else {
+    document.getElementById('sim-control').style.display = 'none';
+    document.getElementById('sim-banner').style.display = 'none';
+    gallery.style.display = 'grid'; zoomstage.style.display = 'none'; toolbar.style.display = 'none';
+    renderGallery(list);
+    lastRenderedAccountId = null;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SELECTION / NAVIGATION
+   ══════════════════════════════════════════════════════════════════ */
+function selectAccount(id) { state.view = 'zoomed'; state.selectedAccountId = id; state.selectedNode = { type: 'principal', id }; state.sim = null; renderAll(); }
+function backToGallery() { state.view = 'gallery'; state.selectedAccountId = null; state.selectedNode = null; state.sim = null; renderAll(); }
+document.getElementById('btn-back-gallery').addEventListener('click', backToGallery);
+
+function selectNode(type, id) {
+  state.selectedNode = { type, id };
+  if (state.view === 'zoomed' && state.selectedAccountId) renderZoom(accountById.get(state.selectedAccountId));
+  renderPanel();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RIGHT PANEL
+   ══════════════════════════════════════════════════════════════════ */
+function renderPanel() {
+  const panel = document.getElementById('panel');
+  if (!state.selectedNode) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">◎</div><div class="panel-empty-text">Click an account, a role node, or a coverage satellite<br>to see evidence, GWP method, and next-best-action.</div></div>`;
+    return;
+  }
+  const { type, id } = state.selectedNode;
+  if (type === 'principal') renderPrincipalPanel(id);
+  else if (type === 'role') renderRolePanel(id);
+  else if (type === 'coverage') renderCoveragePanel(id);
+}
+
+function renderPrincipalPanel(id) {
+  const acc = accountById.get(id);
+  const panel = document.getElementById('panel');
+  const covRows = acc.coverages.map(c => `
+    <div class="cov-row" data-jump="coverage" data-id="${c.node.id}">
+      <span class="cov-row-name"><span class="cov-dot" style="background:${statusColorVar(c.overlay.status)}"></span>${c.node.label} <span style="color:var(--text3);font-weight:400">(${c.asset.label})</span></span>
+      <span class="info-val num" style="color:var(--text3)">${c.overlay.status === 'unbound' ? fmt$(c.overlay.gwp_estimate) : (c.overlay.bound_premium != null ? fmt$(c.overlay.bound_premium) : '—')}</span>
+    </div>`).join('');
+  const exposureBox = acc.missingVerticals.length ? `
+    <div class="box">
+      <h3>Undiscovered Exposure</h3>
+      <p style="margin-bottom:8px">We have zero asset record for this family in ${acc.missingVerticals.length} of five verticals. This is not a known gap on a known asset — it is a suspected asset we have no record of at all.</p>
+      ${acc.missingVerticals.map(v => `<div class="exposure-item"><span class="ev-name">${VERTICAL_LABEL[v]}</span><span class="badge badge-unmapped">Not yet mapped</span></div>`).join('')}
+    </div>` : '';
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-kicker">UBO / Principal</div>
+      <div class="panel-title">${acc.prin.label}</div>
+      <div class="panel-meta-row">${statusBadgeHTML(acc.status)}<span class="badge badge-ring">${acc.verticals.map(v => VERTICAL_LABEL[v]).join(' · ') || '—'}</span></div>
+    </div>
+    <div class="box">
+      <h3>Opportunity Summary</h3>
+      <div class="info-table">
+        <div class="info-row"><div class="info-key">Whitespace $</div><div class="info-val num"><strong>${fmt$(acc.totalGap)}</strong></div></div>
+        <div class="info-row"><div class="info-key">Gap Count</div><div class="info-val num">${acc.gapCount} unbound coverage line${acc.gapCount === 1 ? '' : 's'}</div></div>
+        <div class="info-row"><div class="info-key">Producer</div><div class="info-val">${currentProducer().name}</div></div>
+        <div class="info-row"><div class="info-key">Assets</div><div class="info-val num">${acc.assets.length} — ${acc.assets.map(a => a.label).join(', ')}</div></div>
+      </div>
+    </div>
+    ${exposureBox}
+    <div class="box"><h3>All Coverage Lines</h3><div class="cov-list">${covRows || '<p>No coverage lines on file.</p>'}</div></div>
+  `;
+  panel.querySelectorAll('[data-jump="coverage"]').forEach(el => el.addEventListener('click', () => selectNode('coverage', el.getAttribute('data-id'))));
+}
+
+function renderRolePanel(id) {
+  const role = nodesById.get(id);
+  const acc = accountById.get(role.account_ref);
+  const panel = document.getElementById('panel');
+  const rows = overlayRowsByRole.get(id) || [];
+  const covRows = rows.map(ov => {
+    const covNode = nodesById.get(ov.coverage_id);
+    const asset = covNode && covNode.parent_asset_ref ? nodesById.get(covNode.parent_asset_ref) : null;
+    const gState = coverageGapState(covNode, asset);
+    return `<div class="cov-row" data-jump="coverage" data-id="${ov.coverage_id}">
+      <span class="cov-row-name"><span class="cov-dot" style="background:${gapStateColorVar(gState)}"></span>${covNode ? covNode.label : ov.coverage_label}${asset ? ` <span style="color:var(--text3);font-weight:400">(${asset.label})</span>` : ''}</span>
+      <span class="info-val num" style="color:var(--text3)">${ov.status === 'unbound' ? fmt$(ov.gwp_estimate) : fmt$(ov.bound_premium)}</span>
+    </div>`;
+  }).join('');
+  const conns = (connByRoleId.get(id) || [])
+    .map(c => ({ other: nodesById.get(c.other), why: c.why, freq: c.freq }))
+    .filter(c => c.other);
+  const connRows = conns.map(c => `
+    <div class="conn-row" data-jump="${c.other.node_type}" data-id="${c.other.id}">
+      <div class="conn-name">${c.other.label}${c.other.category ? ` <span style="color:var(--text3);font-weight:400">— ${c.other.category}</span>` : ''}</div>
+      <div class="conn-why">${c.why}</div>
+      <div class="conn-freq">${c.freq}</div>
+    </div>`).join('');
+  panel.innerHTML = `
+    <div class="panel-header">
+      <button class="back-link" id="back-to-prin">◂ ${acc.prin.label}</button>
+      <div class="panel-kicker" style="margin-top:8px">${role.category} · Ring ${role.ring}</div>
+      <div class="panel-title">${role.label}</div>
+      <div class="panel-meta-row">
+        <span class="badge badge-ring">${VERTICAL_LABEL[role.vertical] || role.vertical}</span>
+        <span class="badge badge-ring">${role.coi_type}</span>
+      </div>
+    </div>
+    <div class="box"><h3>Why This Role Exists</h3><p>${role.desc || '—'}</p></div>
+    <div class="box"><h3>Coverage Responsibility (${rows.length})</h3><div class="cov-list">${covRows || '<p>No coverage lines assigned to this role.</p>'}</div></div>
+    <div class="box"><h3>Structural Connections (${conns.length})</h3>${connRows || '<p style="font-size:12.5px;color:var(--text3)">No structural connections on file.</p>'}</div>
+  `;
+  document.getElementById('back-to-prin').addEventListener('click', () => selectNode('principal', acc.id));
+  panel.querySelectorAll('[data-jump="coverage"]').forEach(el => el.addEventListener('click', () => selectNode('coverage', el.getAttribute('data-id'))));
+  panel.querySelectorAll('[data-jump="role"]').forEach(el => el.addEventListener('click', () => selectNode('role', el.getAttribute('data-id'))));
+  panel.querySelectorAll('[data-jump="principal"]').forEach(el => el.addEventListener('click', () => selectNode('principal', el.getAttribute('data-id'))));
+}
+
+function renderCoveragePanel(id) {
+  const cov = nodesById.get(id);
+  const ov = overlayByCovId.get(id) || {};
+  const asset = nodesById.get(cov.parent_asset_ref);
+  const acc = accountById.get(asset.owner_ref);
+  const role = ov.responsible_node_id ? nodesById.get(ov.responsible_node_id) : null;
+  const panel = document.getElementById('panel');
+
+  let statusBox = '';
+  if (ov.status === 'bound' || ov.status === 'expiring') {
+    statusBox = `
+      <div class="box">
+        <h3>Policy Detail</h3>
+        <div class="info-table">
+          <div class="info-row"><div class="info-key">Status</div><div class="info-val"><span class="badge badge-status ${ov.status}">${policyStatusLabel(ov.status)}</span></div></div>
+          <div class="info-row"><div class="info-key">Premium</div><div class="info-val num"><strong>${fmt$(ov.bound_premium)}</strong></div></div>
+          <div class="info-row"><div class="info-key">Carrier</div><div class="info-val">${ov.carrier || '—'}</div></div>
+          <div class="info-row"><div class="info-key">Expiry</div><div class="info-val num">${ov.expiry_date || '—'}${ov.status === 'expiring' && ov.expiry_date ? ` <span style="color:var(--status-expiring)">(${daysUntil(ov.expiry_date)} days out)</span>` : ''}</div></div>
+          <div class="info-row"><div class="info-key">Producer of Record</div><div class="info-val">${ov.producer_of_record || '—'}</div></div>
+        </div>
+      </div>`;
+  } else if (ov.status === 'unbound') {
+    const meta = REASON_META[ov.unbound_reason] || { abbr: '—', label: 'Unknown' };
+    statusBox = `
+      <div class="box">
+        <h3>Whitespace Detail</h3>
+        <div class="info-table">
+          <div class="info-row"><div class="info-key">Status</div><div class="info-val"><span class="badge badge-status unbound">Whitespace Gap — Unbound (with us)</span></div></div>
+          <div class="info-row"><div class="info-key">Reason</div><div class="info-val"><span class="badge badge-reason ${ov.unbound_reason}">${meta.abbr} · ${meta.label}</span></div></div>
+          <div class="info-row"><div class="info-key">Est. GWP</div><div class="info-val num"><strong>${fmt$(ov.gwp_estimate)}</strong></div></div>
+          <div class="info-row"><div class="info-key">GWP Method</div><div class="info-val">${ov.gwp_method || '—'}</div></div>
+        </div>
+        ${ov.evidence_note ? `<p style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${ov.evidence_note}</p>` : ''}
+      </div>`;
+  }
+
+  let crossBox = '';
+  const edge = crossPollByCovId.get(id);
+  if (edge) {
+    const fromNode = nodesById.get(edge.from);
+    crossBox = `
+      <div class="box">
+        <h3>Cross-Pollination — Warm Path</h3>
+        <div class="narrative-quote">${edge.generated_narrative}</div>
+        <div class="info-table">
+          <div class="info-row"><div class="info-key">Responsible Person</div><div class="info-val"><strong>${fromNode ? fromNode.label : ''}</strong></div></div>
+          <div class="info-row"><div class="info-key">Via</div><div class="info-val">${fromNode ? `Ring ${fromNode.ring}, COI weight ${fromNode.coi_weight} — ` : ''}${edge.why}</div></div>
+        </div>
+      </div>`;
+  }
+
+  let peersBox = '';
+  if (ov.status === 'unbound') {
+    const peers = peersShareGap(cov.coverage_type_id, acc.id);
+    if (peers.length) {
+      peersBox = `
+        <div class="box">
+          <h3>${peers.length + 1} Accounts Share This Gap</h3>
+          <div class="peer-list">${peers.map(p => {
+            const pc = p.unbound.find(c => c.node.coverage_type_id === cov.coverage_type_id);
+            return `<div class="peer-row" data-jump="principal" data-id="${p.id}"><span>${p.prin.label}</span><span class="num" style="color:var(--text3)">${fmt$(pc ? pc.overlay.gwp_estimate : null)}</span></div>`;
+          }).join('')}</div>
+        </div>`;
+    }
+    const { list, avg } = peerCompFor(cov.coverage_type_id, id);
+    const confBadge = ov.gwp_confidence ? `<span class="badge badge-ring" style="margin-left:6px">Confidence: ${ov.gwp_confidence.toUpperCase()}${ov.gwp_peer_n ? ' · n=' + ov.gwp_peer_n : ''}</span>` : '';
+    if (list.length || confBadge) {
+      peersBox += `
+        <div class="box">
+          <h3>Peer-Comp Evidence — Already In Your Book</h3>
+          <p style="margin-bottom:8px">${list.length} similar asset${list.length === 1 ? '' : 's'} in this book already carr${list.length === 1 ? 'ies' : 'y'} this coverage${list.length ? `, avg premium <strong class="num">${fmt$(avg)}</strong>` : ''}.${confBadge}</p>
+          <div class="peer-list">${list.map(l => `<div class="peer-row" data-jump="peer-coverage" data-id="${l.node.id}"><span>${l.asset.label}</span><span class="num" style="color:var(--text3)">${fmt$(l.overlay.bound_premium)}</span></div>`).join('')}</div>
+        </div>`;
+    }
+  }
+
+  /* ── Forensic Audit drawer (task 2) — additive, built from data/coverage-corpus.js. Never
+     replaces statusBox/crossBox/peersBox above; always appended after them. ────────────────── */
+  const catEntry = covCatalogByKey.get(cov.vertical + '|' + cov.coverage_type_id);
+  let forensicBox = '';
+  if (catEntry) {
+    const realBaseline = baselineLimitFor(cov.vertical, cov.coverage_type_id, asset);
+    const gState = coverageGapState(cov, asset);
+    const isBoundLike = ov.status === 'bound' || ov.status === 'expiring';
+    // Deficiency is computed in BOTH directions the task requires: a bound-but-under-limit line
+    // (the original case), AND a fully unbound line — where the entire required baseline is the
+    // deficiency, since $0 is actually written. Previously the unbound branch showed neither a
+    // "Bound Limit" nor a "Deficiency" row at all, which is the one case a whitespace-gap engine
+    // most needs it visible for.
+    const deficiency = realBaseline == null ? null
+      : isBoundLike
+        ? (ov.bound_limit_usd != null && ov.bound_limit_usd < realBaseline ? realBaseline - ov.bound_limit_usd : null)
+        : realBaseline; // fully unbound — nothing written, full baseline is the shortfall
+    const boundLimitDisplay = isBoundLike ? fmt$(ov.bound_limit_usd) : '$0 — Not Written';
+    let tierUsedLabel = 'Flat baseline — non-tiered vertical';
+    if (catEntry.baseline_limit_by_tier) {
+      if (cov.vertical === 'yacht') tierUsedLabel = (asset.size_class || 'S4 (default — no size_class on file)') + ' — yacht size class';
+      else if (cov.vertical === 'aviation') tierUsedLabel = aviationTier(asset.label).charAt(0).toUpperCase() + aviationTier(asset.label).slice(1) + ' — aviation tier, inferred from asset label';
+    }
+    const trend = rateTrendByType[cov.coverage_type_id];
+    const trendChip = trend
+      ? `<div class="rate-trend-chip">GWP trend: ${trend.annual_trend_pct} / yr</div><div class="rate-trend-source">${trend.source}</div>`
+      : `<div class="rate-trend-source">No coverage-type-specific rate-trend row for this coverage type in GWP_RateTrend_Table.</div>`;
+    const methodRow = pricingMethodology.find(m => m.method && ov.gwp_method && m.method.toLowerCase().replace(/\s+/g, '_') === ov.gwp_method);
+    forensicBox = `
+      <div class="box forensic-box">
+        <h3>Forensic Audit — Limit Adequacy</h3>
+        <div class="info-table">
+          <div class="info-row"><div class="info-key">Required Baseline</div><div class="info-val num"><strong>${fmt$(realBaseline)}</strong></div></div>
+          <div class="info-row"><div class="info-key">Tier Used</div><div class="info-val">${tierUsedLabel}</div></div>
+          <div class="info-row"><div class="info-key">Bound Limit</div><div class="info-val num"><strong>${boundLimitDisplay}</strong> ${gState === 'deficient' ? '<span class="badge badge-deficient">DEFICIENT</span>' : gState === 'adequate' ? '<span class="badge badge-status bound">Adequate</span>' : !isBoundLike ? '<span class="badge badge-status unbound">WHITESPACE</span>' : ''}</div></div>
+          ${deficiency != null ? `<div class="info-row"><div class="info-key">Limit Deficiency</div><div class="info-val num" style="color:var(--status-deficient)"><strong>${fmt$(deficiency)}</strong> short of required</div></div>` : ''}
+        </div>
+        ${catEntry.required_baseline_limit ? `<div class="narrative-quote" style="margin-top:8px">${catEntry.required_baseline_limit}</div>` : ''}
+        ${(catEntry.statutory_triggers || []).length ? `
+          <h3 style="margin-top:10px">Statutory Triggers</h3>
+          <div class="forensic-list">${catEntry.statutory_triggers.map(t => `
+            <div class="forensic-item">
+              <div class="forensic-item-head">${t.jurisdiction || ''}</div>
+              <div class="forensic-item-body"><strong>Condition:</strong> ${t.condition || '—'}<br><strong>Requirement:</strong> ${t.requirement || '—'}</div>
+            </div>`).join('')}</div>` : ''}
+        ${(catEntry.sub_limit_exclusions || []).length ? `
+          <h3 style="margin-top:10px">Sub-Limits &amp; Exclusions</h3>
+          <div class="forensic-list">${catEntry.sub_limit_exclusions.map(x => {
+            // Schema varies by vertical (5 independently-researched batches): yacht/personal use
+            // {type,detail}, aviation uses {type,description}, auto uses {category,detail},
+            // real_estate is a plain string. Normalize all 4 shapes rather than assuming one.
+            const head = typeof x === 'string' ? '' : (x.type || x.category || '');
+            const body = typeof x === 'string' ? x : (x.detail || x.description || '');
+            return `
+            <div class="forensic-item">
+              <div class="forensic-item-head">${head}</div>
+              <div class="forensic-item-body">${body}</div>
+            </div>`;
+          }).join('')}</div>` : ''}
+        <h3 style="margin-top:10px">GWP Pricing Benchmark</h3>
+        ${trendChip}
+        ${methodRow ? `<p style="margin-top:6px">Priced via <strong>${methodRow.method}</strong> — ${methodRow.trigger_scenario} (confidence: ${methodRow.confidence}).</p>` : ''}
+      </div>`;
+  }
+
+  /* ── Persona & Scale simulation box (task 3) — only rendered when the slider is active AND
+     set to THIS coverage's own vertical; always visually distinct (forensic-sim-box) and always
+     labeled SIMULATED, so a hypothetical requirement can never be read as the account's real
+     coverage figure. ─────────────────────────────────────────────────────────────────────── */
+  let simBox = '';
+  if (catEntry && state.sim && state.sim.vertical === cov.vertical && catEntry.baseline_limit_by_tier) {
+    const simBaseline = baselineLimitFor(cov.vertical, cov.coverage_type_id, asset, state.sim.tier);
+    const realBaseline = baselineLimitFor(cov.vertical, cov.coverage_type_id, asset);
+    const isBoundLike = ov.status === 'bound' || ov.status === 'expiring';
+    const simDeficiency = (isBoundLike && simBaseline != null && ov.bound_limit_usd != null && ov.bound_limit_usd < simBaseline)
+      ? simBaseline - ov.bound_limit_usd : null;
+    simBox = `
+      <div class="box forensic-sim-box">
+        <h3>⚠ Persona &amp; Scale Simulation — ${simTierLabel(cov.vertical, state.sim.tier)}</h3>
+        <p style="margin-bottom:8px">Hypothetical only — not this account's real coverage. Shows what this coverage type would require if this asset were scaled to ${simTierLabel(cov.vertical, state.sim.tier)} instead of its real ${cov.vertical === 'yacht' ? (asset.size_class || 'S4') : aviationTier(asset.label)}.</p>
+        <div class="info-table">
+          <div class="info-row"><div class="info-key">Real Required Baseline</div><div class="info-val num">${fmt$(realBaseline)}</div></div>
+          <div class="info-row"><div class="info-key">Simulated Required Baseline</div><div class="info-val num"><strong>${fmt$(simBaseline)}</strong></div></div>
+          ${isBoundLike ? `<div class="info-row"><div class="info-key">Actual Bound Limit (real, unchanged)</div><div class="info-val num">${fmt$(ov.bound_limit_usd)}</div></div>` : ''}
+          ${simDeficiency != null ? `<div class="info-row"><div class="info-key">Simulated Deficiency</div><div class="info-val num" style="color:var(--status-deficient)"><strong>${fmt$(simDeficiency)}</strong></div></div>` : (isBoundLike ? `<div class="info-row"><div class="info-key">Simulated Verdict</div><div class="info-val">Would remain adequate at this tier</div></div>` : '')}
+        </div>
+      </div>`;
+  }
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <button class="back-link" id="back-to-role">◂ ${role ? role.label : acc.prin.label}</button>
+      <div class="panel-kicker" style="margin-top:8px">Coverage · ${VERTICAL_LABEL[cov.vertical] || cov.vertical}</div>
+      <div class="panel-title">${cov.label}</div>
+      <div class="panel-meta-row"><span class="badge badge-status ${ov.status || 'unbound'}">${policyStatusLabel(ov.status)}</span><span class="badge badge-ring">${acc.prin.label}</span><span class="badge badge-ring">${asset.label}</span>${role ? `<span class="badge badge-ring">${role.label} · Ring ${role.ring}</span>` : ''}</div>
+    </div>
+    ${statusBox}${simBox}${forensicBox}${crossBox}${peersBox}
+  `;
+  document.getElementById('back-to-role').addEventListener('click', () => selectNode(role ? 'role' : 'principal', role ? role.id : acc.id));
+  panel.querySelectorAll('[data-jump="principal"]').forEach(el => el.addEventListener('click', () => selectAccount(el.getAttribute('data-id'))));
+  panel.querySelectorAll('[data-jump="peer-coverage"]').forEach(el => el.addEventListener('click', () => {
+    const peerCov = nodesById.get(el.getAttribute('data-id'));
+    const peerAsset = nodesById.get(peerCov.parent_asset_ref);
+    selectAccount(peerAsset.owner_ref);
+    setTimeout(() => selectNode('coverage', peerCov.id), 0);
+  }));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HEADER + MAIN RENDER LOOP
+   ══════════════════════════════════════════════════════════════════ */
+function renderHeader() {
+  document.getElementById('user-lock').textContent = 'USER: ' + currentProducer().name;
+  overrideSel.value = state.producerId;
+  const list = visibleAccounts();
+  const total = list.reduce((s, a) => s + a.totalGap, 0);
+  document.getElementById('h-book-total').innerHTML = `<strong class="num">${fmt$(total)}</strong> whitespace across <strong class="num">${list.length}</strong> account${list.length === 1 ? '' : 's'} in ${currentProducer().name}'s book — computed live from the bound-policy overlay, never precomputed.`;
+}
+
+function renderAll() {
+  const list = visibleAccounts();
+  renderHeader();
+  renderRail(rankedForRail(list));
+  renderClusterBanner();
+  renderCenter(list);
+  renderPanel();
+}
+
+window.addEventListener('resize', () => {
+  if (state.view === 'zoomed' && state.selectedAccountId) renderZoom(accountById.get(state.selectedAccountId));
+});
+
+/* ── Collapsible left/right panels (reused pattern from Dashboard 1) ── */
+(function(){
+  const lrWrap = document.getElementById('lr-wrap'), lrBtn = document.getElementById('lr-toggle');
+  const panWrap = document.getElementById('panel-wrap'), panBtn = document.getElementById('panel-toggle');
+  lrBtn.addEventListener('click', () => { lrWrap.classList.toggle('collapsed'); lrBtn.textContent = lrWrap.classList.contains('collapsed') ? '▸' : '◂'; });
+  panBtn.addEventListener('click', () => { panWrap.classList.toggle('collapsed'); panBtn.textContent = panWrap.classList.contains('collapsed') ? '◂' : '▸'; });
+})();
+
+/* ── Cross-dashboard deep link — the Leadership Book Rollup opens one
+   specific account here via ?account=<ubo_id> (a real navigation, not a
+   second drill-in surface of its own — see ILLUSTRATIONS.md "Design 2").
+   Scopes the producer override to that account's actual servicing
+   producer too, so the rail and header stay internally consistent with
+   whichever account got zoomed to, instead of showing a different
+   producer's worklist behind it. Runs before the first renderAll() so
+   the page opens directly into the zoomed account, no gallery flash. ── */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const acctParam = params.get('account');
+  if (acctParam && accountById.has(acctParam)) {
+    const acc = accountById.get(acctParam);
+    if (acc.producer_id) { state.producerId = acc.producer_id; overrideSel.value = acc.producer_id; }
+    state.view = 'zoomed';
+    state.selectedAccountId = acctParam;
+    state.selectedNode = { type: 'principal', id: acctParam };
+  }
+})();
+
+renderAll();
+RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
+})();
+</script>
+</body>
+</html>

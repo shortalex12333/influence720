@@ -1,0 +1,38 @@
+{
+  "domains_by_vertical_keys": [
+    "yacht",
+    "aviation",
+    "real_estate",
+    "auto",
+    "personal",
+    "fine_art"
+  ],
+  "role_taxonomy_counts": {
+    "yacht": 39,
+    "aviation": 34,
+    "real_estate": 34,
+    "auto": 34,
+    "personal": 34
+  },
+  "coverage_catalog_counts": {
+    "yacht": 10,
+    "aviation": 9,
+    "real_estate": 11,
+    "auto": 9,
+    "personal": 10,
+    "fine_art": 1
+  },
+  "producer_count": 5,
+  "sample_surnames": [
+    "Pelham",
+    "Rutherglen",
+    "Lindqvist",
+    "Halloway",
+    "Lansdowne",
+    "Yardley",
+    "Montfort",
+    "Ivanovic",
+    "Norwood",
+    "Zamora"
+  ]
+}

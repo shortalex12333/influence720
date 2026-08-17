@@ -5,14 +5,14 @@
   "trailingSlash": false,
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/d0", "destination": "/05-build/dashboard0-ontology-foundation.html" },
-    { "source": "/d1", "destination": "/05-build/dashboard1-tactical-map-v2.dc.html" },
-    { "source": "/d2", "destination": "/05-build/dashboard2-whitespace-gap-engine.html" },
-    { "source": "/d3", "destination": "/05-build/dashboard3-gap-radial.dc.html" },
-    { "source": "/d4", "destination": "/05-build/dashboard4-role-macro-view.html" },
-    { "source": "/d5", "destination": "/05-build/dashboard5-micro-warfare.html" },
-    { "source": "/d6", "destination": "/05-build/dashboard6-executive-command-center.html" }
+    { "source": "/", "destination": "/index" },
+    { "source": "/d0", "destination": "/05-build/dashboard0-ontology-foundation" },
+    { "source": "/d1", "destination": "/05-build/dashboard1-tactical-map-v2.dc" },
+    { "source": "/d2", "destination": "/05-build/dashboard2-whitespace-gap-engine" },
+    { "source": "/d3", "destination": "/05-build/dashboard3-gap-radial.dc" },
+    { "source": "/d4", "destination": "/05-build/dashboard4-role-macro-view" },
+    { "source": "/d5", "destination": "/05-build/dashboard5-micro-warfare" },
+    { "source": "/d6", "destination": "/05-build/dashboard6-executive-command-center" }
   ],
   "headers": [
     {

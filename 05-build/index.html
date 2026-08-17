@@ -20,41 +20,86 @@
     .suite-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
+      gap: 20px;
       margin-top: 30px;
     }
     .suite-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: #0f172a !important;
+      border: 1px solid #334155 !important;
       border-radius: 12px;
-      padding: 20px;
-      color: #fff;
+      padding: 24px;
+      color: #f8fafc !important;
       text-decoration: none;
-      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: block;
     }
     .suite-card:hover {
-      border-color: #39b3e3;
-      background: rgba(57,179,227,0.1);
-      transform: translateY(-2px);
+      border-color: #38bdf8 !important;
+      background: #1e293b !important;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(56,189,248,0.2);
     }
     .suite-card-code {
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      color: #39b3e3;
+      letter-spacing: 0.1em;
+      color: #38bdf8 !important;
       text-transform: uppercase;
     }
     .suite-card-title {
-      font-size: 17px;
-      font-weight: 700;
-      margin-top: 6px;
-      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      margin-top: 8px;
+      color: #ffffff !important;
+      line-height: 1.3;
     }
     .suite-card-desc {
-      font-size: 12.5px;
-      color: #a3a3a3;
-      margin-top: 8px;
-      line-height: 1.5;
+      font-size: 13px;
+      color: #cbd5e1 !important;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    
+    /* Centered Hero Buttons & High Contrast Alignment */
+    .hero-wrapper, .hero-text {
+      text-align: center !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .hero-texr {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      width: 100% !important;
+    }
+    .text-hero1 {
+      text-align: center !important;
+      max-width: 780px !important;
+      margin: 0 auto 24px auto !important;
+      color: #0f172a !important;
+      font-size: 18px !important;
+      line-height: 1.6 !important;
+      font-weight: 500 !important;
+    }
+    .button-group-centered {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 16px !important;
+      margin-top: 16px !important;
+      width: 100% !important;
+    }
+    .hero-button {
+      margin: 0 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
     .media-placeholder {
       width: 100%;
@@ -136,16 +181,18 @@
           </div>
           <div class="hero-texr">
             <div class="text-hero1">Salesforce CRM sees <em>today</em> (Who / Relationships). Applied Epic ERP sees <em>yesterday</em> (What / Policy Ledger). <strong>Influence 720 sees tomorrow</strong> — structural wealth cascade requirements across Yacht, Aviation, Real Estate, Auto Collection, and Personal Risk.</div>
-            <a href="#suite" class="hero-button w-inline-block">
-              <img src="images/Frame-5_1Frame-5.png" loading="lazy" alt="" class="hero-button-icon _2">
-              <div class="text-hero2">LAUNCH SUITE</div>
-              <img src="images/Frame-4_2Frame-4.png" loading="lazy" alt="" class="hero-button-icon _1">
-            </a>
-            <a href="https://github.com/shortalex12333/influence720" target="_blank" class="hero-button w-inline-block">
-              <img src="images/Frame-5_1Frame-5.png" loading="lazy" alt="" class="hero-button-icon _2">
-              <div class="text-hero2">GITHUB REPO</div>
-              <img src="images/Frame-4_2Frame-4.png" loading="lazy" alt="" class="hero-button-icon _1">
-            </a>
+            <div class="button-group-centered">
+              <a href="#suite" class="hero-button w-inline-block">
+                <img src="images/Frame-5_1Frame-5.png" loading="lazy" alt="" class="hero-button-icon _2">
+                <div class="text-hero2">LAUNCH SUITE</div>
+                <img src="images/Frame-4_2Frame-4.png" loading="lazy" alt="" class="hero-button-icon _1">
+              </a>
+              <a href="https://github.com/shortalex12333/influence720" target="_blank" class="hero-button w-inline-block">
+                <img src="images/Frame-5_1Frame-5.png" loading="lazy" alt="" class="hero-button-icon _2">
+                <div class="text-hero2">GITHUB REPO</div>
+                <img src="images/Frame-4_2Frame-4.png" loading="lazy" alt="" class="hero-button-icon _1">
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -14,6 +14,46 @@
 body.theme-dark{--bg:#101112;--surface:#17191b;--surface2:#1f2225;--surface3:#292d31;--text:#f7f7f5;--text2:#ecece8;--text3:#d4d4cf;--border:#2a2e32;--border2:#404850;--focus:#fff;--btnbg:#17191b;--btntext:#f7f7f5;--btnactive:#fff;--btnactivetext:#111;--accent:#27b3e3;
   --domain1:#fff;--domain2:#ffd2c3;--domain3:#a7e7f2;--domain4:#d7d8ff;--domain5:#f5b2d5;--domain6:#e8c6b0;--domain7:#9ce3cf;--domain8:#d7c6ff;--domain9:#bad9ff;
   --status-bound:#4ed48a;--status-unbound:#f0766e;--status-expiring:#e0b060;}
+
+/* --- Influence 720 canonical color/token layer (color-unify Phase 1) ---
+   Added ALONGSIDE the two blocks above without deleting or renaming anything in
+   them: --bg, --surface2, --surface3, --border, --border2, --focus,
+   --btnbg/--btntext/--btnborder/--btnactive/--btnactivetext, --font, --accent,
+   --status-bound/--status-unbound/--status-expiring and the --domain* scale are
+   all left byte-for-byte untouched so every selector already reading those names
+   (in this file and in dashboard0/2/4/5/6, which all still @import/link this
+   stylesheet) keeps rendering exactly as before. Old names are migrated to the
+   new canonical names by other agents in the next phase.
+   --surface is the one deliberate exception: its NAME already equals the
+   canonical name, so per the plan it is REPOINTED in place to the canonical
+   value below (this block is later in source order, so it wins the cascade).
+   --status-unbound is the confirmed brand-rule violation this phase exists to
+   fix: it is red today (light #b1382e / dark #f0766e). The new --state-unbound
+   below is grey — red is reserved exclusively for the new --state-breach token.
+   D1/D3 (dashboard1-tactical-map-v2.dc.html, dashboard3-gap-radial.dc.html)
+   do not load this stylesheet at all — their equivalents are mirrored directly
+   into their inline JS tokens() methods, not here. */
+:root{
+  --surface-base:#FFFFFF; --surface:#F7F8F8; --surface-el:#FFFFFF;
+  --mark:#2B7BA3;
+  --state-bound:#2F8F4C; --state-unbound:#6E747C; --state-expiring:#B0862F;
+  --state-deficient:#8A4A22; --state-breach:#CC3239;
+  --link-gatekeeper:#A87C22;
+  --turf-1:#3F6FD0; --turf-2:#B85F1E; --turf-3:#2F8F4C; --turf-4:#6E44B8; --turf-5:#2C8288;
+  --txt:rgba(0,0,0,0.87); --txt2:rgba(0,0,0,0.58); --txt3:rgba(0,0,0,0.40); --txt-ghost:rgba(0,0,0,0.22);
+  --font-sans:-apple-system,BlinkMacSystemFont,system-ui,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'SF Mono',ui-monospace,'Fira Code',monospace;
+}
+body.theme-dark{
+  --surface-base:#0F1113; --surface:#141618; --surface-el:#1B1E21;
+  --mark:#5AABCC;
+  --state-bound:#3FAE60; --state-unbound:#8B8F96; --state-expiring:#DCAE5C;
+  --state-deficient:#A15A2E; --state-breach:#E5484D;
+  --link-gatekeeper:#DCAE5C;
+  --turf-1:#5B8DEF; --turf-2:#E07A30; --turf-3:#3FAE60; --turf-4:#8B5CDC; --turf-5:#3FA9AE;
+  --txt:rgba(255,255,255,0.92); --txt2:rgba(255,255,255,0.62); --txt3:rgba(255,255,255,0.44); --txt-ghost:rgba(255,255,255,0.26);
+}
+
 html,body{height:100%}body{background:var(--bg);font-family:var(--font);color:var(--text);overflow:hidden;display:flex;flex-direction:column;line-height:1.45}button{font:inherit}button:focus-visible,.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 
 header{flex-shrink:0;min-height:56px;background:var(--surface);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:16px}
@@ -21,18 +61,18 @@ header{flex-shrink:0;min-height:56px;background:var(--surface);border-bottom:1px
 .brand-logo-img{height:30px;width:auto;border-radius:6px;border:1px solid rgba(255,255,255,0.15);vertical-align:middle;transition:transform 0.2s, opacity 0.2s}
 .brand-logo-img:hover{transform:scale(1.05);opacity:0.9}
 .h-left{display:flex;flex-direction:column;gap:6px;min-width:0}
-.h-title{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--accent);line-height:1.2}
+.h-title{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--mark);line-height:1.2}
 .h-sub{font-size:11px;font-weight:300;color:var(--text3);line-height:1.5;max-width:900px;letter-spacing:.02em}
 .h-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;row-gap:6px}
 
-.btn{height:36px;padding:0 12px;border:1px solid var(--btnborder,var(--accent));border-radius:999px;background:var(--btnbg);color:var(--btntext);font-size:12px;font-weight:600;cursor:pointer;min-width:78px}
+.btn{height:36px;padding:0 12px;border:1px solid var(--btnborder,var(--mark));border-radius:999px;background:var(--btnbg);color:var(--btntext);font-size:12px;font-weight:600;cursor:pointer;min-width:78px}
 .btn:hover,.btn.on{background:var(--btnactive);color:var(--btnactivetext);border-color:var(--btnactive)}
 .vtag{font-size:12px;color:var(--text2);padding:7px 10px;border:1px solid var(--border2);border-radius:999px;font-weight:700;background:var(--surface2)}
 
-.theme-switch-wrap{display:flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid rgba(39,179,227,0.45);border-radius:999px;background:var(--surface2)}
+.theme-switch-wrap{display:flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid rgba(90,171,204,0.45);border-radius:999px;background:var(--surface2)}
 .theme-switch-lbl{font-size:11px;font-weight:500;color:var(--text3);user-select:none}
 .theme-switch{position:relative;width:40px;height:22px;border-radius:999px;border:none;background:#b0b0aa;cursor:pointer;transition:background .3s;padding:0;flex-shrink:0}
-body.theme-dark .theme-switch{background:var(--accent)}
+body.theme-dark .theme-switch{background:var(--mark)}
 .theme-switch-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.25)}
 body.theme-dark .theme-switch-thumb{transform:translateX(18px)}
 
@@ -42,8 +82,8 @@ body.theme-dark .theme-switch-thumb{transform:translateX(18px)}
    (not a link) so there is never a self-referential click. */
 .suite-nav{display:flex;align-items:center;flex-wrap:wrap;gap:6px;row-gap:4px}
 .suite-nav-item{font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--text3);text-decoration:none;white-space:nowrap}
-.suite-nav-item:hover{color:var(--accent);text-decoration:underline}
-.suite-nav-current{font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--accent);white-space:nowrap;cursor:default}
+.suite-nav-item:hover{color:var(--mark);text-decoration:underline}
+.suite-nav-current{font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--mark);white-space:nowrap;cursor:default}
 .suite-nav-sep{font-size:10px;color:var(--border2)}
 
 .main{flex:1;display:flex;overflow:hidden;position:relative;background:var(--bg)}
@@ -51,11 +91,11 @@ body.theme-dark .theme-switch-thumb{transform:translateX(18px)}
 .lr-wrap.collapsed{width:0}
 #lr{flex:1;min-width:0;background:var(--surface);border-right:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden;transition:opacity .2s}
 .lr-wrap.collapsed #lr{opacity:0;pointer-events:none;border-right:none}
-#lr-toggle{position:absolute;top:50%;right:-20px;transform:translateY(-50%);z-index:30;width:20px;height:56px;background:var(--surface);border:1px solid var(--accent);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;font-weight:700;padding:0}
+#lr-toggle{position:absolute;top:50%;right:-20px;transform:translateY(-50%);z-index:30;width:20px;height:56px;background:var(--surface);border:1px solid var(--mark);border-left:none;border-radius:0 6px 6px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;font-weight:700;padding:0}
 #lr-toggle:hover{background:var(--surface2);color:var(--text)}
 .lr-wrap.collapsed #lr-toggle{border-left:1px solid var(--border2);border-radius:6px}
-#lrh{padding:14px 18px;border-bottom:2px solid var(--accent);background:var(--surface)}
-#lrh-title{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--accent);text-transform:uppercase}
+#lrh{padding:14px 18px;border-bottom:2px solid var(--mark);background:var(--surface)}
+#lrh-title{font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--mark);text-transform:uppercase}
 #lrh-sub{font-size:12px;color:var(--text3);margin-top:4px}
 #lrb{flex:1;overflow:auto;padding:10px;background:var(--surface2)}
 
@@ -75,33 +115,33 @@ body.theme-dark .theme-switch-thumb{transform:translateX(18px)}
 
 .lr-group{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
 .lr-group-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;background:var(--surface2)}
-.lr-group-name{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.lr-group-name{font-size:10px;font-weight:600;color:var(--mark);letter-spacing:.08em;text-transform:uppercase}
 .lr-group-meta{font-size:11px;font-weight:400;color:var(--text3)}
 .lr-group-body{display:flex;flex-direction:column;padding:6px}
 .lr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:10px;border-radius:8px;cursor:pointer;border:1px solid transparent}
-.lr-row:hover{background:var(--surface2);border-color:var(--accent)}
+.lr-row:hover{background:var(--surface2);border-color:var(--mark)}
 .lr-row.active{background:var(--btnactive);color:var(--btnactivetext);border-color:var(--btnactive)}
 .lr-row-label{font-size:13px;font-weight:600;line-height:1.35}
 .lr-row-sub,.lr-row-score{font-size:11px;font-weight:400;color:var(--text3)}
 .lr-row.active .lr-row-sub,.lr-row.active .lr-row-score{color:var(--btnactivetext)}
 
 #tt{position:fixed;z-index:400;pointer-events:none;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;max-width:320px;opacity:0}
-.tt-title{font-size:14px;font-weight:600;color:var(--accent);display:block;margin-bottom:4px}
+.tt-title{font-size:14px;font-weight:600;color:var(--mark);display:block;margin-bottom:4px}
 .tt-meta{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px;letter-spacing:.03em}
 .tt-desc{font-size:12px;font-weight:400;color:var(--text2);line-height:1.55}
 
-.panel-header{padding:0 0 14px 0;border-bottom:2px solid var(--accent);margin-bottom:14px}
-.panel-title{font-size:20px;font-weight:700;color:var(--accent);line-height:1.2;letter-spacing:-.01em}
+.panel-header{padding:0 0 14px 0;border-bottom:2px solid var(--mark);margin-bottom:14px}
+.panel-title{font-size:20px;font-weight:700;color:var(--mark);line-height:1.2;letter-spacing:-.01em}
 .panel-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.04em;border:1px solid transparent}
 .badge-ring{background:var(--surface3);color:var(--text2);border-color:var(--border)}
 .badge-domain{color:#fff}
 .badge-coi{background:var(--surface2);color:var(--text2);border-color:var(--border)}
 .badge-status{font-weight:700}
-.badge-status.bound{background:rgba(31,122,77,0.12);color:var(--status-bound);border-color:rgba(31,122,77,0.35)}
-.badge-status.unbound{background:rgba(177,56,46,0.12);color:var(--status-unbound);border-color:rgba(177,56,46,0.35)}
-.badge-status.expiring{background:rgba(168,121,15,0.12);color:var(--status-expiring);border-color:rgba(168,121,15,0.35)}
-.badge-coi.signatory{background:rgba(39,179,227,0.10);color:var(--accent);border-color:rgba(39,179,227,0.35)}
+.badge-status.bound{background:rgba(63,174,96,0.12);color:var(--state-bound);border-color:rgba(63,174,96,0.35)}
+.badge-status.unbound{background:rgba(139,143,150,0.12);color:var(--state-unbound);border-color:rgba(139,143,150,0.35)}
+.badge-status.expiring{background:rgba(220,174,92,0.12);color:var(--state-expiring);border-color:rgba(220,174,92,0.35)}
+.badge-coi.signatory{background:rgba(90,171,204,0.10);color:var(--mark);border-color:rgba(90,171,204,0.35)}
 body.theme-dark .badge-coi.signatory{background:#0d2018;color:#4ed48a;border-color:#1a3a28}
 .badge-coi.conditional{background:#3a2a1a;color:#f0b86e;border-color:#5a3a1a}
 body.theme-dark .badge-coi.conditional{background:#201508;color:#d4943a;border-color:#3a2008}
@@ -149,14 +189,14 @@ body:not(.theme-dark) .badge-coi.transaction{background:#ede0ff;color:#3d1a6b;bo
 
 .filter-group{display:flex;flex-direction:column;gap:3px;min-width:110px}
 .filter-lbl{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.filter-lbl span{color:var(--accent);font-weight:700;letter-spacing:0}
+.filter-lbl span{color:var(--mark);font-weight:700;letter-spacing:0}
 .filter-sel{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:5px;padding:4px 7px;font-size:11px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;padding-right:22px}
-.filter-sel:hover,.filter-sel:focus{border-color:var(--accent)}
+.filter-sel:hover,.filter-sel:focus{border-color:var(--mark)}
 
 /* One-shot onboarding hint only — 6s, forwards-filled, hard-removed via setTimeout.
    No other motion anywhere in this file. See engine/render-core.js's removeHint(). */
 #theme-hint{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;padding-bottom:48px;pointer-events:none}
-#theme-hint-box{display:flex;align-items:center;gap:12px;padding:14px 24px;background:rgba(10,10,12,0.82);border:1px solid rgba(39,179,227,0.45);border-radius:14px;backdrop-filter:blur(8px);color:#fff;font-size:13px;font-weight:400;letter-spacing:.02em;box-shadow:0 8px 32px rgba(0,0,0,.35);animation:hint-life 6s cubic-bezier(.4,0,.2,1) forwards}
+#theme-hint-box{display:flex;align-items:center;gap:12px;padding:14px 24px;background:rgba(10,10,12,0.82);border:1px solid rgba(90,171,204,0.45);border-radius:14px;backdrop-filter:blur(8px);color:#fff;font-size:13px;font-weight:400;letter-spacing:.02em;box-shadow:0 8px 32px rgba(0,0,0,.35);animation:hint-life 6s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes hint-life{0%{opacity:0;transform:translateY(18px)}12%{opacity:1;transform:translateY(0)}70%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(6px)}}
 
 /* Tabular-numeral discipline for every $ / count figure (brief §3.4) */

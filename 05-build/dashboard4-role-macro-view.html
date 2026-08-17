@@ -31,34 +31,39 @@
 .ucluster svg{overflow:visible;cursor:pointer;display:block}
 .ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
 .ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
-.ucluster-meta{font-size:11px;font-weight:700;color:var(--accent)}
+.ucluster-meta{font-size:11px;font-weight:700;color:var(--mark)}
 .canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
 .canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
 .canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
 /* Limit-adequacy hue — same rust used by dashboard2-whitespace-gap-engine.html
    for a coverage that IS bound but whose bound_limit_usd falls below its
    tier's required baseline_limit_usd. Deliberately not the same red as
-   fully-unbound whitespace — this is money already on file, just under-sized. */
-:root{--status-deficient:#a15a2e}
-body.theme-dark{--status-deficient:#e0916a}
+   fully-unbound whitespace — this is money already on file, just under-sized.
+   Token cleanup (color-unify Phase 1): this file used to redeclare its own
+   one-off --status-deficient (light #a15a2e / dark #e0916a) here. engine/
+   style-core.css now ships the same rust under the canonical shared name
+   --state-deficient (light #8A4A22 / dark #A15A2E) — the local block is
+   removed and every var(--status-deficient) reference below is repointed to
+   var(--state-deficient) so this dashboard's rust matches the rest of the
+   suite instead of its own private shade. */
 .rail-block{margin-bottom:18px}
 .rail-total{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-top:4px}
 .rail-total-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
-.vreset{cursor:pointer;color:var(--accent);font-weight:700;text-transform:none;letter-spacing:0;float:right}
+.vreset{cursor:pointer;color:var(--mark);font-weight:700;text-transform:none;letter-spacing:0;float:right}
 .vcard{border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;background:var(--surface);transition:border-color .15s,opacity .2s}
-.vcard:hover{border-color:var(--accent)}
+.vcard:hover{border-color:var(--mark)}
 .vcard.dim{opacity:.32}
-.vcard.isolated{border-color:var(--accent);background:var(--surface3)}
+.vcard.isolated{border-color:var(--mark);background:var(--surface3)}
 .vcard-top{display:flex;justify-content:space-between;align-items:baseline}
 .vcard-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)}
 .vcard-val{font-size:15px;font-weight:800;color:var(--text)}
 .vcard-bar{height:6px;border-radius:999px;background:var(--surface3);overflow:hidden;margin-top:6px;display:flex}
-.vcard-bar-sold{background:var(--status-bound);height:100%}
+.vcard-bar-sold{background:var(--state-bound);height:100%}
 .vcard-bar-prospect{background:var(--text3);opacity:.5;height:100%}
 .method-note{font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:4px}
 .comp-row{display:flex;align-items:center;gap:8px;min-width:220px}
 .comp-track{flex:1;height:8px;background:var(--surface3);border-radius:999px;overflow:hidden;display:flex}
-.comp-seg-sold{height:8px;background:var(--status-bound)}
+.comp-seg-sold{height:8px;background:var(--state-bound)}
 .comp-seg-prospect{height:8px;background:var(--text3);opacity:.5}
 .comp-num{font-size:11px;color:var(--text3);white-space:nowrap}
 .legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:6px;max-width:255px}
@@ -67,7 +72,7 @@ body.theme-dark{--status-deficient:#e0916a}
 .hatch-chip{display:inline-block;width:20px;height:12px;border-radius:3px;flex-shrink:0}
 .prod-table{width:100%;border-collapse:collapse;margin-top:4px}
 .prod-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border2);cursor:pointer;user-select:none}
-.prod-table th:hover{color:var(--accent)}
+.prod-table th:hover{color:var(--mark)}
 .prod-table td{font-size:12px;padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:top}
 .prod-name{font-weight:700;color:var(--text)}
 .prod-sub{font-size:10px;color:var(--text3);margin-top:2px}
@@ -86,10 +91,10 @@ body.theme-dark{--status-deficient:#e0916a}
 .hm-head,.hm-rowlbl{background:var(--surface2);color:var(--text2);font-weight:700;padding:7px 8px;display:flex;align-items:center}
 .hm-head{justify-content:center;text-transform:uppercase;letter-spacing:.04em;font-size:10px}
 .hm-cell{background:var(--surface);padding:6px 8px;cursor:default;min-height:54px;display:flex;flex-direction:column;justify-content:center;gap:4px}
-.hm-cell-total{font-weight:800;color:var(--text);font-size:12px;font-variant-numeric:tabular-nums}
+.hm-cell-total{font-weight:800;color:var(--text);font-size:12px;font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
 .hm-cell-bar{height:5px;border-radius:999px;overflow:hidden;display:flex;background:var(--surface3)}
-.hm-seg-adequate{height:100%;background:var(--status-bound)}
-.hm-seg-deficient{height:100%;background:var(--status-deficient)}
+.hm-seg-adequate{height:100%;background:var(--state-bound)}
+.hm-seg-deficient{height:100%;background:var(--state-deficient)}
 .hm-seg-whitespace{height:100%;background:var(--text3);opacity:.5}
 .hm-cell-empty{color:var(--text3);font-size:10px}
 .hm-cell[title]{position:relative}
@@ -99,13 +104,20 @@ body.theme-dark{--status-deficient:#e0916a}
 .carrier-rank{width:20px;font-weight:800;color:var(--text3);font-size:12px}
 .carrier-name{flex:1;font-weight:700;font-size:12.5px;color:var(--text)}
 .carrier-bar-track{width:100%;height:6px;background:var(--surface3);border-radius:999px;overflow:hidden;margin-top:4px}
-.carrier-bar-fill{height:100%;background:var(--accent)}
+.carrier-bar-fill{height:100%;background:var(--mark)}
 .carrier-figs{text-align:right;white-space:nowrap;font-size:11px;color:var(--text3)}
-.carrier-figs strong{display:block;color:var(--text);font-size:13px;font-variant-numeric:tabular-nums}
+.carrier-figs strong{display:block;color:var(--text);font-size:13px;font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
 .carrier-radar-wrap{flex-shrink:0}
 /* Tabular-numeral discipline on every figure this file renders that style-core's
-   own .num/.sc-val/.info-val selectors don't already cover. */
-.rail-total,.vcard-val,.beach-val,.prod-table td{font-variant-numeric:tabular-nums}
+   own .num/.sc-val/.info-val selectors don't already cover. Phase 4 (typography):
+   var(--font-mono) added alongside tabular-nums — every dollar figure/count in
+   this file now renders in the shared mono stack. .num itself is style-core's
+   own shared class (used here for the panel's headline $ total and the
+   prod-table $/weight cells); it gets the same mono treatment via this local
+   override rather than editing style-core.css, which a different agent owns —
+   this file's own <style> block loads after that stylesheet's <link>, so the
+   override applies cleanly by cascade order. */
+.rail-total,.vcard-val,.beach-val,.prod-table td,.num{font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
 </style>
 </head>
 <body>
@@ -187,13 +199,14 @@ body.theme-dark{--status-deficient:#e0916a}
       </div>
     </div>
     <div class="legend">
-      <div class="legend-row"><span class="legend-swatch" style="background:#2ec478"></span>Well-penetrated role — mostly bound</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#e0a640"></span>Partially penetrated</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#8b93a3"></span>Untapped beachhead — all estimated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#3FAE60"></span>Well-penetrated role — mostly bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#DCAE5C"></span>Partially penetrated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#8B8F96"></span>Untapped beachhead — all estimated</div>
       <div class="legend-row"><span class="hatch-chip" style="background:repeating-linear-gradient(45deg,var(--text2) 0 2px,transparent 2px 5px)"></span>Hatched share = estimated, not bound</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-deficient)"></span>Solid rust = bound but under the required limit (deficient)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-deficient)"></span>Solid rust = bound but under the required limit (deficient)</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.4"></span>No modeled coverage responsibility</div>
       <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--text2);background:transparent"></span>Bold outline = account-level (UBO) bubble</div>
+      <div class="legend-row" id="legend-turf" style="flex-wrap:wrap;row-gap:4px"></div>
     </div>
     <div class="overlay-modal" id="heatmap-modal">
       <div class="overlay-modal-head">
@@ -538,11 +551,74 @@ function producerBreakdown(n) {
 }
 
 // ════════════════════════════════════════════════════════════════════
+// TURF / PRODUCER-IDENTITY OUTLINE (Phase 2 wire-in) — Producer Gap Skew
+// (currentFin()/nodeFinancialsForProducer() above) stays the PRIMARY
+// producer-identity interaction: pick a producer, the whole wheel re-tints
+// to their own book. This is an ADDITIONAL, subtler signal layered on top,
+// shown only in Regional Aggregate mode (no producer selected) — once a
+// specific producer is chosen the re-tint already carries producer identity
+// and this outline steps aside rather than fighting it for attention.
+//
+// Attribution source, checked against the real data model rather than
+// invented: RELATIONSHIP_WEIGHTS (data/overlays.js) is a real per-
+// (producer_id, node_id=role id) prospecting/servicing relationship record
+// (relationship_weight, activity_count_90d, last_activity_date, ...) — the
+// exact same join rwRowsFor()/producerBreakdown() above already use to rank
+// "who already has the strongest foothold" on a role. Reused verbatim here,
+// just collapsed to the single strongest producer instead of a ranked list:
+// summed per producer across the node's own role id(s), highest total wins.
+// A node with zero logged relationship rows gets no outline — never
+// fabricates a turf owner where the data has none.
+// ════════════════════════════════════════════════════════════════════
+const turfIndexByProducerId = new Map(PRODUCERS.map((p, i) => [p.producer_id, i]));
+const turfProducerCache = new Map();
+function strongestTurfProducerId(n) {
+  if (turfProducerCache.has(n.id)) return turfProducerCache.get(n.id);
+  const weightByProducer = new Map();
+  rwRowsFor(n).forEach(r => weightByProducer.set(r.producer_id, (weightByProducer.get(r.producer_id) || 0) + r.relationship_weight));
+  let best = null, bestWeight = -Infinity;
+  weightByProducer.forEach((w, pid) => { if (w > bestWeight) { bestWeight = w; best = pid; } });
+  turfProducerCache.set(n.id, best);
+  return best;
+}
+// Post-processing pass, same pattern as splitFillNode() — reads the x/y/r
+// RingEngine already computed and appends ONE extra stroke-only ring just
+// outside the split-fill circle. Never touches splitFillNode()'s own
+// g.innerHTML rewrite (runs after it, additive only) and never changes what
+// solid/hatch/deficient wedges render underneath.
+function applyTurfOutline(p, svg) {
+  if (state.producerId) return; // Producer Gap Skew active — its re-tint is the sole producer-identity signal while active
+  const producerId = strongestTurfProducerId(p.n);
+  if (!producerId) return;
+  const idx = turfIndexByProducerId.get(producerId);
+  if (idx == null) return;
+  const g = svg.querySelector('g[data-nid="' + CSS.escape(p.n.id) + '"]');
+  if (!g) return;
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y); ring.setAttribute('r', p.r + 3);
+  ring.setAttribute('fill', 'none');
+  ring.setAttribute('stroke', 'var(--turf-' + (idx + 1) + ')');
+  ring.setAttribute('stroke-width', '1.4');
+  ring.setAttribute('stroke-opacity', '0.6');
+  ring.setAttribute('pointer-events', 'none');
+  g.appendChild(ring);
+}
+
+// ════════════════════════════════════════════════════════════════════
 // VISUAL ENCODING
 // ════════════════════════════════════════════════════════════════════
 function colorScale(ratio) {
   if (ratio == null) return 'var(--text3)';
-  const grey = [139,147,163], amber = [224,166,64], green = [46,196,120];
+  // Canonical triplet (color-unify Phase 1) — literal RGB, not var() refs,
+  // because this interpolates at runtime and a CSS custom property can't be
+  // read/blended from JS. Hardcoded to match engine/style-core.css's
+  // dark-theme --state-unbound/--state-expiring/--state-bound exactly
+  // (#8B8F96 / #DCAE5C / #3FAE60) — the SAME three hex values the legend
+  // swatches above are drawn from, so legend and actual node fill agree
+  // exactly. Previously this interpolated its own one-off grey/amber/green
+  // (#8b93a3/#e0a640/#2ec478) that collided with style-core's own (different)
+  // status-bound/status-expiring values — now there is one source of truth.
+  const grey = [139,143,150], amber = [220,174,92], green = [63,174,96];
   let c;
   if (ratio <= 0.5) { const k = ratio/0.5; c = grey.map((v,i) => Math.round(v + (amber[i]-v)*k)); }
   else { const k = (ratio-0.5)/0.5; c = amber.map((v,i) => Math.round(v + (green[i]-v)*k)); }
@@ -728,7 +804,7 @@ function splitFillNode(p, svg, v) {
     const sw = isPrincipal ? 2 : 1.2;
     const segs = [
       { frac: fin.soldAdequate / fin.total, fill: col, opacity: 0.92, hatch: false },
-      { frac: fin.soldDeficient / fin.total, fill: 'var(--status-deficient)', opacity: 0.92, hatch: false },
+      { frac: fin.soldDeficient / fin.total, fill: 'var(--state-deficient)', opacity: 0.92, hatch: false },
       { frac: fin.prospected / fin.total, fill: col, opacity: 0.22, hatch: true },
     ].filter(s => s.frac > 0.0005);
     if (segs.length <= 1) {
@@ -800,6 +876,7 @@ function renderUniverse(v) {
   });
   injectDefs(svg, v);
   layout.forEach(p => splitFillNode(p, svg, v));
+  layout.forEach(p => applyTurfOutline(p, svg)); // additive post-pass, after split-fill — see TURF section above
   updateClusterMeta(v);
 }
 
@@ -917,6 +994,11 @@ const selProducer = document.getElementById('sel-producer');
 PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name; selProducer.appendChild(o); });
 selProducer.addEventListener('change', e => { state.producerId = e.target.value || null; renderAll(); });
 
+// Turf-outline legend — same PRODUCERS order as the select above, so slot N
+// here is always the same producer as var(--turf-N) in applyTurfOutline().
+document.getElementById('legend-turf').innerHTML = '<span style="width:100%">Thin outline = strongest producer relationship (Regional Aggregate only):</span>' +
+  PRODUCERS.map((p, i) => '<span style="display:inline-flex;align-items:center;gap:4px;margin-right:9px"><span class="legend-swatch" style="width:9px;height:9px;border:1.4px solid var(--turf-' + (i + 1) + ');background:transparent"></span>' + escapeXML(p.name) + '</span>').join('');
+
 // ════════════════════════════════════════════════════════════════════
 // RIGHT PANEL
 // ════════════════════════════════════════════════════════════════════
@@ -976,9 +1058,9 @@ function renderNodePanel(n) {
       '<h3>' + (isPrincipal ? 'Total $ Touching This Account' : 'Total $ Touching This Role') + '</h3>' +
       '<p class="num" style="font-size:26px;font-weight:900;color:var(--text)">' + fmtMoney(fin.total) + '</p>' +
       (fin.total > 0 ?
-        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--status-bound)"></div></div></div></div>' +
+        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--state-bound)"></div></div></div></div>' +
         '<div class="info-row" style="grid-template-columns:1fr 1fr;margin-top:5px"><span class="info-val">Bound ' + fmtMoney(fin.sold) + '</span><span class="info-val" style="text-align:right">Estimated whitespace ' + fmtMoney(fin.prospected) + '</span></div>' +
-        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--status-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient) — ' + fmtMoney(fin.deficiencyAmount) + ' short of the tier-required baseline across those lines</span></div>' : '')
+        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--state-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient) — ' + fmtMoney(fin.deficiencyAmount) + ' short of the tier-required baseline across those lines</span></div>' : '')
         : '<p class="empty-note" style="margin-top:6px">No bound or estimated coverage is currently modeled as this ' + (isPrincipal ? 'account' : "role's") + ' responsibility.</p>') +
       (acct ? '<div style="margin-top:9px;font-size:11px;color:var(--text3)">Account: <strong style="color:var(--text2)">' + escapeXML(acct.label) + '</strong></div>' : '') +
     '</div>' +
@@ -1079,10 +1161,10 @@ function buildCarrierRadar(rows, maxPremium) {
     const anchor = Math.cos(a) > 0.15 ? 'start' : (Math.cos(a) < -0.15 ? 'end' : 'middle');
     const shortName = r.carrier.length > 18 ? r.carrier.slice(0, 17) + '…' : r.carrier;
     labels += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '" font-size="10" font-weight="700" fill="var(--text2)">' + escapeXML(shortName) + '</text>';
-    labels += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4" fill="var(--accent)"><title>' + escapeXML(r.carrier) + ' — ' + fmtMoney(r.premium) + ', ' + r.count + ' lines</title></circle>';
+    labels += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4" fill="var(--mark)"><title>' + escapeXML(r.carrier) + ' — ' + fmtMoney(r.premium) + ', ' + r.count + ' lines</title></circle>';
   });
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + ring + spokes +
-    '<polygon points="' + poly.join(' ') + '" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2"/>' + labels + '</svg>';
+    '<polygon points="' + poly.join(' ') + '" fill="var(--mark)" fill-opacity="0.18" stroke="var(--mark)" stroke-width="2"/>' + labels + '</svg>';
 }
 function renderCarrierPanel() {
   const byCarrier = new Map();

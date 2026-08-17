@@ -11,18 +11,34 @@
    Never redefine a shared class's own tokens here; only add what this dashboard needs
    that style-core.css doesn't already provide. */
 
-/* Limit-adequacy hue — identical token to dashboard2/dashboard4's own --status-deficient
-   (bound but under the required baseline limit). Kept local per-file exactly the way
-   dashboard4 keeps it local, rather than editing the shared style-core.css tokens. */
-:root{--status-deficient:#a15a2e}
-body.theme-dark{--status-deficient:#e0916a}
+/* Limit-adequacy hue — was a locally-redeclared --status-deficient identical to D2/D6's own
+   copy-pasted block (color-unify Phase 1). That local block is now removed: every reference
+   in this file that used to read var(--status-deficient) reads var(--state-deficient) instead,
+   the shared token style-core.css now defines once. --status-unbound (still red in style-core
+   today) is untouched here — its migration is a separate, later pass, not this file's task. */
 
-/* Node/edge state palette — FIXED hex per the founder's directive (item 2/4), not theme-
-   adaptive tokens: these four colors are the dashboard's own real-state vocabulary (SFDC
-   intimacy+bound / expiring<90d / priced gap / silo) and the two edge colors (Trojan
-   conversion, fiduciary breach) — same hue in light or dark so a color always means the
-   same real thing regardless of theme. */
-:root{--tj-green:#22c55e;--tj-amber:#eab308;--tj-red:#ef4444;--tj-purple:#a855f7;--tj-gold:#dcae5c}
+/* Node/edge state palette — token-unify Phase 1 follow-through. These four names stay as this
+   dashboard's own real-state vocabulary (SFDC intimacy+bound / expiring<90d / priced gap /
+   silo) and the two edge colors (Trojan conversion, fiduciary breach), but three of the four
+   now REPOINT to the shared canonical tokens in style-core.css instead of carrying their own
+   competing hex (a third, Tailwind-500-style palette that disagreed with both style-core's
+   tokens and this file's own satellite hex trio). --tj-green/--tj-amber/--tj-red resolve to
+   the real bound/expiring/breach semantics; --tj-red is the correct target for this file's
+   breach usage specifically because the always-on red breach line (role.ring===1, open gap)
+   is a genuine fiduciary-breach signal, not a generic "unbound" one. --tj-gold already equalled
+   --link-gatekeeper's value, so it's formalized as a repoint too. --tj-purple ("Silo — unmapped")
+   has no canonical equivalent in style-core.css's state-* set (there is no shared "silo" token),
+   so it deliberately stays a fixed literal — same theme-invariant intent as before, not migrated
+   to nothing just to migrate it. */
+:root{--tj-green:var(--state-bound);--tj-amber:var(--state-expiring);--tj-red:var(--state-breach);--tj-purple:#a855f7;--tj-gold:var(--link-gatekeeper)}
+
+/* Typography (color-unify Phase 4) — every dollar figure and every date is monospace, human-
+   authored prose stays sans. Applied by fmt$()/fmt$Full() wrapping their own output in this
+   span rather than hand-adding font-family to each consuming class (.tos-amt, .path-amt,
+   .deficiency-line, .formula-box, .sc-composite-val, tooltip strings, etc.) — that would miss
+   call sites and risks mono-ifying a label/prose string sitting in the same box (e.g.
+   .formula-box holds both a number AND a plain-English label; the box itself must stay sans). */
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 
 /* D1-measured rail/drawer widths — the SAME local override already proven correct on
    dashboard2/dashboard6, applied here rather than left at style-core.css's own defaults
@@ -36,8 +52,8 @@ body.theme-dark{--status-deficient:#e0916a}
 
 /* Left rail path rows */
 .path-amt{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
-.path-amt.unbound{color:var(--status-unbound)}
-.path-amt.deficient{color:var(--status-deficient)}
+.path-amt.unbound{color:var(--state-unbound)}
+.path-amt.deficient{color:var(--state-deficient)}
 .lr-row.active .path-amt{color:var(--btnactivetext)}
 .path-chain{font-size:11.5px;color:var(--text3);margin-top:4px;line-height:1.5}
 .lr-row.active .path-chain{color:var(--btnactivetext);opacity:.85}
@@ -64,13 +80,13 @@ body.theme-dark{--status-deficient:#e0916a}
 
 /* DISC brief */
 .disc-primary{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
-.disc-letter{font-size:34px;font-weight:900;color:var(--accent);line-height:1;letter-spacing:-.02em}
+.disc-letter{font-size:34px;font-weight:900;color:var(--mark);line-height:1;letter-spacing:-.02em}
 .disc-label{font-size:13px;font-weight:700;color:var(--text)}
 .disc-pace{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:2px}
 .disc-rules{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px}
 .disc-rule-row{display:flex;gap:8px;font-size:11px;color:var(--text2);line-height:1.5}
 .disc-rule-k{flex-shrink:0;width:74px;font-weight:700;color:var(--text3);text-transform:uppercase;font-size:9.5px;letter-spacing:.05em;padding-top:2px}
-.disc-disclaimer{margin-top:10px;padding:9px 10px;background:rgba(39,179,227,.08);border:1px solid rgba(39,179,227,.3);border-radius:6px;font-size:10.5px;color:var(--text2);line-height:1.55}
+.disc-disclaimer{margin-top:10px;padding:9px 10px;background:rgba(90,171,204,.08);border:1px solid rgba(90,171,204,.3);border-radius:6px;font-size:10.5px;color:var(--text2);line-height:1.55}
 
 /* Financial credibility score */
 .formula-box{margin-top:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;font-size:11.5px;color:var(--text2);line-height:1.8;font-variant-numeric:tabular-nums}
@@ -84,11 +100,11 @@ body.theme-dark{--status-deficient:#e0916a}
 .statute-jur{font-size:11px;font-weight:800;color:var(--text)}
 .statute-req{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:3px}
 .sub-limit-row{font-size:11px;color:var(--text3);line-height:1.5;margin-top:4px;padding-left:10px;border-left:2px solid var(--border2)}
-.deficiency-line{font-size:16px;font-weight:900;color:var(--status-deficient);margin-top:2px}
+.deficiency-line{font-size:16px;font-weight:900;color:var(--state-deficient);margin-top:2px}
 .gwp-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.5}
 .gwp-chip-trend{font-size:15px;font-weight:900;flex-shrink:0}
-.gwp-chip-trend.up{color:var(--status-unbound)}
-.gwp-chip-trend.down{color:var(--status-bound)}
+.gwp-chip-trend.up{color:var(--state-unbound)}
+.gwp-chip-trend.down{color:var(--state-bound)}
 .gwp-chip-trend.flat{color:var(--text3)}
 .no-source-flag{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
 
@@ -218,12 +234,15 @@ body.theme-dark{--status-deficient:#e0916a}
       <div class="legend-head">Role node — real state</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-amber)"></span>Policy expiring &lt;90d</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-green)"></span>Active SFDC intimacy or bound policy</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-red)"></span>Unplaced Coverage Corpus gap — Trojan target</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-unbound)"></span>Unplaced Coverage Corpus gap — Trojan target</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-red)"></span>Signatory gap — fiduciary breach (Ring 0/1)</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-purple)"></span>Silo — no known relationship, no policy on file</div>
       <div class="legend-head">Satellite (per coverage line)</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#3fae60"></span>Bound</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#c99a1f"></span>Expiring &lt;90d</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#b05a54;opacity:.65"></span>Whitespace gap</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-bound)"></span>Bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-expiring)"></span>Expiring &lt;90d</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-unbound);opacity:.65"></span>Whitespace gap</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-deficient);opacity:.65"></span>Deficient limit</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-breach)"></span>Whitespace/deficient on a Ring 0/1 signatory</div>
       <div class="legend-head">Edges</div>
       <div class="legend-row"><span class="legend-line" style="border-top:3px dashed var(--tj-gold)"></span>Selected Trojan Horse conversion path</div>
       <div class="legend-row"><span class="legend-line" style="border-top:3px solid var(--tj-red)"></span>Fiduciary breach — Ring 1 signatory, open gap</div>
@@ -251,14 +270,22 @@ document.getElementById('theme-toggle').addEventListener('click', () => { RingEn
 // HELPERS
 // ════════════════════════════════════════════════════════════════════
 function escapeXML(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// Two dollar formatters, one intent each (kept, not merged): fmt$() abbreviates for the
+// rail/tooltip's tighter space, fmt$Full() is full precision for the panel/brief — a reasonable,
+// already-brand-aligned split (frontend_ux.md allows abbreviated forms on macro/aggregate
+// views). What was inconsistent is now fixed: both wrap their own output in the same .mono span,
+// so the identical dollar figure is monospace everywhere it's shown, never sans in one place and
+// mono in another.
 function fmt$(v){
   if (v == null) return '—';
   const abs = Math.abs(v);
-  if (abs >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
-  if (abs >= 1000) return '$' + Math.round(v/1000) + 'K';
-  return '$' + Math.round(v).toLocaleString();
+  let s;
+  if (abs >= 1000000) s = '$' + (v/1000000).toFixed(2) + 'M';
+  else if (abs >= 1000) s = '$' + Math.round(v/1000) + 'K';
+  else s = '$' + Math.round(v).toLocaleString();
+  return '<span class="mono">' + s + '</span>';
 }
-function fmt$Full(v){ return v == null ? '—' : '$' + Math.round(v).toLocaleString(); }
+function fmt$Full(v){ return v == null ? '—' : '<span class="mono">$' + Math.round(v).toLocaleString() + '</span>'; }
 // Fixed anchor date — same convention dashboard2-whitespace-gap-engine.html's own TODAY
 // constant uses, so "expiring <90d" means the identical real calendar window on both pages
 // rather than drifting with the visitor's own system clock.
@@ -413,6 +440,13 @@ function nodeRadius(n) {
 // outranks a role that also happens to be a known contact; a role with neither an active
 // relationship nor a bound line but WITH a real priced gap is the Trojan target; anything left
 // (no relationship, no bound line, no gap on file at all) is genuinely untouched — a silo.
+//
+// Red-rationing gate (color-unify remediation): a priced gap only earns breach-red when the role
+// itself is Ring 0/1 (a signatory or the apex) — the same gate dashboard2's coverageGapState()/
+// fiduciary-breach-line already applies. A Trojan target on a Ring 2-4 operational role is a
+// routine, common unbound state (grey), not a fiduciary breach — reserving red for the rare,
+// severe case is what makes the fiduciary-breach edge (drawn separately, ~1005) still read as
+// urgent instead of drowning in same-color noise across the wheel.
 // ════════════════════════════════════════════════════════════════════
 function roleNodeState(role, producerId) {
   const rows = overlayRowsByRole.get(role.id) || [];
@@ -421,7 +455,11 @@ function roleNodeState(role, producerId) {
   const hasBound = rows.some(o => o.status === 'bound');
   if (hasBound || isKnown(producerId, role.id)) return { color: 'var(--tj-green)', label: hasBound ? 'Bound + active intimacy' : 'Active SFDC intimacy' };
   const hasGap = rows.some(o => { const cn = nodeById.get(o.coverage_id); return cn && pricedGapFor(cn); });
-  if (hasGap) return { color: 'var(--tj-red)', label: 'Unplaced gap — Trojan target' };
+  if (hasGap) {
+    return role.ring <= 1
+      ? { color: 'var(--tj-red)', label: 'Signatory gap — fiduciary breach' }
+      : { color: 'var(--state-unbound)', label: 'Unplaced gap — Trojan target' };
+  }
   return { color: 'var(--tj-purple)', label: 'Silo — unmapped' };
 }
 
@@ -433,11 +471,22 @@ function roleNodeState(role, producerId) {
 let MAX_SAT_VALUE = 1;
 BOUND_POLICY_OVERLAY.forEach(o => { const v = (o.status === 'unbound' ? o.gwp_estimate : o.bound_premium) || 0; if (v > MAX_SAT_VALUE) MAX_SAT_VALUE = v; });
 function satRadius(v) { const MIN = 2.6, MAX = 7.5; return MIN + Math.sqrt(Math.max(0, v || 0) / MAX_SAT_VALUE) * (MAX - MIN); }
-function satelliteState(covNode, o) {
-  if (o.status === 'expiring') { const d = daysUntil(o.expiry_date); if (d != null && d >= 0 && d < 90) return { color: '#c99a1f', label: 'Expiring <90d' }; }
+// Colors sourced from the same canonical tokens as the role-node state above. Per-coverage
+// satellites follow the identical bound/expiring/unbound/breach semantics dashboard2's own
+// coverageGapState()/gapStateColorVar() already establish: a priced gap (whitespace or
+// deficient) is routine grey/rust UNLESS the role carrying it is Ring 0/1, in which case it's
+// the same fiduciary-breach red as the role node and the breach edge below — never unconditional
+// red for every open gap regardless of authority tier (that was the color-unify remediation's
+// second finding; fixed here to match the rest of the suite).
+function satelliteState(covNode, o, ring) {
+  if (o.status === 'expiring') { const d = daysUntil(o.expiry_date); if (d != null && d >= 0 && d < 90) return { color: 'var(--state-expiring)', label: 'Expiring <90d' }; }
   const gap = pricedGapFor(covNode);
-  if (!gap) return { color: '#3fae60', label: 'Bound' };
-  return { color: '#b05a54', op: 0.65, label: gap.kind === 'unbound' ? 'Whitespace gap' : 'Deficient limit' };
+  if (!gap) return { color: 'var(--state-bound)', label: 'Bound' };
+  const isBreach = ring <= 1;
+  const label = gap.kind === 'unbound' ? 'Whitespace gap' : 'Deficient limit';
+  return isBreach
+    ? { color: 'var(--state-breach)', op: 0.9, label: label + ' — Ring ' + ring + ' signatory' }
+    : { color: gap.kind === 'unbound' ? 'var(--state-unbound)' : 'var(--state-deficient)', op: 0.65, label };
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -624,10 +673,17 @@ function recompute() {
 
 selProducer.addEventListener('change', () => { state.producerId = selProducer.value; refreshAccountOptions(); recompute(); });
 selAccount.addEventListener('change', () => { state.uboId = selAccount.value; recompute(); });
-selKind.addEventListener('change', () => { state.kindFilter = selKind.value; renderRail(); });
-selVertical.addEventListener('change', () => { state.verticalFilter = selVertical.value; renderRail(); });
-selIntimacy.addEventListener('change', () => { state.intimacyFilter = selIntimacy.value; renderRail(); });
-selSeverity.addEventListener('change', () => { state.severityFilter = selSeverity.value; renderRail(); });
+// Gap Type/Vertical Petal/Intimacy/Fiduciary Severity now also re-render the canvas (renderAll())
+// after the rail, so the pentagon's dimFn (below, in renderUniverse) picks up the freshly-rebuilt
+// filteredNodeIds and dims out-of-filter nodes in the same pass — same "filters dim, never
+// rearrange" law D0's own sel-ring/sel-coitype handlers already use (renderAll() rebuilds each
+// wheel's <svg> from the same deterministic layout inputs, so this never causes a visible
+// re-layout; positions/sizes are unaffected by filter state, only per-node opacity is). Producer
+// and Account selectors are untouched — they still only call recompute(), a real context change.
+selKind.addEventListener('change', () => { state.kindFilter = selKind.value; renderRail(); renderAll(); });
+selVertical.addEventListener('change', () => { state.verticalFilter = selVertical.value; renderRail(); renderAll(); });
+selIntimacy.addEventListener('change', () => { state.intimacyFilter = selIntimacy.value; renderRail(); renderAll(); });
+selSeverity.addEventListener('change', () => { state.severityFilter = selSeverity.value; renderRail(); renderAll(); });
 
 // ════════════════════════════════════════════════════════════════════
 // LEFT RAIL
@@ -642,6 +698,21 @@ function filteredPaths() {
     return true;
   });
 }
+// Filter law (Phase 3) — Gap Type/Vertical Petal/Intimacy/Fiduciary Severity used to only ever
+// filter this rail, never the canvas, so the pentagon could show every node while the rail
+// showed one path: a genuine rail/canvas disconnect. Fixed the same way D0 already does it —
+// filters DIM in the canvas, never remove and never re-layout — just adapted to this file's own
+// filter shape: D0's filters are simple per-node attribute predicates, D5's are path-shaped (a
+// filter matches a contact->role->gap triple, not a bare node), so "matches" here means "this
+// node is an endpoint — contact or role — of at least one path filteredPaths() currently keeps."
+// filteredNodeIds is rebuilt every renderRail() call (the same real filtered list the rail
+// already computes) so the rail and canvas dimming are always reading the identical filter
+// result, never two independently-derived answers.
+function filtersAreDefault() {
+  return state.kindFilter === 'all' && state.verticalFilter === 'all' && state.intimacyFilter === 'all' && state.severityFilter === 'all';
+}
+let filteredNodeIds = new Set();
+function nodeMatchesFilters(n) { return filteredNodeIds.has(n.id); }
 function shortName(label) {
   if (!label) return '—';
   const parts = String(label).split('—');
@@ -655,6 +726,8 @@ function shortTitle(label) {
 const VERTICAL_LABELS = { yacht: 'Yacht', aviation: 'Aviation', real_estate: 'Real Estate', auto: 'Auto', personal: 'Personal' };
 function renderRail() {
   const list = filteredPaths();
+  filteredNodeIds = new Set();
+  list.forEach(p => { filteredNodeIds.add(p.contact.id); filteredNodeIds.add(p.role.id); });
   const wrap = document.getElementById('path-list');
   document.getElementById('lrh-title').textContent = accountLabel(state.uboId) || 'No account';
   const unboundN = currentPaths.filter(p => p.gap.kind === 'unbound').length;
@@ -710,7 +783,7 @@ function badgeDomain(name) {
 function badgeGapKind(kind) {
   const cls = kind === 'unbound' ? 'unbound' : 'expiring';
   const label = kind === 'unbound' ? 'UNBOUND' : 'DEFICIENT LIMIT';
-  return '<span class="badge badge-status ' + cls + '" style="' + (kind==='deficient' ? 'background:rgba(161,90,46,.14);color:var(--status-deficient);border-color:rgba(161,90,46,.4)' : '') + '">' + label + '</span>';
+  return '<span class="badge badge-status ' + cls + '" style="' + (kind==='deficient' ? 'background:rgba(161,90,46,.14);color:var(--state-deficient);border-color:rgba(161,90,46,.4)' : 'color:var(--state-unbound)') + '">' + label + '</span>';
 }
 function trendClass(pct) {
   const n = parseFloat(pct);
@@ -730,11 +803,11 @@ function renderPanel(p) {
   const chainHtml =
     '<div class="chain">' +
       '<div class="chain-node">' +
-        '<div class="chain-dot" style="background:var(--accent)"></div>' +
+        '<div class="chain-dot" style="background:var(--mark)"></div>' +
         '<div class="chain-body">' +
           '<div class="chain-role">1 · Known SFDC Contact (' + escapeXML(VERTICAL_LABELS[contact.vertical]) + ' · real relationship_weight ' + p.rw.relationship_weight.toFixed(1) + ')</div>' +
           '<div class="chain-name">' + escapeXML(contact.label) + '</div>' +
-          '<div class="chain-sub">' + badgeRing(contact.ring) + ' ' + badgeCoi(contact.coi_type) + ' · last activity ' + escapeXML(p.rw.last_activity_date) + ' · ' + p.rw.activity_count_90d + ' touches/90d</div>' +
+          '<div class="chain-sub">' + badgeRing(contact.ring) + ' ' + badgeCoi(contact.coi_type) + ' · last activity <span class="mono">' + escapeXML(p.rw.last_activity_date) + '</span> · ' + p.rw.activity_count_90d + ' touches/90d</div>' +
         '</div>' +
       '</div>' +
       '<div class="chain-link">' +
@@ -743,7 +816,7 @@ function renderPanel(p) {
         (p.crossVertical ? '<div class="cross-tag" style="margin-top:8px">⇄ Cross-vertical jump — ' + VERTICAL_LABELS[contact.vertical] + ' → ' + VERTICAL_LABELS[role.vertical] + '</div>' : '') +
       '</div>' +
       '<div class="chain-node">' +
-        '<div class="chain-dot" style="background:' + (gap.kind==='unbound' ? 'var(--status-unbound)' : 'var(--status-deficient)') + '"></div>' +
+        '<div class="chain-dot" style="background:' + (gap.kind==='unbound' ? 'var(--state-unbound)' : 'var(--state-deficient)') + '"></div>' +
         '<div class="chain-body">' +
           '<div class="chain-role">2 · 360 Structural Role (' + escapeXML(VERTICAL_LABELS[role.vertical]) + ' · responsible_node_id)</div>' +
           '<div class="chain-name">' + escapeXML(role.label) + '</div>' +
@@ -761,7 +834,7 @@ function renderPanel(p) {
           '<div class="chain-sub">' + badgeGapKind(gap.kind) + ' ' +
             (gap.kind === 'unbound'
               ? 'Est. GWP <strong style="color:var(--text)">' + fmt$Full(gap.gapDollar) + '</strong>' + (gap.ov.gwp_method ? ' · method: ' + escapeXML(gap.ov.gwp_method) : '')
-              : 'Bound at <strong style="color:var(--text)">' + fmt$Full(gap.ov.bound_limit_usd) + '</strong> vs required <strong style="color:var(--text)">' + fmt$Full(gap.baseline) + '</strong> — short by <strong style="color:var(--status-deficient)">' + fmt$Full(gap.gapDollar) + '</strong>') +
+              : 'Bound at <strong style="color:var(--text)">' + fmt$Full(gap.ov.bound_limit_usd) + '</strong> vs required <strong style="color:var(--text)">' + fmt$Full(gap.baseline) + '</strong> — short by <strong style="color:var(--state-deficient)">' + fmt$Full(gap.gapDollar) + '</strong>') +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -797,12 +870,12 @@ function renderPanel(p) {
       '<div class="formula-eq"><span>Trojan Opportunity Score</span><span>' + fmt$Full(p.tos) + '</span></div>' +
     '</div>' +
     '<p style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px">The rail is ranked on this figure — same three real inputs as the Financial Credibility Score below, rescaled into an accessible-dollar estimate instead of a unitless index.</p>' +
-    '<div class="sc-composite" style="margin-top:14px"><div class="sc-composite-lbl">Financial Credibility Score</div><div class="sc-composite-val">' + p.score.toFixed(1) + '</div></div>' +
+    '<div class="sc-composite" style="margin-top:14px"><div class="sc-composite-lbl">Financial Credibility Score</div><div class="sc-composite-val"><span class="mono">' + p.score.toFixed(1) + '</span></div></div>' +
     '<div class="formula-box">' +
       '<div class="formula-row"><span>Relationship weight (producer ↔ ' + escapeXML(shortName(contact.label)) + ')</span><b>' + p.rw.relationship_weight.toFixed(2) + '</b></div>' +
       '<div class="formula-row"><span>Edge confidence (freq: “' + escapeXML(e.freq) + '”)</span><b>× ' + conf.toFixed(2) + '</b></div>' +
       '<div class="formula-row"><span>Gap size (' + fmt$Full(gap.gapDollar) + ' ÷ $10,000)</span><b>× ' + gapUnit.toFixed(2) + '</b></div>' +
-      '<div class="formula-eq"><span>Score</span><span>' + p.score.toFixed(1) + '</span></div>' +
+      '<div class="formula-eq"><span>Score</span><span class="mono">' + p.score.toFixed(1) + '</span></div>' +
     '</div>';
 
   // ── 4. Statutory citations, limit deficiency, GWP benchmark (NEW) ──
@@ -822,7 +895,7 @@ function renderPanel(p) {
   }
   const deficiencyHtml = gap.kind === 'deficient'
     ? '<div class="statute-row"><div class="statute-jur">Limit Deficiency</div><div class="deficiency-line">' + fmt$Full(gap.gapDollar) + ' short of required</div><div class="statute-req">Bound at ' + fmt$Full(gap.ov.bound_limit_usd) + ' against a real required baseline of ' + fmt$Full(gap.baseline) + (p.asset.size_class ? ' (tier ' + escapeXML(p.asset.size_class) + ')' : '') + '.</div></div>'
-    : '<div class="statute-row"><div class="statute-jur">Whitespace — Never Bound</div><div class="deficiency-line" style="color:var(--status-unbound)">' + fmt$Full(gap.gapDollar) + ' estimated GWP at stake</div><div class="statute-req">' + (gap.ov.unbound_reason ? 'Reason on file: ' + escapeXML(gap.ov.unbound_reason.replace(/_/g,' ')) + '. ' : '') + (gap.ov.evidence_note ? escapeXML(gap.ov.evidence_note) : '') + '</div></div>';
+    : '<div class="statute-row"><div class="statute-jur">Whitespace — Never Bound</div><div class="deficiency-line" style="color:var(--state-unbound)">' + fmt$Full(gap.gapDollar) + ' estimated GWP at stake</div><div class="statute-req">' + (gap.ov.unbound_reason ? 'Reason on file: ' + escapeXML(gap.ov.unbound_reason.replace(/_/g,' ')) + '. ' : '') + (gap.ov.evidence_note ? escapeXML(gap.ov.evidence_note) : '') + '</div></div>';
   const gwpChip = trend
     ? '<div class="gwp-chip"><span class="gwp-chip-trend ' + trendClass(trend.annual_trend_pct) + '">' + escapeXML(trend.annual_trend_pct) + '</span><span><strong style="color:var(--text)">GWP_RateTrend_Table</strong> — ' + escapeXML(trend.source) + '</span></div>'
     : '<div class="gwp-chip"><span class="no-source-flag">No rate index</span><span>No entry in this project’s own GWP_RateTrend_Table for “' + escapeXML(p.cov.coverage_type_id) + '.”</span></div>';
@@ -909,6 +982,7 @@ function renderUniverse(v) {
     ringOf: n => n.ring, domainOf: n => categoryDomainId.get(n.category) || 1,
     labelFn: n => shortName(n.label), edges,
     activeId, showLabels: true, vz: Math.max(0.18, fitZoom), vx: 0, vy: 0,
+    dimFn: n => !filtersAreDefault() && !nodeMatchesFilters(n),
     onSelect: n => { state.focus = (state.focus && state.focus.id === n.id) ? null : { vertical: v, id: n.id }; renderUniverse(v); drawTrojanCrossLink(); },
     onHover: (evt, n) => {
       const st = roleNodeState(n, state.producerId);
@@ -935,7 +1009,7 @@ function drawSatellitesAndBreaches(svg, layout) {
     rows.forEach((o, i) => {
       const covNode = nodeById.get(o.coverage_id);
       if (!covNode) return;
-      const st = satelliteState(covNode, o);
+      const st = satelliteState(covNode, o, role.ring);
       const value = (o.status === 'unbound' ? o.gwp_estimate : o.bound_premium) || 0;
       const sr = satRadius(value);
       const angle = n === 1 ? -Math.PI / 2 : (i / n) * Math.PI * 2;
@@ -946,7 +1020,7 @@ function drawSatellitesAndBreaches(svg, layout) {
       dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
       scene.appendChild(dot);
 
-      // Fiduciary breach line — solid, fixed #ef4444, for the most severe real case: a Ring-1
+      // Fiduciary breach line — solid, var(--state-breach), for the most severe real case: a Ring-1
       // signatory-level role carrying an open coverage gap (never-written OR bound-deficient).
       if (role.ring === 1 && (st.label === 'Whitespace gap' || st.label === 'Deficient limit')) {
         const bx = p.x + Math.cos(angle) * (orbitR + sr + 8), by = p.y + Math.sin(angle) * (orbitR + sr + 8);
@@ -1003,13 +1077,13 @@ function drawTrojanCrossLink() {
   const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
   line.setAttribute('x1', from.x); line.setAttribute('y1', from.y);
   line.setAttribute('x2', to.x); line.setAttribute('y2', to.y);
-  line.setAttribute('stroke', '#dcae5c'); line.setAttribute('stroke-width', '3');
+  line.setAttribute('stroke', 'var(--link-gatekeeper)'); line.setAttribute('stroke-width', '3');
   line.setAttribute('stroke-dasharray', '7 5'); line.setAttribute('opacity', '0.95');
   overlay.appendChild(line);
   [from, to].forEach(p => {
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', '9');
-    c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#dcae5c'); c.setAttribute('stroke-width', '2.5');
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', 'var(--link-gatekeeper)'); c.setAttribute('stroke-width', '2.5');
     overlay.appendChild(c);
   });
   canvas.appendChild(overlay);

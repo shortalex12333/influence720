@@ -13,7 +13,7 @@
    code (data loading, RingEngine.render() call, nodeFinancials()/colorScale()/
    pxRadius(), Producer Gap Skew mechanism) verbatim, and layers two additive
    post-processing passes on top, the same technique dashboard4's own
-   splitFillNode()/drawHub() already use and dashboard2-whitespace-gap-engine.html's
+   splitFillNode() already uses and dashboard2-whitespace-gap-engine.html's
    drawSatellitesAndBreaches() already proved out:
      1. Producer Effort-vs-Yield node coloring (a NEW color mode, real/computed
         from PRODUCERS.touchpoints_90d + gwp_captured_90d + churn_risk_score —
@@ -22,7 +22,33 @@
         real RELATIONSHIP_WEIGHTS.last_activity_date, crossed with a real
         BOUND_POLICY_OVERLAY.expiry_date <90 days — both conditions real and
         traced, never conflating "no relationship on file" with "decayed").
-   render-core.js itself is never edited. */
+
+   CANVAS GEOMETRY — 2026-08-17 rebuilt to match D0's real pentagon-of-5-wheels
+   technique (dashboard0-ontology-foundation.html), reusing dashboard4-role-
+   macro-view.html's JUST-REBUILT pentagon code directly (same correction,
+   same mechanism) rather than the old single combined 45-sector wheel this
+   file used to render. Five separate <svg> elements, one per vertical, each
+   its own independent RingEngine.render() call against the PLAIN 9-segment
+   domains (TEMPLATE_ONTOLOGY.segments) — no vertOffset, no combinedDomains.
+   drawHub()/drawVerticalOverlay() are retired (replaced by a per-cluster
+   floating label, D0/D4's own pattern). The one real wrinkle D4 didn't have
+   to solve: a churn role's OWN vertical and its account/principal's home
+   vertical very often differ (confirmed live against the dataset: 10 of the
+   14 real churn roles today have their account sitting in a DIFFERENT
+   vertical's wheel — e.g. an aviation signatory role whose UBO account is
+   homed under Yacht). So the red breach edge (role -> account) can no
+   longer assume both ends live in the same <svg>. Fixed by reusing D0's own
+   cross-vertical-link technique verbatim (dashboard0's drawCrossLinks()):
+   look up each end's real rendered position via getBoundingClientRect()
+   against the shared #universe-canvas, draw on one canvas-wide overlay
+   <svg>, and recompute it every time applyZoom() runs (pan/zoom/resize/
+   selection) — exactly how D0 keeps its amber gatekeeper links glued to
+   real node positions across universes. Silent-churn satellites stay
+   same-svg (a satellite always orbits its own role's own node, never
+   crosses a wheel boundary) — only the account-edge needed the overlay.
+   Node dollar sizing/coloring (both color modes), the Effort-vs-Yield
+   classification, and the Silent Churn detection math are all UNCHANGED —
+   only the canvas geometry and the edge-drawing mechanism moved. */
 :root{--status-deficient:#a15a2e;--pcy-green:#2ec478;--pcy-amber:#e0a640;--pcy-legacy:#8b5cdc}
 body.theme-dark{--status-deficient:#e0916a;--pcy-green:#4ed48a;--pcy-amber:#e0b060;--pcy-legacy:#b699f5}
 
@@ -90,18 +116,26 @@ body.theme-dark .churn-row{background:#141618}
 .prod-name{font-weight:700;color:var(--text)}
 .prod-sub{font-size:10px;color:var(--text3);margin-top:2px}
 .empty-note{color:var(--text3);font-size:12px;line-height:1.5}
-/* Pan/zoom stage — same technique dashboard0/dashboard2 already use: a CSS transform
-   on an inner wrapper div, decoupled from RingEngine's own internal vz/vx/vy (left at
-   default 1/0/0 here) so panning/zooming never re-runs the 60-pass layout, only a
-   selection/mode change redraws the wheel's own content. */
-#zoomstage{position:absolute;inset:0;overflow:hidden;cursor:grab}
-#zoomstage.dragging{cursor:grabbing}
-#wheel-inner{position:absolute;top:0;left:0;transform-origin:0 0}
-#wheel-inner svg{display:block;overflow:visible;width:100%;height:100%}
+/* Pentagon canvas — D0's real technique (dashboard0-ontology-foundation.html),
+   reused via dashboard4-role-macro-view.html: five independent clusters, each
+   its own frameless <svg>, arranged on a shared coordinate space and panned/
+   zoomed together via a single CSS transform on #canvas-inner. */
+.universe-canvas{position:absolute;inset:0;overflow:hidden;cursor:grab}
+.universe-canvas.dragging{cursor:grabbing}
+#canvas-inner{position:relative;transform-origin:0 0}
+.ucluster{position:absolute}
+.ucluster svg{overflow:visible;cursor:pointer;display:block}
+.ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
+.ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ucluster-meta{font-size:11px;font-weight:700;color:var(--accent)}
 .canvas-zoom-ctrl{position:absolute;bottom:14px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
 .canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
 .canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
 .fiduciary-breach-line{pointer-events:none}
+/* Cross-vertical (and same-vertical) churn breach edges — one canvas-wide overlay
+   <svg>, exactly D0's #cross-link-overlay technique, recomputed every applyZoom()
+   call so it stays glued to real node positions across pan/zoom/resize/selection. */
+#churn-breach-overlay{position:absolute;top:0;left:0;pointer-events:none}
 .rail-total,.vcard-val,.churn-row-days,.prod-table td{font-variant-numeric:tabular-nums}
 </style>
 </head>
@@ -113,7 +147,7 @@ body.theme-dark .churn-row{background:#141618}
       <a href="index.html" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
       <div class="h-title">Executive Command Center</div>
     </div>
-    <div class="h-sub">Same authority-ring wheel as every 720 dashboard — ring=authority tier (0-4), 9-segment domain=real lifecycle category, node size=real Epic GWP $ (bound + estimated). Producers have no ring/domain of their own — pick a producer below and switch Node Color Mode to Effort vs Yield to recolor their own touched nodes by a real, computed classification. Red satellites + red edges are real, traced silent-churn risk: a Ring 0/1 signatory contact stale 120+ days with a real coverage line expiring inside 90 days.</div>
+    <div class="h-sub">Five vertical wheels — <strong>yacht, aviation, real estate, auto, personal</strong> — arranged pentagon-style, same layout as D0. Ring=authority tier (0-4), 9-segment domain=real lifecycle category, node size=real Epic GWP $ (bound + estimated). Producers have no ring/domain of their own — pick a producer below and switch Node Color Mode to Effort vs Yield to recolor their own touched nodes by a real, computed classification. Red satellites + red edges are real, traced silent-churn risk: a Ring 0/1 signatory contact stale 120+ days with a real coverage line expiring inside 90 days — an at-risk role's account is frequently on a DIFFERENT vertical's wheel, so the edge crosses petals.</div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
       <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard5-micro-warfare.html" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D6 Executive Command Center</span>
     </nav>
@@ -183,13 +217,13 @@ body.theme-dark .churn-row{background:#141618}
   </div>
 
   <div id="cv-wrap">
-    <div id="zoomstage">
-      <div id="wheel-inner"><svg id="cv"></svg></div>
-    </div>
-    <div class="canvas-zoom-ctrl">
-      <button id="zoom-in">+</button>
-      <button id="zoom-out">&minus;</button>
-      <button class="wide" id="zoom-reset">Reset view</button>
+    <div class="universe-canvas" id="universe-canvas">
+      <div id="canvas-inner"></div>
+      <div class="canvas-zoom-ctrl">
+        <button id="zoom-in" type="button">+</button>
+        <button id="zoom-out" type="button">&minus;</button>
+        <button class="wide" id="zoom-reset" type="button">Reset view</button>
+      </div>
     </div>
     <div class="legend">
       <div class="legend-group-lbl">Penetration Ratio (default coloring)</div>
@@ -252,15 +286,11 @@ VERTICALS.forEach(v => {
 });
 function normVertical(v){ return v === 'realestate' ? 'real_estate' : v; }
 
-let _off = 0;
-const vertOffset = {};
-const combinedDomains = [];
-VERTICALS.forEach(v => {
-  vertOffset[v] = _off;
-  DOMAINS_BY_VERTICAL[v].list.forEach(d => { combinedDomains.push({ id: _off + d.id, name: d.name, col: d.col }); });
-  _off += DOMAINS_BY_VERTICAL[v].count;
-});
-const TOTAL_DOMAINS = combinedDomains.length;
+// PLAIN_DOMAINS — the same 9-segment list every wheel uses, verbatim, no
+// per-vertical offset. Each vertical gets its OWN <svg>/RingEngine.render()
+// call (see the WHEEL section below), so there is no need to merge 5
+// verticals' domains into one 45-sector ring the way this file used to.
+const PLAIN_DOMAINS = SEGMENTS.map(s => ({ id: s.id, name: s.name, col: s.col }));
 
 function domainName(vertical, localId) {
   const v = normVertical(vertical);
@@ -276,6 +306,15 @@ const nodeById = new Map(ONTOLOGY_NODES.map(n => [n.id, n]));
 const roleNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'role');
 const principalNodes = ONTOLOGY_NODES.filter(n => n.node_type === 'principal');
 const wheelNodes = roleNodes.concat(principalNodes);
+// Split once, by each node's own (normalized) vertical — this is the partition
+// that drives which of the 5 separate <svg> wheels a node renders into. A
+// principal/account node carries exactly one vertical tag even though the
+// roles that reference it via account_ref frequently belong to a DIFFERENT
+// vertical (confirmed live: 2,057 of 2,965 roles have a vertical that
+// differs from their own account's home vertical) — the exact real case
+// the churn-breach edge below has to cross.
+const wheelNodesByVertical = {};
+VERTICALS.forEach(v => { wheelNodesByVertical[v] = wheelNodes.filter(n => normVertical(n.vertical) === v); });
 const producerNameById = new Map(PRODUCERS.map(p => [p.producer_id, p.name]));
 
 const rolesByAccount = new Map();
@@ -564,7 +603,7 @@ function nodeColor(n) {
 // ════════════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════════════
-const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null, colorMode: 'ratio' };
+const state = { selectedId: null, ringFilter: 'all', activeVerticals: new Set(VERTICALS), producerId: null, colorMode: 'ratio', zoom: 1, panX: 0, panY: 0 };
 function producerGrandTotal(producerId) {
   let sold = 0, prospected = 0;
   roleNodes.forEach(n => { const f = nodeFinancialsForProducer(n, producerId); sold += f.sold; prospected += f.prospected; });
@@ -578,17 +617,90 @@ function producerVerticalTotal(vertical, producerId) {
   });
   return sold + prospected;
 }
-const wheelSvg = document.getElementById('cv');
 const panelEl = document.getElementById('panel');
+const svgByVertical = {};
+const clusterElByVertical = {};
+
+// ════════════════════════════════════════════════════════════════════
+// PENTAGON CANVAS — D0's real technique (dashboard0-ontology-foundation.html),
+// reused via dashboard4-role-macro-view.html verbatim: 5 clusters on a
+// shared coordinate space, each cluster's center on a circle of radius
+// ORBIT_RADIUS, evenly spaced (72° apart), starting at 12 o'clock and going
+// clockwise. CANVAS_SIZE just needs to be big enough that no cluster's
+// absolute box clips outside #canvas-inner. Each cluster is sized by that
+// vertical's own real $ magnitude — sqrt-scaled between MIN_PX/MAX_PX so
+// area (not radius) tracks $ roughly linearly, same principle as every
+// other dollar-scaled element in this suite (and identical to D4's own
+// verticalPx()).
+// ════════════════════════════════════════════════════════════════════
+const ORBIT_RADIUS = 700;
+const CANVAS_SIZE = 2700;
+const CLUSTER_MIN_PX = 540, CLUSTER_MAX_PX = 1000;
+function verticalTotal(v) { return verticalRollup[v].sold + verticalRollup[v].prospected; }
+const VERTICAL_TOTAL_LO = Math.min(...VERTICALS.map(verticalTotal));
+const VERTICAL_TOTAL_HI = Math.max(...VERTICALS.map(verticalTotal));
+function verticalPx(v) {
+  if (VERTICAL_TOTAL_HI <= VERTICAL_TOTAL_LO) return Math.round((CLUSTER_MIN_PX + CLUSTER_MAX_PX) / 2);
+  const frac = Math.sqrt((verticalTotal(v) - VERTICAL_TOTAL_LO) / (VERTICAL_TOTAL_HI - VERTICAL_TOTAL_LO));
+  return Math.round(CLUSTER_MIN_PX + frac * (CLUSTER_MAX_PX - CLUSTER_MIN_PX));
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ZOOM & PAN — same interaction model as D0/D4: plain scroll wheel zooms,
+// click-drag pans, zoom is anchored to the viewport CENTER. applyZoom() also
+// redraws the churn-breach overlay (drawChurnBreaches(), defined below) on
+// every call — the same discipline D0's own applyZoom()/drawCrossLinks()
+// pairing uses, so the red edges never drift out of sync with node position
+// during a pan or zoom.
+// ════════════════════════════════════════════════════════════════════
+function applyZoom() {
+  document.getElementById('canvas-inner').style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  drawChurnBreaches();
+}
+function zoomBy(delta) {
+  const newZoom = Math.max(0.25, Math.min(2.5, state.zoom + delta));
+  if (newZoom === state.zoom) return;
+  const canvas = document.getElementById('universe-canvas');
+  const vx = canvas.clientWidth / 2, vy = canvas.clientHeight / 2;
+  const contentX = (vx - state.panX) / state.zoom, contentY = (vy - state.panY) / state.zoom;
+  state.panX = vx - newZoom * contentX;
+  state.panY = vy - newZoom * contentY;
+  state.zoom = newZoom;
+  applyZoom();
+}
+function centerView() {
+  const canvas = document.getElementById('universe-canvas');
+  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+(function(){
+  const canvasEl = document.getElementById('universe-canvas');
+  canvasEl.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+  let drag = null;
+  canvasEl.addEventListener('mousedown', (e) => { drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false }; canvasEl.classList.add('dragging'); });
+  canvasEl.addEventListener('mousemove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+    if (drag.moved) { state.panX = drag.panX + dx; state.panY = drag.panY + dy; applyZoom(); }
+  });
+  function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
+  canvasEl.addEventListener('mouseup', endDrag);
+  canvasEl.addEventListener('mouseleave', endDrag);
+})();
 
 // ════════════════════════════════════════════════════════════════════
 // WHEEL — RingEngine.render() draws layout/rings/domain wedges/tooltip
-// wiring/click wiring exactly as shipped. Everything below is the same
-// additive post-processing pass dashboard4/dashboard2 already use.
+// wiring/click wiring exactly as shipped, once PER VERTICAL against the
+// plain 9-segment domains. Everything below is the same additive post-
+// processing pass dashboard4/dashboard2 already use.
 // ════════════════════════════════════════════════════════════════════
-function injectDefs() {
-  wheelSvg.insertAdjacentHTML('afterbegin',
-    '<defs><pattern id="hatch-prospect" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+function injectDefs(svg, v) {
+  svg.insertAdjacentHTML('afterbegin',
+    '<defs><pattern id="hatch-prospect-' + v + '" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
     '<rect width="5" height="5" fill="none"/>' +
     '<line x1="0" y1="0" x2="0" y2="5" stroke="var(--text2)" stroke-width="1.6" stroke-opacity="0.85"/>' +
     '</pattern></defs>'
@@ -602,21 +714,22 @@ function arcSegPath(cx, cy, r, startAngle, sweep) {
   return 'M ' + cx + ' ' + cy + ' L ' + p0x + ' ' + p0y + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + p1x + ' ' + p1y + ' Z';
 }
 
-// Split-fill for Penetration Ratio mode (verbatim from dashboard4) — up to 3
-// wedges (Adequate solid / Deficient rust / Whitespace hatched). In Effort vs
-// Yield mode this collapses to a single flat categorical fill instead: the
+// Split-fill for Penetration Ratio mode (verbatim from dashboard4, now scoped
+// per-svg/per-vertical `v` for the hatch pattern id) — up to 3 wedges
+// (Adequate solid / Deficient rust / Whitespace hatched). In Effort vs Yield
+// mode this collapses to a single flat categorical fill instead: the
 // classification is a real per-producer LABEL, not a $ split, so it is never
 // rendered with the false precision of a proportional wedge.
-function splitFillNode(p) {
+function splitFillNode(p, svg, v) {
   const n = p.n;
   const isPrincipal = n.node_type === 'principal';
   const fin = currentFin(n);
-  const g = wheelSvg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
+  const g = svg.querySelector('g[data-nid="' + CSS.escape(n.id) + '"]');
   if (!g) return;
   g.setAttribute('data-ring', n.ring);
-  g.setAttribute('data-vertical', normVertical(n.vertical));
   g.setAttribute('data-deficient', fin.soldDeficient > 0 ? '1' : '0');
   g.setAttribute('data-churn', churnRoles.has(n.id) ? '1' : '0');
+  const hatchUrl = 'url(#hatch-prospect-' + v + ')';
   const cx = p.x, cy = p.y, r = p.r;
   const isActive = state.selectedId === n.id;
   const effortMode = state.colorMode === 'effort_yield' && !!state.producerId;
@@ -645,7 +758,7 @@ function splitFillNode(p) {
     if (segs.length <= 1) {
       const s = segs[0] || { fill: col, opacity: 0.22, hatch: true };
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
-      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="url(#hatch-prospect)"/>';
+      if (s.hatch) inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + hatchUrl + '"/>';
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + s.fill + '" stroke-width="' + sw + '"/>';
     } else {
       let start = -Math.PI / 2;
@@ -653,7 +766,7 @@ function splitFillNode(p) {
         const sweep = s.frac * Math.PI * 2;
         const d = arcSegPath(cx, cy, r, start, sweep);
         inner += '<path d="' + d + '" fill="' + s.fill + '" fill-opacity="' + s.opacity + '"/>';
-        if (s.hatch) inner += '<path d="' + d + '" fill="url(#hatch-prospect)"/>';
+        if (s.hatch) inner += '<path d="' + d + '" fill="' + hatchUrl + '"/>';
         start += sweep;
       });
       inner += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '"/>';
@@ -662,93 +775,119 @@ function splitFillNode(p) {
   g.innerHTML = inner;
 }
 
-function drawHub(scene) {
+// Small floating corner label per cluster — vertical name + a real summary
+// stat (this vertical's own $ total, whole-book or the active producer's own
+// gap pattern, plus how many of ITS OWN roles are silent-churn at risk).
+// Replaces the old combined-wheel's center hub + mega-segment overlay labels
+// (drawHub()/drawVerticalOverlay(), both retired) — same real numbers, now
+// anchored per-cluster instead of drawn onto one wheel.
+function updateClusterMeta(v) {
+  const meta = document.getElementById('meta-' + v);
+  if (!meta) return;
   const producer = state.producerId ? PRODUCERS.find(p => p.producer_id === state.producerId) : null;
-  const label = producer ? (producer.name.toUpperCase() + "'S BOOK") : 'WHOLE BOOK';
-  const total = producer ? producerGrandTotal(state.producerId).total : GRAND_TOTAL;
-  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-  g.innerHTML =
-    '<text x="0" y="-8" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="0.06em" fill="var(--text3)">' + escapeXML(label) + '</text>' +
-    '<text x="0" y="24" text-anchor="middle" font-size="34" font-weight="900" fill="var(--text)">' + fmtMoney(total) + '</text>';
-  scene.appendChild(g);
+  const total = producer ? producerVerticalTotal(v, state.producerId) : verticalTotal(v);
+  const roleCount = wheelNodesByVertical[v].filter(n => n.node_type === 'role').length;
+  const atRisk = Array.from(churnRoles.keys()).filter(rid => { const r = nodeById.get(rid); return r && normVertical(r.vertical) === v; }).length;
+  meta.textContent = fmtMoney(total) + (producer ? " · " + producer.name + "'s book" : ' · Whole Book') + ' · ' + roleCount + ' roles' + (atRisk > 0 ? ' · ' + atRisk + ' at risk' : '');
 }
 
-function drawVerticalOverlay(scene) {
-  const hubR = RingEngine.DEFAULT_RING.RO[4];
-  VERTICALS.forEach(v => {
-    const startIdx = vertOffset[v] + 1;
-    const count = DOMAINS_BY_VERTICAL[v].count;
-    const a0 = RingEngine.sectorStart(startIdx, TOTAL_DOMAINS);
-    const a1 = RingEngine.sectorStart(startIdx + count, TOTAL_DOMAINS);
-    const mid = (a0 + a1) / 2;
-    const lineR = hubR + 170;
-    const lx0 = Math.cos(a0) * lineR, ly0 = Math.sin(a0) * lineR;
-    const labelR = hubR + 150;
-    const lx = Math.cos(mid) * labelR, ly = Math.sin(mid) * labelR;
-    const roll = verticalRollup[v];
-    const vtot = state.producerId ? producerVerticalTotal(v, state.producerId) : (roll.sold + roll.prospected);
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('data-vertical-overlay', v);
-    g.innerHTML =
-      '<line x1="0" y1="0" x2="' + lx0.toFixed(1) + '" y2="' + ly0.toFixed(1) + '" stroke="var(--accent)" stroke-width="1.5" stroke-opacity="0.5" stroke-dasharray="1 5"/>' +
-      '<text x="' + lx.toFixed(1) + '" y="' + (ly-10).toFixed(1) + '" text-anchor="middle" font-size="24" font-weight="800" letter-spacing="0.04em" fill="var(--accent)">' + VERTICAL_LABELS[v].toUpperCase() + '</text>' +
-      '<text x="' + lx.toFixed(1) + '" y="' + (ly+20).toFixed(1) + '" text-anchor="middle" font-size="28" font-weight="900" fill="var(--text)">' + fmtMoney(vtot) + '</text>';
-    scene.appendChild(g);
+// ════════════════════════════════════════════════════════════════════
+// CHURN-BREACH OVERLAY — D0's real cross-vertical-link technique
+// (dashboard0-ontology-foundation.html's drawCrossLinks()), reused verbatim
+// for the red role -> account edge: look up each end's TRUE rendered screen
+// position via getBoundingClientRect() (immune to whichever cluster's own
+// internal RingEngine fit-zoom or the outer canvas pan/zoom is currently
+// applied), and draw on one canvas-wide overlay <svg>. Used uniformly for
+// every churn edge — same-vertical or cross-vertical — since a role and its
+// account frequently sit on two different petals (confirmed live: 10 of 14
+// real churn roles today) and a single mechanism that is always correct
+// beats two code paths that silently diverge. Recomputed every applyZoom()
+// call, exactly like D0's own pairing.
+// ════════════════════════════════════════════════════════════════════
+function findNodeEl(id) {
+  const n = nodeById.get(id);
+  if (!n) return null;
+  const svg = svgByVertical[normVertical(n.vertical)];
+  if (!svg) return null;
+  return svg.querySelector('g[data-nid="' + CSS.escape(id) + '"]');
+}
+function nodeCenterInCanvas(id) {
+  const el = findNodeEl(id);
+  const canvas = document.getElementById('universe-canvas');
+  if (!el || !canvas) return null;
+  const er = el.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+  return { x: er.left + er.width / 2 - cr.left + canvas.scrollLeft, y: er.top + er.height / 2 - cr.top + canvas.scrollTop };
+}
+function drawChurnBreaches() {
+  const canvas = document.getElementById('universe-canvas');
+  const old = document.getElementById('churn-breach-overlay');
+  if (old) old.remove();
+  if (!canvas) return;
+  const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  overlay.id = 'churn-breach-overlay';
+  overlay.setAttribute('width', canvas.scrollWidth || canvas.clientWidth);
+  overlay.setAttribute('height', canvas.scrollHeight || canvas.clientHeight);
+  churnRoles.forEach((info, roleId) => {
+    const role = nodeById.get(roleId);
+    if (!role) return;
+    const roleV = normVertical(role.vertical);
+    const acct = nodeById.get(role.account_ref);
+    const acctV = acct ? normVertical(acct.vertical) : null;
+    const visible = (state.ringFilter === 'all' || state.ringFilter === String(role.ring)) &&
+      state.activeVerticals.has(roleV) && (!acct || state.activeVerticals.has(acctV));
+    if (!visible || !acct) return;
+    const from = nodeCenterInCanvas(roleId);
+    const to = nodeCenterInCanvas(role.account_ref);
+    if (!from || !to) return;
+    overlay.appendChild(RingEngine.svgEl('line', {
+      class: 'fiduciary-breach-line', x1: from.x, y1: from.y, x2: to.x, y2: to.y,
+      stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.85',
+    }));
   });
+  canvas.appendChild(overlay);
 }
 
-// Silent-churn satellites + solid red breach edges — the same additive
-// technique dashboard2-whitespace-gap-engine.html's drawSatellitesAndBreaches()
-// proved out, adapted for churn risk instead of coverage risk: reads each
-// role's TRUE rendered (x,y,r) straight off the layout RingEngine.render()
-// just returned, and draws the edge directly to that role's OWN real
-// principal node — both already rendered in this same wheel (unlike D2's
-// per-account zoom, D6 never needs a synthetic endpoint).
-function drawChurnSatellitesAndBreaches(scene, layout) {
-  const byId = new Map(layout.map(p => [p.n.id, p]));
-  layout.forEach(p => {
-    const info = churnRoles.get(p.n.id);
-    if (!info) return;
-    const angle = -Math.PI / 2;
-    const orbitR = p.r + 9;
-    const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
-    const dot = RingEngine.svgEl('circle', {
-      cx: sx, cy: sy, r: 6, fill: 'var(--status-unbound)', stroke: 'var(--surface)', 'stroke-width': '1.4', cursor: 'pointer',
-    });
-    dot.addEventListener('click', evt => { evt.stopPropagation(); state.selectedId = p.n.id; renderAll(); });
-    dot.addEventListener('mouseenter', evt => {
-      const nearest = info.expiring.slice().sort((a,b)=>a.daysUntil-b.daysUntil)[0];
-      RingEngine.tooltip.show(evt, 'Silent Churn Risk', p.n.label,
-        Math.round(info.daysStale) + ' days since last logged contact (Ring ' + p.n.ring + ') · ' + info.expiring.length + ' coverage line' + (info.expiring.length>1?'s':'') + ' expiring ≤90d, nearest ' + nearest.label + ' in ' + nearest.daysUntil + 'd');
-    });
-    dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
-    scene.appendChild(dot);
-
-    const acct = byId.get(p.n.account_ref);
-    if (acct) {
-      scene.appendChild(RingEngine.svgEl('line', {
-        class: 'fiduciary-breach-line', x1: p.x, y1: p.y, x2: acct.x, y2: acct.y,
-        stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.85',
-      }));
-    }
+// A satellite always orbits its OWN role's own rendered node — never crosses
+// a wheel boundary — so it stays a same-svg element appended straight into
+// that cluster's own <g> scene, exactly the technique this file already used
+// before the pentagon rebuild (only the breach EDGE needed the overlay above).
+function drawChurnSatellite(scene, p) {
+  const info = churnRoles.get(p.n.id);
+  if (!info) return;
+  const angle = -Math.PI / 2;
+  const orbitR = p.r + 9;
+  const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
+  const dot = RingEngine.svgEl('circle', {
+    cx: sx, cy: sy, r: 6, fill: 'var(--status-unbound)', stroke: 'var(--surface)', 'stroke-width': '1.4', cursor: 'pointer',
   });
+  dot.addEventListener('click', evt => { evt.stopPropagation(); state.selectedId = p.n.id; renderAll(); });
+  dot.addEventListener('mouseenter', evt => {
+    const nearest = info.expiring.slice().sort((a,b)=>a.daysUntil-b.daysUntil)[0];
+    RingEngine.tooltip.show(evt, 'Silent Churn Risk', p.n.label,
+      Math.round(info.daysStale) + ' days since last logged contact (Ring ' + p.n.ring + ') · ' + info.expiring.length + ' coverage line' + (info.expiring.length>1?'s':'') + ' expiring ≤90d, nearest ' + nearest.label + ' in ' + nearest.daysUntil + 'd');
+  });
+  dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
+  scene.appendChild(dot);
 }
 
-function renderWheel() {
-  recomputeMaxNodeTotal();
-  const { layout } = RingEngine.render(wheelSvg, {
-    nodes: wheelNodes,
-    domains: combinedDomains,
+function renderUniverse(v) {
+  const svg = svgByVertical[v];
+  const nodes = wheelNodesByVertical[v];
+  const px = verticalPx(v);
+  const HUB_MAX_R = RingEngine.DEFAULT_RING.RO[4] + 200;
+  const fitZoom = px / (2 * (HUB_MAX_R + 30));
+  const { layout } = RingEngine.render(svg, {
+    nodes, domains: PLAIN_DOMAINS,
     colorFn: nodeColor,
     sizeFn: n => pxRadius(currentFin(n).total, n.node_type === 'principal'),
     scoreFn: n => currentFin(n).total || 0,
     ringOf: n => n.ring,
-    domainOf: n => vertOffset[normVertical(n.vertical)] + n.domain,
+    domainOf: n => n.domain,
     labelFn: n => n.label,
     edges: [],
     activeId: state.selectedId,
     showLabels: false,
-    vz: 1, // pan/zoom handled by the #wheel-inner CSS transform, not RingEngine's own vz/vx/vy
+    vz: Math.max(0.12, fitZoom),
     onSelect: n => { state.selectedId = n.id; renderAll(); },
     onHover: (evt, n) => {
       const f = currentFin(n);
@@ -765,85 +904,65 @@ function renderWheel() {
     },
     onLeave: RingEngine.tooltip.hide,
   });
-  const scene = wheelSvg.querySelector('g');
-  injectDefs();
-  layout.forEach(p => splitFillNode(p));
-  drawHub(scene);
-  drawVerticalOverlay(scene);
-  drawChurnSatellitesAndBreaches(scene, layout);
+  const scene = svg.querySelector('g');
+  injectDefs(svg, v);
+  layout.forEach(p => { splitFillNode(p, svg, v); drawChurnSatellite(scene, p); });
+  updateClusterMeta(v);
+}
+
+function renderWheel() {
+  recomputeMaxNodeTotal(); // must run before sizeFn below — reflects the active producer/color mode, GLOBAL across all 5 wheels (not per-vertical) so node radii stay comparable across verticals
+  const inner = document.getElementById('canvas-inner');
+  inner.innerHTML = '';
+  inner.style.width = CANVAS_SIZE + 'px';
+  inner.style.height = CANVAS_SIZE + 'px';
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  VERTICALS.forEach((v, i) => {
+    const px = verticalPx(v);
+    const angle = (2 * Math.PI * i / VERTICALS.length) - Math.PI / 2;
+    const clusterCx = cx + ORBIT_RADIUS * Math.cos(angle);
+    const clusterCy = cy + ORBIT_RADIUS * Math.sin(angle);
+    // Frameless — no card border, no per-cluster background. Just the wheel
+    // and a small floating label anchored to its corner (D0's own pattern).
+    const cluster = document.createElement('div');
+    cluster.className = 'ucluster';
+    cluster.style.left = (clusterCx - px / 2) + 'px';
+    cluster.style.top = (clusterCy - px / 2) + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', px); svg.setAttribute('height', px);
+    svgByVertical[v] = svg;
+    cluster.appendChild(svg);
+    const label = document.createElement('div');
+    label.className = 'ucluster-label';
+    label.innerHTML = '<span class="ucluster-name">' + VERTICAL_LABELS[v] + '</span><span class="ucluster-meta" id="meta-' + v + '"></span>';
+    cluster.appendChild(label);
+    inner.appendChild(cluster);
+    clusterElByVertical[v] = cluster;
+    renderUniverse(v);
+  });
+  applyZoom(); // also redraws the churn-breach overlay
   applyFilters();
 }
 
 function applyFilters() {
-  document.querySelectorAll('#cv g[data-nid]').forEach(el => {
-    const ring = el.getAttribute('data-ring');
-    const vert = el.getAttribute('data-vertical');
-    const show = (state.ringFilter === 'all' || state.ringFilter === ring) && state.activeVerticals.has(vert);
-    el.style.opacity = show ? '1' : '0.08';
-    el.style.pointerEvents = show ? 'auto' : 'none';
+  VERTICALS.forEach(v => {
+    const cluster = clusterElByVertical[v];
+    const svg = svgByVertical[v];
+    if (!cluster || !svg) return;
+    const activeV = state.activeVerticals.has(v);
+    cluster.style.opacity = activeV ? '1' : '0.12';
+    cluster.style.pointerEvents = activeV ? 'auto' : 'none';
+    if (activeV) {
+      svg.querySelectorAll('g[data-nid]').forEach(el => {
+        const ring = el.getAttribute('data-ring');
+        const show = state.ringFilter === 'all' || state.ringFilter === ring;
+        el.style.opacity = show ? '1' : '0.08';
+        el.style.pointerEvents = show ? 'auto' : 'none';
+      });
+    }
   });
-  document.querySelectorAll('#cv g[data-vertical-overlay]').forEach(el => {
-    const v = el.getAttribute('data-vertical-overlay');
-    el.style.opacity = state.activeVerticals.has(v) ? '1' : '0.15';
-  });
+  drawChurnBreaches();
 }
-
-// ════════════════════════════════════════════════════════════════════
-// PAN / ZOOM — same interaction model as every other dashboard in this
-// project (D0/D2): plain scroll wheel zooms, click-drag pans, applied as a
-// CSS transform on #wheel-inner (verbatim technique from
-// dashboard2-whitespace-gap-engine.html) so panning/zooming never re-runs
-// RingEngine's own 60-pass layout — only a selection/mode change redraws
-// the wheel's own content.
-// ════════════════════════════════════════════════════════════════════
-const WHEEL_SIZE = 2700; // fixed internal canvas — comfortably contains RO[4]+vertical-label margin (drawVerticalOverlay reaches hubR+170+label width)
-const zoomState = { zoom: 1, panX: 0, panY: 0 };
-function applyWheelTransform() {
-  document.getElementById('wheel-inner').style.transform = 'translate(' + zoomState.panX + 'px, ' + zoomState.panY + 'px) scale(' + zoomState.zoom + ')';
-}
-function centerWheelView() {
-  const stage = document.getElementById('zoomstage');
-  zoomState.panX = stage.clientWidth / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
-  zoomState.panY = stage.clientHeight / 2 - (WHEEL_SIZE / 2) * zoomState.zoom;
-}
-function fitWheelZoom() {
-  const stage = document.getElementById('zoomstage');
-  const visibleR = RingEngine.DEFAULT_RING.RO[4] + 200;
-  const fit = Math.min(stage.clientWidth || 900, stage.clientHeight || 700) / (2 * visibleR);
-  zoomState.zoom = Math.max(0.15, Math.min(2.5, fit));
-}
-function resetWheelView() { fitWheelZoom(); centerWheelView(); applyWheelTransform(); }
-function zoomWheelBy(delta) {
-  const newZoom = Math.max(0.15, Math.min(2.5, zoomState.zoom + delta));
-  if (newZoom === zoomState.zoom) return;
-  const stage = document.getElementById('zoomstage');
-  const vx = stage.clientWidth / 2, vy = stage.clientHeight / 2;
-  const contentX = (vx - zoomState.panX) / zoomState.zoom, contentY = (vy - zoomState.panY) / zoomState.zoom;
-  zoomState.panX = vx - newZoom * contentX; zoomState.panY = vy - newZoom * contentY;
-  zoomState.zoom = newZoom;
-  applyWheelTransform();
-}
-(function(){
-  document.getElementById('wheel-inner').style.width = WHEEL_SIZE + 'px';
-  document.getElementById('wheel-inner').style.height = WHEEL_SIZE + 'px';
-  const stage = document.getElementById('zoomstage');
-  stage.addEventListener('wheel', e => { e.preventDefault(); zoomWheelBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
-  let drag = null;
-  stage.addEventListener('mousedown', e => { drag = { x: e.clientX, y: e.clientY, panX: zoomState.panX, panY: zoomState.panY, moved: false }; stage.classList.add('dragging'); });
-  stage.addEventListener('mousemove', e => {
-    if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
-    if (drag.moved) { zoomState.panX = drag.panX + dx; zoomState.panY = drag.panY + dy; applyWheelTransform(); }
-  });
-  function endDrag() { drag = null; stage.classList.remove('dragging'); }
-  stage.addEventListener('mouseup', endDrag);
-  stage.addEventListener('mouseleave', endDrag);
-})();
-document.getElementById('zoom-in').addEventListener('click', () => zoomWheelBy(0.15));
-document.getElementById('zoom-out').addEventListener('click', () => zoomWheelBy(-0.15));
-document.getElementById('zoom-reset').addEventListener('click', resetWheelView);
-window.addEventListener('resize', resetWheelView);
 
 // ════════════════════════════════════════════════════════════════════
 // LEFT RAIL
@@ -1026,9 +1145,15 @@ function renderPanel() {
 // BOOT
 // ════════════════════════════════════════════════════════════════════
 function renderAll() { renderRail(); renderWheel(); renderPanel(); }
+// Each cluster's own <svg> has explicit fixed width/height (verticalPx(v)),
+// not "100%", so a window resize doesn't require refitting content — only
+// the pan/zoom viewport around it changes. Rebuilding on resize is kept
+// anyway (cheap, ~300 nodes total) for parity with D0/D4's own resize handler.
+window.addEventListener('resize', renderWheel);
 renderCompBar();
 renderAll();
-resetWheelView();
+centerView();
+applyZoom();
 RingEngine.showOnboardingHint('Scroll to zoom, drag to pan — try the Producer Gap Skew + Node Color Mode selectors above the wheel');
 </script>
 </body>

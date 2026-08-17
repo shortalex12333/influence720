@@ -361,6 +361,9 @@ function pricedGapFor(covNode) {
 // per-file copy. Every real role's own .category resolves 1:1 against these 9 names (verified,
 // same finding dashboard4's own fix-note documents). ────────────────────────────────────────
 const domains = TEMPLATE_ONTOLOGY.segments.map(s => ({ id: s.id, name: s.name, col: s.col }));
+// Hoisted above its original "CENTER CANVAS" section — now also needed by refreshAccountOptions()'s
+// richness ranking, which runs before that section's own script order would otherwise define it.
+const VERTICAL_ORDER = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
 const categoryDomainId = new Map(domains.map(d => [d.name, d.id]));
 const colorByCategory = new Map(domains.map(d => [d.name, d.col]));
 
@@ -579,10 +582,24 @@ function refreshAccountOptions() {
     const o = document.createElement('option'); o.value = id; o.textContent = accountLabel(id);
     selAccount.appendChild(o);
   });
-  // Prefer an account that actually has at least one real conversion path — never default
-  // silently into the empty state when a populated account is one click away.
-  let withPaths = ids.find(id => computePaths(state.producerId, id).length > 0);
-  state.uboId = withPaths || ids[0] || null;
+  // Default to the account with the richest real cross-vertical Trojan Horse footprint in this
+  // producer's own book — not merely the first account that happens to have any path at all.
+  // "First that qualifies" landed on accounts like PRIN.MARCHETTI (1 of 5 verticals populated,
+  // 0 cross-vertical paths) purely by list order, making the pentagon look sparse/broken by
+  // accident rather than by the account's real substance. Ranked by: verticals actually
+  // populated (the pentagon's own "how much of the wheel is real" signal) > cross-vertical
+  // paths (this dashboard's actual mission — a same-vertical path is real but not the point) >
+  // total path count.
+  let best = null, bestKey = null;
+  ids.forEach(id => {
+    const vertsPopulated = VERTICAL_ORDER.filter(v => rolesFor(id, v).length > 0).length;
+    const paths = computePaths(state.producerId, id);
+    const crossVert = paths.filter(p => p.crossVertical).length;
+    const key = [vertsPopulated, crossVert, paths.length];
+    if (!bestKey || key[0] > bestKey[0] || (key[0] === bestKey[0] && key[1] > bestKey[1]) ||
+        (key[0] === bestKey[0] && key[1] === bestKey[1] && key[2] > bestKey[2])) { best = id; bestKey = key; }
+  });
+  state.uboId = best || ids[0] || null;
   selAccount.value = state.uboId;
 }
 refreshAccountOptions();
@@ -590,11 +607,17 @@ refreshAccountOptions();
 let currentPaths = [];
 function recompute() {
   currentPaths = computePaths(state.producerId, state.uboId);
-  state.selectedPathId = null;
+  // Auto-select the top-ranked (highest Trojan Opportunity Score) path by default — same "never
+  // land on an empty state when a populated one is one click away" discipline dashboard2's own
+  // renderCenter() already uses. currentPaths is already sorted desc by .tos (computePaths).
+  // Without this the gold conversion edge, cross-vertical jump ring, and full right-panel chain
+  // never appear until the user happens to click a row — the canvas reads as "just dots."
+  const top = currentPaths[0] || null;
+  state.selectedPathId = top ? top.id : null;
   state.focus = null;
   renderRail();
-  renderPanel(null);
-  centerView();
+  renderPanel(top);
+  fitAndCenterView();
   renderAll();
 }
 
@@ -822,7 +845,6 @@ function renderPanel(p) {
 // selected account's own book in that vertical (not by role count, D0's own convention) —
 // per the founder's explicit item-1 instruction for D4/D5/D6.
 // ════════════════════════════════════════════════════════════════════
-const VERTICAL_ORDER = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
 const ORBIT_RADIUS = 560;
 const CANVAS_SIZE = 1800;
 const svgByVertical = {};
@@ -1044,12 +1066,35 @@ function zoomBy(delta) {
 }
 document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
 document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
-document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+document.getElementById('zoom-reset').addEventListener('click', () => { fitAndCenterView(); applyZoom(); });
 
-function centerView() {
+// Auto-fit zoom — computes a zoom level that brings the WHOLE pentagon (all 5 vertical wheels,
+// each sized per this account's own real $ magnitude via pxFor) inside the current viewport on
+// load, account switch, and rail collapse/resize. Previously the canvas centered at a fixed
+// zoom=1 on the pentagon's mathematical midpoint — a point no cluster actually occupies — so
+// only one of the five wheels (whichever landed nearest that midpoint) was ever visible without
+// the user manually scroll-zooming out first. That made even a genuinely rich, fully cross-
+// vertical account look like "three lonely dots in a void."
+function fitAndCenterView() {
   const canvas = document.getElementById('universe-canvas');
-  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
-  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  const uboId = state.uboId;
+  const maxTotal = maxVertTotalForAccount(uboId);
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  VERTICAL_ORDER.forEach((v, i) => {
+    const px = pxFor(uboId, v, maxTotal);
+    const angle = (2 * Math.PI * i / VERTICAL_ORDER.length) - Math.PI / 2;
+    const ccx = cx + ORBIT_RADIUS * Math.cos(angle), ccy = cy + ORBIT_RADIUS * Math.sin(angle);
+    minX = Math.min(minX, ccx - px / 2); maxX = Math.max(maxX, ccx + px / 2);
+    minY = Math.min(minY, ccy - px / 2); maxY = Math.max(maxY, ccy + px / 2);
+  });
+  const contentW = maxX - minX, contentH = maxY - minY;
+  const contentCx = (minX + maxX) / 2, contentCy = (minY + maxY) / 2;
+  const PAD = 0.88; // real margin so cluster labels/legend/rail don't crowd the pentagon's edge
+  const fitZoom = Math.min(canvas.clientWidth / contentW, canvas.clientHeight / contentH) * PAD;
+  state.zoom = Math.max(0.3, Math.min(2.5, fitZoom));
+  state.panX = canvas.clientWidth / 2 - contentCx * state.zoom;
+  state.panY = canvas.clientHeight / 2 - contentCy * state.zoom;
 }
 
 const canvasEl = document.getElementById('universe-canvas');
@@ -1066,18 +1111,19 @@ function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
 canvasEl.addEventListener('mouseup', endDrag);
 canvasEl.addEventListener('mouseleave', endDrag);
 
-window.addEventListener('resize', () => { renderAll(); });
+window.addEventListener('resize', () => { fitAndCenterView(); renderAll(); });
 
-// lr collapse toggle — same chrome behavior as dashboard2/dashboard4
+// lr collapse toggle — same chrome behavior as dashboard2/dashboard4. Re-fits after the collapse
+// transition finishes so the pentagon re-centers into the newly-widened canvas rather than
+// staying anchored to the old (narrower) viewport's fit.
 document.getElementById('lr-toggle').addEventListener('click', () => {
   document.getElementById('lr-wrap').classList.toggle('collapsed');
-  setTimeout(renderAll, 260);
+  setTimeout(() => { fitAndCenterView(); renderAll(); }, 260);
 });
 
 // ════════════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════════════
-centerView();
 recompute();
 </script>
 </body>

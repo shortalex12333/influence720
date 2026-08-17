@@ -620,14 +620,37 @@ function zoomBy(delta) {
   state.zoom = newZoom;
   applyZoom();
 }
-function centerView() {
+// Auto-fit zoom — same fix applied to dashboard5-micro-warfare.html after the founder's live
+// D5 inspection showed only ~1 of 5 pentagon wheels on load: the old centerView() centered at
+// zoom=1 on the pentagon's mathematical midpoint, a point no cluster actually occupies, so most
+// of the pentagon sat outside the viewport until the user manually scroll-zoomed out. D4's own
+// verification report ("Zoomed-out screenshot shows 5 visually distinct wheel shapes") confirms
+// the same gap — the pentagon was only ever confirmed visible after a deliberate zoom-out, not
+// at the real default. Computes a real bounding-box fit over all 5 clusters (verticalPx(v) is
+// stable across producer-skew/filter toggles — those only recolor/relabel, never resize a
+// cluster — so this fit is valid for the page's whole lifetime, not recomputed per-toggle).
+function fitAndCenterView() {
   const canvas = document.getElementById('universe-canvas');
-  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
-  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  VERTICALS.forEach((v, i) => {
+    const px = verticalPx(v);
+    const angle = (2 * Math.PI * i / VERTICALS.length) - Math.PI / 2;
+    const ccx = cx + ORBIT_RADIUS * Math.cos(angle), ccy = cy + ORBIT_RADIUS * Math.sin(angle);
+    minX = Math.min(minX, ccx - px / 2); maxX = Math.max(maxX, ccx + px / 2);
+    minY = Math.min(minY, ccy - px / 2); maxY = Math.max(maxY, ccy + px / 2);
+  });
+  const contentW = maxX - minX, contentH = maxY - minY;
+  const contentCx = (minX + maxX) / 2, contentCy = (minY + maxY) / 2;
+  const PAD = 0.88; // real margin so cluster labels/legend/rail don't crowd the pentagon's edge
+  const fitZoom = Math.min(canvas.clientWidth / contentW, canvas.clientHeight / contentH) * PAD;
+  state.zoom = Math.max(0.25, Math.min(2.5, fitZoom));
+  state.panX = canvas.clientWidth / 2 - contentCx * state.zoom;
+  state.panY = canvas.clientHeight / 2 - contentCy * state.zoom;
 }
 document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
 document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
-document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+document.getElementById('zoom-reset').addEventListener('click', () => { fitAndCenterView(); applyZoom(); });
 (function(){
   const canvasEl = document.getElementById('universe-canvas');
   canvasEl.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
@@ -879,7 +902,10 @@ function renderRail() {
 
 document.getElementById('vfilter-reset').addEventListener('click', () => { state.activeVerticals = new Set(VERTICALS); renderVCards(); applyFilters(); });
 document.getElementById('sel-ring').addEventListener('change', e => { state.ringFilter = e.target.value; applyFilters(); });
-document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+document.getElementById('lr-toggle').addEventListener('click', () => {
+  document.getElementById('lr-wrap').classList.toggle('collapsed');
+  setTimeout(() => { fitAndCenterView(); applyZoom(); }, 260);
+});
 
 // Producer Gap Skew — same 5 real producers rosters.js already loads for
 // D1's own producer picker (Alex/Rahul/Jacob/Cristian/Naomi); selecting one
@@ -1111,10 +1137,10 @@ function renderAll() { renderRail(); renderWheel(); renderPanel(); }
 // not "100%", so a window resize doesn't require refitting content — only
 // the pan/zoom viewport around it changes. Rebuilding on resize is kept
 // anyway (cheap, ~300 nodes total) for parity with D0's own resize handler.
-window.addEventListener('resize', renderWheel);
+window.addEventListener('resize', () => { fitAndCenterView(); applyZoom(); renderWheel(); });
 renderCompBar();
 renderAll();
-centerView();
+fitAndCenterView();
 applyZoom();
 RingEngine.showOnboardingHint('Toggle Light / Dark mode with the switch in the top bar');
 </script>

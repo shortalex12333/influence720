@@ -1,0 +1,10 @@
+{
+  "name": "influence720",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Influence 720 Executive Platform & 720 Radial Suite",
+  "scripts": {
+    "build": "echo 'Static build complete'",
+    "vercel-build": "echo 'Static build complete'"
+  }
+}

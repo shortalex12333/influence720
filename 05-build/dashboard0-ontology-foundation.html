@@ -397,7 +397,7 @@ function zoomBy(delta) {
 }
 document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
 document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
-document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+document.getElementById('zoom-reset').addEventListener('click', () => { fitAndCenterView(); applyZoom(); });
 
 /* ══════════════════════════════════════════════════════════════════
    FILTER CONTROLS — 360's own header Filters-popover mechanic (same
@@ -604,10 +604,30 @@ function updateFilterCountLabel() {
   lbl.textContent = `${matching} of ${TOTAL_ROLE_COUNT} roles match`;
 }
 
-function centerView() {
+// Auto-fit zoom — same fix applied across D4/D5/D6 after the founder's live D5 inspection
+// showed only ~1 of 5 pentagon wheels on load: the old centerView() centered at zoom=1 on the
+// pentagon's mathematical midpoint, a point no cluster actually occupies, so at typical viewport
+// sizes most of the pentagon sat outside the viewport by default (this file's own math: 5
+// clusters up to ~570px each on an ORBIT_RADIUS=560 ring is a ~1690px-wide pentagon, well past
+// most viewports at zoom=1). Computes a real bounding-box fit over all 5 clusters instead.
+function fitAndCenterView() {
   const canvas = document.getElementById('universe-canvas');
-  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
-  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  VERTICAL_ORDER.forEach((v, i) => {
+    const px = pxFor(universes[v]);
+    const angle = (2 * Math.PI * i / VERTICAL_ORDER.length) - Math.PI / 2;
+    const ccx = cx + ORBIT_RADIUS * Math.cos(angle), ccy = cy + ORBIT_RADIUS * Math.sin(angle);
+    minX = Math.min(minX, ccx - px / 2); maxX = Math.max(maxX, ccx + px / 2);
+    minY = Math.min(minY, ccy - px / 2); maxY = Math.max(maxY, ccy + px / 2);
+  });
+  const contentW = maxX - minX, contentH = maxY - minY;
+  const contentCx = (minX + maxX) / 2, contentCy = (minY + maxY) / 2;
+  const PAD = 0.88; // real margin so cluster labels/legend don't crowd the pentagon's edge
+  const fitZoom = Math.min(canvas.clientWidth / contentW, canvas.clientHeight / contentH) * PAD;
+  state.zoom = Math.max(0.35, Math.min(2.5, fitZoom));
+  state.panX = canvas.clientWidth / 2 - contentCx * state.zoom;
+  state.panY = canvas.clientHeight / 2 - contentCy * state.zoom;
 }
 
 function selectRole(id) {
@@ -763,10 +783,10 @@ function renderPanel() {
   panBtn.addEventListener('click', () => { panWrap.classList.toggle('collapsed'); panBtn.textContent = panWrap.classList.contains('collapsed') ? '◂' : '▸'; });
 })();
 
-window.addEventListener('resize', renderAll);
+window.addEventListener('resize', () => { fitAndCenterView(); renderAll(); });
 
 renderAll();
-centerView();
+fitAndCenterView();
 applyZoom();
 renderPanel();
 

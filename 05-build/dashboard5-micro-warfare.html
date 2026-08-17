@@ -16,6 +16,21 @@
 :root{--status-deficient:#a15a2e}
 body.theme-dark{--status-deficient:#e0916a}
 
+/* Node/edge state palette — FIXED hex per the founder's directive (item 2/4), not theme-
+   adaptive tokens: these four colors are the dashboard's own real-state vocabulary (SFDC
+   intimacy+bound / expiring<90d / priced gap / silo) and the two edge colors (Trojan
+   conversion, fiduciary breach) — same hue in light or dark so a color always means the
+   same real thing regardless of theme. */
+:root{--tj-green:#22c55e;--tj-amber:#eab308;--tj-red:#ef4444;--tj-purple:#a855f7;--tj-gold:#dcae5c}
+
+/* D1-measured rail/drawer widths — the SAME local override already proven correct on
+   dashboard2/dashboard6, applied here rather than left at style-core.css's own defaults
+   (340px/420px). */
+.lr-wrap{width:300px}
+.lr-wrap.collapsed{width:0}
+.panel-wrap{width:320px}
+.panel-wrap:not(.collapsed) #panel{padding:16px}
+
 .h-filters{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:9px 20px;border-bottom:1px solid var(--border2);background:var(--surface)}
 
 /* Left rail path rows */
@@ -27,6 +42,10 @@ body.theme-dark{--status-deficient:#e0916a}
 .lr-row.active .path-chain{color:var(--btnactivetext);opacity:.85}
 .score-pill{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--surface3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;font-variant-numeric:tabular-nums}
 .lr-row.active .score-pill{background:rgba(255,255,255,.18);color:var(--btnactivetext);border-color:transparent}
+.tos-amt{font-size:16px;font-weight:900;color:var(--tj-gold);font-variant-numeric:tabular-nums}
+.lr-row.active .tos-amt{color:var(--btnactivetext)}
+.cross-tag{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:999px;background:rgba(220,174,92,.16);color:var(--tj-gold);border:1px solid rgba(220,174,92,.4);margin-top:5px}
+.lr-row.active .cross-tag{background:rgba(255,255,255,.18);color:var(--btnactivetext);border-color:transparent}
 .empty-state{padding:22px 16px;text-align:center;color:var(--text3);font-size:12.5px;line-height:1.6}
 
 /* Path chain visualization in the right panel */
@@ -37,7 +56,7 @@ body.theme-dark{--status-deficient:#e0916a}
 .chain-role{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
 .chain-name{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.3;margin-top:2px}
 .chain-sub{font-size:11.5px;color:var(--text2);line-height:1.45;margin-top:2px}
-.chain-link{margin-left:5px;padding:6px 0 6px 21px;border-left:2px dashed var(--border2);position:relative}
+.chain-link{margin-left:5px;padding:6px 0 6px 21px;border-left:2px dashed var(--tj-gold);position:relative}
 .chain-link-why{font-size:11.5px;font-style:italic;color:var(--text2);line-height:1.5}
 .chain-link-freq{display:inline-block;margin-top:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--surface3);color:var(--text3)}
 .chain-gap{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
@@ -58,25 +77,68 @@ body.theme-dark{--status-deficient:#e0916a}
 .formula-row b{color:var(--text)}
 .formula-eq{border-top:1px solid var(--border);margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-weight:800;color:var(--text)}
 
-.legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:6px;max-width:260px}
+/* Statutory / limit-deficiency / GWP-benchmark box (right drawer, box 4) */
+.statute-row{margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.statute-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.statute-jur{font-size:11px;font-weight:800;color:var(--text)}
+.statute-req{font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:3px}
+.sub-limit-row{font-size:11px;color:var(--text3);line-height:1.5;margin-top:4px;padding-left:10px;border-left:2px solid var(--border2)}
+.deficiency-line{font-size:16px;font-weight:900;color:var(--status-deficient);margin-top:2px}
+.gwp-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;font-size:11.5px;color:var(--text2);margin-top:8px;line-height:1.5}
+.gwp-chip-trend{font-size:15px;font-weight:900;flex-shrink:0}
+.gwp-chip-trend.up{color:var(--status-unbound)}
+.gwp-chip-trend.down{color:var(--status-bound)}
+.gwp-chip-trend.flat{color:var(--text3)}
+.no-source-flag{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+
+/* ══════════════════════════════════════════════════════════════════
+   PENTAGON-OF-5-WHEELS CANVAS — reused verbatim from dashboard0-ontology-
+   foundation.html: five independent <svg> clusters on a shared pannable/
+   zoomable coordinate space, frameless (no card border, no background per
+   cluster), each with a small floating corner label. NOT one combined wheel
+   with vertical-offset domains — that pattern (dashboard4/6's own, being
+   corrected away from) is deliberately not used here.
+   ══════════════════════════════════════════════════════════════════ */
+/* #cv-wrap (style-core.css) is the flex:1 sized box; .universe-canvas fills it via absolute
+   inset rather than its own flex:1 — it sits inside #cv-wrap, which is a flex ITEM of .main,
+   not itself a flex CONTAINER, so flex:1 here would do nothing and the box would instead grow
+   to fit #canvas-inner's own 1800px content (verified live: that exact bug, fixed here). */
+.universe-canvas{position:absolute;inset:0;overflow:hidden;cursor:grab}
+.universe-canvas.dragging{cursor:grabbing}
+#canvas-inner{position:relative;transform-origin:0 0}
+.ucluster{position:absolute}
+.ucluster svg{overflow:visible;cursor:pointer;display:block}
+.ucluster-label{position:absolute;top:8px;left:12px;pointer-events:none;display:flex;flex-direction:column;gap:1px;max-width:220px}
+.ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.ucluster-meta{font-size:10.5px;color:var(--text3);line-height:1.4}
+.ucluster-meta strong{color:var(--text2);font-variant-numeric:tabular-nums}
+#cross-link-overlay{position:absolute;top:0;left:0;pointer-events:none;z-index:5}
+.canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
+
+.legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:6px;max-width:270px;max-height:85%;overflow:auto}
 .legend-row{display:flex;align-items:center;gap:7px}
 .legend-swatch{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.legend-line{width:16px;height:2px;flex-shrink:0}
+.legend-head{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:4px}
+.legend-head:first-child{margin-top:0}
 </style>
 </head>
 <body>
 
 <header>
   <div class="h-left">
-    <div class="h-left-row">
-      <a href="index.html" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
-      <div class="h-title">Trojan Horse — Micro Warfare Canvas</div>
-    </div>
-    <div class="h-sub">One account, one producer. Every row is a real path: a Salesforce contact this producer already knows, a real knows-edge into the role that owns a specific priced coverage gap on this account, and the gap itself. Click a path to see the execution chain, an approach brief, and a credibility score.</div>
+    <div class="h-title">Trojan Horse — Micro Warfare Canvas</div>
+    <div class="h-sub">One account, one producer, five vertical wheels. Every rail row is a real path: a Salesforce contact this producer already knows, a real knows-edge into the role that owns a specific priced coverage gap on this account — possibly in a different vertical entirely — and the gap itself. Click a path to see the execution chain, an approach brief, a credibility score, and the real statutory/limit/benchmark brief behind the number.</div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
       <a class="suite-nav-item" href="dashboard0-ontology-foundation.html" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard1-tactical-map-v2.dc.html" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard2-whitespace-gap-engine.html" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard3-gap-radial.dc.html" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="dashboard4-role-macro-view.html" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D5 Micro — Trojan Horse</span>
     </nav>
   </div>
   <div class="h-ctrl">
+    <div class="filter-group" style="min-width:190px"><span class="filter-lbl">Producer Override</span>
+      <select class="filter-sel" id="sel-producer"></select>
+    </div>
     <span class="vtag" id="whole-book-tag">—</span>
     <div class="theme-switch-wrap">
       <span class="theme-switch-lbl">Light</span>
@@ -87,9 +149,6 @@ body.theme-dark{--status-deficient:#e0916a}
 </header>
 
 <div class="h-filters">
-  <div class="filter-group"><span class="filter-lbl">Producer</span>
-    <select class="filter-sel" id="sel-producer"></select>
-  </div>
   <div class="filter-group"><span class="filter-lbl">Account (UBO)</span>
     <select class="filter-sel" id="sel-account"></select>
   </div>
@@ -100,9 +159,36 @@ body.theme-dark{--status-deficient:#e0916a}
       <option value="deficient">Deficient (under limit) only</option>
     </select>
   </div>
+  <div class="filter-group"><span class="filter-lbl">Vertical Petal</span>
+    <select class="filter-sel" id="sel-vertical">
+      <option value="all">All 5 verticals</option>
+      <option value="yacht">Yacht</option>
+      <option value="aviation">Aviation</option>
+      <option value="real_estate">Real Estate</option>
+      <option value="auto">Auto</option>
+      <option value="personal">Personal</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Intimacy</span>
+    <select class="filter-sel" id="sel-intimacy">
+      <option value="all">Any relationship_weight</option>
+      <option value="hot">Hot (≥7.0)</option>
+      <option value="warm">Warm (4.0–6.9)</option>
+      <option value="cold">Cold (&lt;4.0)</option>
+    </select>
+  </div>
+  <div class="filter-group"><span class="filter-lbl">Fiduciary Severity</span>
+    <select class="filter-sel" id="sel-severity">
+      <option value="all">Any ring</option>
+      <option value="1">Critical — Ring 1 Signatory</option>
+      <option value="2">High — Ring 2 Conditional</option>
+      <option value="3">Moderate — Ring 3 Transaction</option>
+      <option value="4">Low — Ring 4 Operational</option>
+    </select>
+  </div>
   <div style="flex:1"></div>
   <div class="filter-group"><span class="filter-lbl">Ranked By</span>
-    <div class="vtag" style="padding:4px 10px;font-size:11px">Financial Credibility Score, high → low</div>
+    <div class="vtag" style="padding:4px 10px;font-size:11px">Trojan Opportunity Score ($), high → low</div>
   </div>
 </div>
 
@@ -119,14 +205,28 @@ body.theme-dark{--status-deficient:#e0916a}
   </div>
 
   <div id="cv-wrap">
-    <svg id="cv"></svg>
+    <div class="universe-canvas" id="universe-canvas">
+      <div id="canvas-inner"></div>
+      <div class="canvas-zoom-ctrl">
+        <button id="zoom-in">+</button>
+        <button id="zoom-out">&minus;</button>
+        <button class="wide" id="zoom-reset">Reset view</button>
+      </div>
+    </div>
     <div class="legend">
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--accent)"></span>Selected known contact</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-unbound)"></span>Target role — unbound gap</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-deficient)"></span>Target role — deficient limit</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#3fa0c9;opacity:.7"></span>Other known contact (this producer)</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.35"></span>Untapped role</div>
-      <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--accent);background:transparent"></span>Selected chain edge (bold line)</div>
+      <div class="legend-head">Role node — real state</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-amber)"></span>Policy expiring &lt;90d</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-green)"></span>Active SFDC intimacy or bound policy</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-red)"></span>Unplaced Coverage Corpus gap — Trojan target</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--tj-purple)"></span>Silo — no known relationship, no policy on file</div>
+      <div class="legend-head">Satellite (per coverage line)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#3fae60"></span>Bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#c99a1f"></span>Expiring &lt;90d</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#b05a54;opacity:.65"></span>Whitespace gap</div>
+      <div class="legend-head">Edges</div>
+      <div class="legend-row"><span class="legend-line" style="border-top:3px dashed var(--tj-gold)"></span>Selected Trojan Horse conversion path</div>
+      <div class="legend-row"><span class="legend-line" style="border-top:3px solid var(--tj-red)"></span>Fiduciary breach — Ring 1 signatory, open gap</div>
+      <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--tj-gold);background:transparent"></span>Cross-vertical jump endpoint</div>
     </div>
   </div>
 
@@ -140,10 +240,11 @@ body.theme-dark{--status-deficient:#e0916a}
 <script src="data/overlays.js"></script>
 <script src="data/rosters.js"></script>
 <script src="data/coverage-corpus.js"></script>
+<script src="data/template-ontology.js"></script>
 <script src="engine/render-core.js"></script>
 <script>
 RingEngine.theme.apply();
-document.getElementById('theme-toggle').addEventListener('click', () => { RingEngine.theme.toggle(); drawGraph(); });
+document.getElementById('theme-toggle').addEventListener('click', () => { RingEngine.theme.toggle(); renderAll(); });
 
 // ════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -157,6 +258,14 @@ function fmt$(v){
   return '$' + Math.round(v).toLocaleString();
 }
 function fmt$Full(v){ return v == null ? '—' : '$' + Math.round(v).toLocaleString(); }
+// Fixed anchor date — same convention dashboard2-whitespace-gap-engine.html's own TODAY
+// constant uses, so "expiring <90d" means the identical real calendar window on both pages
+// rather than drifting with the visitor's own system clock.
+const TODAY = new Date('2026-08-15T00:00:00Z');
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  return Math.round((new Date(dateStr + 'T00:00:00Z') - TODAY) / 86400000);
+}
 
 // ════════════════════════════════════════════════════════════════════
 // INDICES over the shared dataset — same pattern as dashboard1-tactical-map-v2.dc.html
@@ -175,6 +284,7 @@ const covsByAsset = new Map();
 covNodes.forEach(c => { if (!covsByAsset.has(c.parent_asset_ref)) covsByAsset.set(c.parent_asset_ref, []); covsByAsset.get(c.parent_asset_ref).push(c); });
 const rolesByAccount = new Map();
 roleNodes.forEach(n => { if (!rolesByAccount.has(n.account_ref)) rolesByAccount.set(n.account_ref, []); rolesByAccount.get(n.account_ref).push(n); });
+function rolesFor(uboId, vertical) { return (rolesByAccount.get(uboId) || []).filter(r => r.vertical === vertical); }
 
 // rwIndex — "SFDC Known Contact" = a role node with a real RELATIONSHIP_WEIGHTS row for the
 // current producer. Verified live: every RELATIONSHIP_WEIGHTS.node_id resolves to a role node,
@@ -191,6 +301,13 @@ EDGES_720.filter(e => e.edge_type === 'knows').forEach(e => {
 });
 
 const overlayByCovId = new Map(BOUND_POLICY_OVERLAY.map(o => [o.coverage_id, o]));
+// Coverage responsibility rows per role — same real FK dashboard2's own drawSatellitesAndBreaches()
+// reads (BOUND_POLICY_OVERLAY.responsible_node_id -> role.id, verified 5,722/5,722 resolve).
+const overlayRowsByRole = new Map();
+BOUND_POLICY_OVERLAY.forEach(o => {
+  if (!overlayRowsByRole.has(o.responsible_node_id)) overlayRowsByRole.set(o.responsible_node_id, []);
+  overlayRowsByRole.get(o.responsible_node_id).push(o);
+});
 
 // ── Limit-adequacy catalog — direct client-side port of dashboard2-whitespace-gap-engine.html's
 // baselineLimitFor()/aviationTier(), same catalog (data/coverage-corpus.js), same tier logic,
@@ -199,6 +316,7 @@ const covCatalogByKey = new Map();
 Object.keys((typeof COVERAGE_CORPUS !== 'undefined' && COVERAGE_CORPUS.verticals) || {}).forEach(v => {
   COVERAGE_CORPUS.verticals[v].forEach(entry => covCatalogByKey.set(v + '|' + entry.coverage_type_id, entry));
 });
+const rateTrendByType = (typeof GWP_RATE_TREND !== 'undefined') ? GWP_RATE_TREND : {};
 const AVIATION_TIER_KEYWORDS = { light: ['Sikorsky', 'Citation', 'H175'], mid: ['Challenger', 'Falcon'], heavy: ['Gulfstream', 'Global'] };
 const AVIATION_TIERS = ['light', 'mid', 'heavy'];
 function aviationTier(assetLabel) {
@@ -238,22 +356,19 @@ function pricedGapFor(covNode) {
   return null;
 }
 
-// ── Category → 9-segment domain color, verbatim from dashboard1-tactical-map-v2.dc.html
-// (CATEGORY_COLOR_BY_NAME, direct 1:1 name match, no more thematic-approximation). ────────────
-const CATEGORY_COLOR_BY_NAME = {
-  'Ownership & Structure': '#6a9de0', 'Legal & Finance': '#3a7fd4', 'Compliance & Certification': '#2a9a8a',
-  'Insurance & Risk Market': '#c9a84c', 'Acquisition & Disposal': '#6aaa44', 'Build, Fit-Out & Refit': '#e07a30',
-  'Operations & Crew': '#cc5555', 'Usage & Experience': '#aa44aa', 'Back-Office & Third-Party Management': '#4488aa',
-};
-const CATEGORIES = Array.from(new Set(roleNodes.map(n => n.category))).sort();
-const domains = CATEGORIES.map((c, i) => ({ id: i + 1, name: c, col: CATEGORY_COLOR_BY_NAME[c] || '#6a9de0' }));
+// ── 9-segment domain wheel — read LIVE off TEMPLATE_ONTOLOGY.segments, the exact same object
+// dashboard0-ontology-foundation.html treats as its own SEGMENTS constant, not a hand-typed
+// per-file copy. Every real role's own .category resolves 1:1 against these 9 names (verified,
+// same finding dashboard4's own fix-note documents). ────────────────────────────────────────
+const domains = TEMPLATE_ONTOLOGY.segments.map(s => ({ id: s.id, name: s.name, col: s.col }));
 const categoryDomainId = new Map(domains.map(d => [d.name, d.id]));
+const colorByCategory = new Map(domains.map(d => [d.name, d.col]));
 
-// ── Composite score / size — ported verbatim from dashboard1-tactical-map-v2.dc.html
+// ── Composite score / authority size — ported verbatim from dashboard1-tactical-map-v2.dc.html
 // (Influence 360's own nR()/compScore()/proxScore(), weights unchanged: do not edit). ─────────
 function proxScore(d) { return Math.max(0, 10 - ((d ?? 4) - 1) * 2); }
 function compScore(n) { return ((n.coi_weight || 1) * 0.5) + ((n.coi_freq || 1) * 0.3) + (proxScore(n.decision_dist) * 0.2); }
-function nR(n) {
+function authorityR(n) {
   const comp = compScore(n);
   const minR = ({ 1: 11, 2: 8, 3: 6, 4: 5 })[n.ring] ?? 5;
   const maxR = ({ 1: 22, 2: 16, 3: 12, 4: 9 })[n.ring] ?? 9;
@@ -261,22 +376,73 @@ function nR(n) {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// FINANCIAL CREDIBILITY SCORE
+// PER-ROLE REAL $ MAGNITUDE — bound premium (bound/expiring) + estimated GWP (unbound), summed
+// straight off every real coverage line this exact role is the on-file responsible party for
+// (BOUND_POLICY_OVERLAY.responsible_node_id), same convention dashboard4's own roleFin uses.
+// Drives both node radius (item 2: "size by role authority + real Epic GWP $ magnitude") and
+// each vertical wheel's own cluster size (item: size communicates the real $ signal).
+// ════════════════════════════════════════════════════════════════════
+const roleDollarCache = new Map();
+function roleDollarTotal(roleId) {
+  if (roleDollarCache.has(roleId)) return roleDollarCache.get(roleId);
+  const rows = overlayRowsByRole.get(roleId) || [];
+  let total = 0;
+  rows.forEach(o => { total += (o.status === 'unbound' ? (o.gwp_estimate || 0) : (o.bound_premium || 0)); });
+  roleDollarCache.set(roleId, total);
+  return total;
+}
+let MAX_ROLE_DOLLAR = 1;
+roleNodes.forEach(n => { MAX_ROLE_DOLLAR = Math.max(MAX_ROLE_DOLLAR, roleDollarTotal(n.id)); });
+// Node radius = authority-tier baseline, inflated up to 35% further by this role's own real $
+// magnitude relative to the single largest role-dollar figure anywhere in the book — so two
+// Ring-1 signatories with identical authority still visibly differ if one carries $2M of real
+// premium/estimate and the other carries $20K.
+function nodeRadius(n) {
+  const base = authorityR(n);
+  const mag = MAX_ROLE_DOLLAR > 0 ? Math.sqrt(Math.max(0, roleDollarTotal(n.id)) / MAX_ROLE_DOLLAR) : 0;
+  return base * (0.65 + 0.35 * mag);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ROLE NODE STATE — the real 4-color encoding (item 2). Priority cascade, each rung a real
+// field, never a placeholder: an expiring policy is the most time-urgent real signal, so it
+// outranks a role that also happens to be a known contact; a role with neither an active
+// relationship nor a bound line but WITH a real priced gap is the Trojan target; anything left
+// (no relationship, no bound line, no gap on file at all) is genuinely untouched — a silo.
+// ════════════════════════════════════════════════════════════════════
+function roleNodeState(role, producerId) {
+  const rows = overlayRowsByRole.get(role.id) || [];
+  const hasNearExpiry = rows.some(o => { const d = daysUntil(o.expiry_date); return d != null && d >= 0 && d < 90; });
+  if (hasNearExpiry) return { color: 'var(--tj-amber)', label: 'Expiring <90d' };
+  const hasBound = rows.some(o => o.status === 'bound');
+  if (hasBound || isKnown(producerId, role.id)) return { color: 'var(--tj-green)', label: hasBound ? 'Bound + active intimacy' : 'Active SFDC intimacy' };
+  const hasGap = rows.some(o => { const cn = nodeById.get(o.coverage_id); return cn && pricedGapFor(cn); });
+  if (hasGap) return { color: 'var(--tj-red)', label: 'Unplaced gap — Trojan target' };
+  return { color: 'var(--tj-purple)', label: 'Silo — unmapped' };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SATELLITES — per-coverage-line 4-state badge orbiting the role's own rendered position, same
+// technique dashboard2-whitespace-gap-engine.html's drawSatellitesAndBreaches() already proved
+// out: sqrt-scaled real $ radius, read straight off RingEngine's own returned (x,y,r) layout.
+// ════════════════════════════════════════════════════════════════════
+let MAX_SAT_VALUE = 1;
+BOUND_POLICY_OVERLAY.forEach(o => { const v = (o.status === 'unbound' ? o.gwp_estimate : o.bound_premium) || 0; if (v > MAX_SAT_VALUE) MAX_SAT_VALUE = v; });
+function satRadius(v) { const MIN = 2.6, MAX = 7.5; return MIN + Math.sqrt(Math.max(0, v || 0) / MAX_SAT_VALUE) * (MAX - MIN); }
+function satelliteState(covNode, o) {
+  if (o.status === 'expiring') { const d = daysUntil(o.expiry_date); if (d != null && d >= 0 && d < 90) return { color: '#c99a1f', label: 'Expiring <90d' }; }
+  const gap = pricedGapFor(covNode);
+  if (!gap) return { color: '#3fae60', label: 'Bound' };
+  return { color: '#b05a54', op: 0.65, label: gap.kind === 'unbound' ? 'Whitespace gap' : 'Deficient limit' };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FINANCIAL CREDIBILITY SCORE (preserved verbatim — the existing, already-shown-live formula)
 // A real, traceable number: how warm is the entry path × how well the edge is actually
-// working right now × how big is the real dollar prize. A warmer, more active path to a
-// bigger real gap scores higher — nothing here is fabricated per-path; every input is a
-// field that already exists on RELATIONSHIP_WEIGHTS / EDGES_720 / BOUND_POLICY_OVERLAY.
-//
+// working right now × how big is the real dollar prize.
 //   score = relationship_weight (producer↔known-contact, RELATIONSHIP_WEIGHTS.relationship_weight, 0–10ish)
 //         × edge_confidence(freq)   (how live EDGES_720's own real 'freq' cadence field is)
-//         × (gap_dollar / 10,000)   (the real priced $ size of the gap, unbound gwp_estimate
-//                                    or deficient limit-shortfall, scaled to a $10K unit)
-//
-// edge_confidence is a fixed lookup on EDGES_720's own real freq values (verified: 9 distinct
-// values occur in the live data — transaction-triggered/weekly/monthly/quarterly/annual/
-// as-needed/dormant/"should be weekly, now silent"/"should be monthly, now silent"). Active
-// cadences score near 1.0; the two "now silent" values and "dormant" — a decayed edge that
-// LOOKS structurally real but isn't currently working — score low, same as dormant itself.
+//         × (gap_dollar / 10,000)   (the real priced $ size of the gap)
 // ════════════════════════════════════════════════════════════════════
 const EDGE_CONFIDENCE = {
   'transaction-triggered': 1.00, 'weekly': 1.00, 'monthly': 0.85, 'quarterly': 0.70,
@@ -289,31 +455,21 @@ function credibilityScore(rw, freq, gapDollar) {
   const raw = rw * conf * (gapDollar / 10000);
   return Math.round(raw * 10) / 10;
 }
+// ── NEW: Trojan Opportunity Score ($) — the rail's own real ranking figure (per the directive,
+// "you may reuse the existing credibility-score formula's gap_dollar component, or a real,
+// documented variant"). Same three real inputs as the Financial Credibility Score above, but
+// rescaled into an actual accessible-dollar estimate instead of a unitless index:
+//   TOS ($) = gap_dollar × (relationship_weight ÷ 10) × edge_confidence(freq)
+// relationship_weight is divided by 10 (its own real ceiling in this dataset is 9.1) so a
+// maximally warm, maximally live edge returns close to the gap's full face value, and a cold
+// or decayed edge returns a proportionally smaller accessible share of the same real gap. ────
+function trojanOpportunityScore(rw, freq, gapDollar) {
+  return gapDollar * (rw / 10) * edgeConfidence(freq);
+}
 
 // ════════════════════════════════════════════════════════════════════
-// DISC-STYLE APPROACH BRIEF — a transparent, rule-based heuristic derived ONLY from the
-// target role's real ring / coi_type / category attributes on ONTOLOGY_NODES. This is NOT a
-// psychological profile of a specific person — no individual behavioral data exists anywhere
-// in this dataset, and none is invented here. It is a documented lookup over three real,
-// structural fields, exactly like the rest of this file's scoring. UI copy must say
-// "approach style suggested by role/seniority pattern," never "this person's DISC profile."
-//
-// STEP 1 — PRIMARY letter from coi_type (what kind of decision authority this role TYPE
-// structurally exercises — the clearest behavioral proxy the dataset actually carries):
-//   signatory   -> D  final sign-off authority: direct, results-first
-//   regulatory  -> C  compliance/certification gate: detail-first, process-respecting
-//   operational -> S  day-to-day execution: steady, relationship-respecting
-//   transaction -> I  deal-cycle broker/intermediary: relationship + momentum
-//   conditional -> C, secondary I  approval-chain dependent, but also a relational routing point
-//   adjacent    -> S  peripheral influencer: low-pressure, informational first
-//
-// STEP 2 — PACE modifier from ring (independent axis, always applied):
-//   ring 1 -> fast      (near-final authority — don't bury the ask)
-//   ring 2 -> moderate  (conditional sign-off — expect one more internal check)
-//   ring 3 -> measured  (transaction-critical — expect a defined process/timeline)
-//   ring 4 -> patient   (operational — respect existing workload before asking for time)
-//
-// STEP 3 — CONTEXT phrase from category (fixed lookup, all 9 real category values covered).
+// DISC-STYLE APPROACH BRIEF (preserved verbatim) — a transparent, rule-based heuristic derived
+// ONLY from the target role's real ring / coi_type / category attributes on ONTOLOGY_NODES.
 // ════════════════════════════════════════════════════════════════════
 const DISC_PRIMARY = {
   signatory:   { letter: 'D', secondary: null, label: 'Dominance — direct, results-first' },
@@ -350,7 +506,9 @@ function discBrief(role) {
 // ════════════════════════════════════════════════════════════════════
 // PATH COMPUTATION — "Trojan Horse Conversion Edge" = a real chain: known contact ->
 // (real knows-edge, its real why/freq) -> the role that's the coverage's responsible_node_id
-// -> the priced gap. One real edge hop, exactly as specified — no fabricated multi-hop chains.
+// -> the priced gap. One real edge hop, exactly as specified. Contact and role can sit in the
+// SAME vertical or in two DIFFERENT verticals — crossVertical is computed and carried on every
+// path so the rail/panel/canvas all agree on which paths need the pentagon's own cross-link.
 // ════════════════════════════════════════════════════════════════════
 function computePaths(producerId, uboId) {
   const assets = assetsByOwner.get(uboId) || [];
@@ -370,25 +528,36 @@ function computePaths(producerId, uboId) {
         const contact = nodeById.get(e.from);
         if (!contact) return;
         const score = credibilityScore(rw.relationship_weight, e.freq, gap.gapDollar);
+        const tos = trojanOpportunityScore(rw.relationship_weight, e.freq, gap.gapDollar);
         paths.push({
           id: cov.id + '::' + e.id,
-          uboId, asset, cov, gap, role, edge: e, contact, rw, score,
+          uboId, asset, cov, gap, role, edge: e, contact, rw, score, tos,
+          crossVertical: contact.vertical !== role.vertical,
         });
       });
     });
   });
-  paths.sort((a, b) => b.score - a.score);
+  paths.sort((a, b) => b.tos - a.tos);
   return paths;
 }
 
 // ════════════════════════════════════════════════════════════════════
 // STATE + WIRING
 // ════════════════════════════════════════════════════════════════════
-const state = { producerId: PRODUCERS[0].producer_id, uboId: null, kindFilter: 'all', selectedPathId: null };
+const state = {
+  producerId: PRODUCERS[0].producer_id, uboId: null,
+  kindFilter: 'all', verticalFilter: 'all', intimacyFilter: 'all', severityFilter: 'all',
+  selectedPathId: null,
+  zoom: 1, panX: 0, panY: 0,
+  focus: null, // { vertical, id } — the one node currently click-revealed on the canvas
+};
 
 const selProducer = document.getElementById('sel-producer');
 const selAccount = document.getElementById('sel-account');
 const selKind = document.getElementById('sel-kind');
+const selVertical = document.getElementById('sel-vertical');
+const selIntimacy = document.getElementById('sel-intimacy');
+const selSeverity = document.getElementById('sel-severity');
 
 PRODUCERS.forEach(p => {
   const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name + ' — ' + p.archetype;
@@ -422,21 +591,32 @@ let currentPaths = [];
 function recompute() {
   currentPaths = computePaths(state.producerId, state.uboId);
   state.selectedPathId = null;
+  state.focus = null;
   renderRail();
   renderPanel(null);
-  drawGraph();
+  centerView();
+  renderAll();
 }
 
 selProducer.addEventListener('change', () => { state.producerId = selProducer.value; refreshAccountOptions(); recompute(); });
 selAccount.addEventListener('change', () => { state.uboId = selAccount.value; recompute(); });
-selKind.addEventListener('change', () => { state.kindFilter = selKind.value; renderRail(); drawGraph(); });
+selKind.addEventListener('change', () => { state.kindFilter = selKind.value; renderRail(); });
+selVertical.addEventListener('change', () => { state.verticalFilter = selVertical.value; renderRail(); });
+selIntimacy.addEventListener('change', () => { state.intimacyFilter = selIntimacy.value; renderRail(); });
+selSeverity.addEventListener('change', () => { state.severityFilter = selSeverity.value; renderRail(); });
 
 // ════════════════════════════════════════════════════════════════════
 // LEFT RAIL
 // ════════════════════════════════════════════════════════════════════
+function intimacyBucket(rw) { return rw >= 7 ? 'hot' : rw >= 4 ? 'warm' : 'cold'; }
 function filteredPaths() {
-  if (state.kindFilter === 'all') return currentPaths;
-  return currentPaths.filter(p => p.gap.kind === state.kindFilter);
+  return currentPaths.filter(p => {
+    if (state.kindFilter !== 'all' && p.gap.kind !== state.kindFilter) return false;
+    if (state.verticalFilter !== 'all' && p.role.vertical !== state.verticalFilter && p.contact.vertical !== state.verticalFilter) return false;
+    if (state.intimacyFilter !== 'all' && intimacyBucket(p.rw.relationship_weight) !== state.intimacyFilter) return false;
+    if (state.severityFilter !== 'all' && String(p.role.ring) !== state.severityFilter) return false;
+    return true;
+  });
 }
 function shortName(label) {
   if (!label) return '—';
@@ -448,19 +628,21 @@ function shortTitle(label) {
   const parts = String(label).split('—');
   return parts.length > 1 ? parts.slice(1).join('—').trim() : '';
 }
+const VERTICAL_LABELS = { yacht: 'Yacht', aviation: 'Aviation', real_estate: 'Real Estate', auto: 'Auto', personal: 'Personal' };
 function renderRail() {
   const list = filteredPaths();
   const wrap = document.getElementById('path-list');
   document.getElementById('lrh-title').textContent = accountLabel(state.uboId) || 'No account';
   const unboundN = currentPaths.filter(p => p.gap.kind === 'unbound').length;
   const defN = currentPaths.filter(p => p.gap.kind === 'deficient').length;
+  const crossN = currentPaths.filter(p => p.crossVertical).length;
   document.getElementById('lrh-sub').textContent =
-    currentPaths.length ? (currentPaths.length + ' real Trojan Horse paths — ' + unboundN + ' unbound · ' + defN + ' deficient') : 'No known-contact path into a priced gap on this account';
+    currentPaths.length ? (currentPaths.length + ' real Trojan Horse paths — ' + unboundN + ' unbound · ' + defN + ' deficient · ' + crossN + ' cross-vertical') : 'No known-contact path into a priced gap on this account';
   document.getElementById('whole-book-tag').textContent = accountLabel(state.uboId) ? ('Account: ' + accountLabel(state.uboId)) : '—';
 
   if (!list.length) {
     wrap.innerHTML = '<div class="empty-state">' +
-      (currentPaths.length ? 'No paths match this Gap Type filter.' :
+      (currentPaths.length ? 'No paths match the active filters.' :
       'This account has no priced gap whose responsible role is reachable through any real knows-edge from a contact this producer already knows on Salesforce. Try another account.') +
       '</div>';
     return;
@@ -471,9 +653,11 @@ function renderRail() {
       '<div style="flex:1;min-width:0">' +
         '<div class="lr-row-label">' + escapeXML(shortName(p.contact.label)) + ' → ' + escapeXML(shortName(p.role.label)) + '</div>' +
         '<div class="path-chain">' + escapeXML(p.gap.ov.coverage_label || p.cov.label) + ' · ' + escapeXML(shortTitle(p.role.label) || p.role.category) + '</div>' +
+        (p.crossVertical ? '<div class="cross-tag">⇄ ' + VERTICAL_LABELS[p.contact.vertical] + ' → ' + VERTICAL_LABELS[p.role.vertical] + '</div>' : '') +
       '</div>' +
       '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">' +
-        '<div class="path-amt ' + p.gap.kind + '">' + fmt$(p.gap.gapDollar) + '</div>' +
+        '<div class="tos-amt">' + fmt$(p.tos) + '</div>' +
+        '<div class="path-amt ' + p.gap.kind + '">' + fmt$(p.gap.gapDollar) + ' gap</div>' +
         '<div class="score-pill">CS ' + p.score.toFixed(1) + '</div>' +
       '</div>' +
     '</div>';
@@ -481,10 +665,11 @@ function renderRail() {
   wrap.querySelectorAll('.lr-row').forEach(el => {
     el.addEventListener('click', () => {
       state.selectedPathId = el.getAttribute('data-path');
+      state.focus = null;
       renderRail();
       const p = currentPaths.find(x => x.id === state.selectedPathId);
       renderPanel(p);
-      drawGraph();
+      renderAll();
     });
   });
 }
@@ -495,7 +680,7 @@ function renderRail() {
 function badgeCoi(coiType) { return '<span class="badge badge-coi ' + escapeXML(coiType || '') + '">' + escapeXML(coiType || '—') + '</span>'; }
 function badgeRing(ring) { return '<span class="badge badge-ring">Ring ' + ring + '</span>'; }
 function badgeDomain(name) {
-  const col = CATEGORY_COLOR_BY_NAME[name] || '#6a9de0';
+  const col = colorByCategory.get(name) || '#6a9de0';
   return '<span class="badge badge-domain" style="background:' + col + '">' + escapeXML(name) + '</span>';
 }
 function badgeGapKind(kind) {
@@ -503,11 +688,16 @@ function badgeGapKind(kind) {
   const label = kind === 'unbound' ? 'UNBOUND' : 'DEFICIENT LIMIT';
   return '<span class="badge badge-status ' + cls + '" style="' + (kind==='deficient' ? 'background:rgba(161,90,46,.14);color:var(--status-deficient);border-color:rgba(161,90,46,.4)' : '') + '">' + label + '</span>';
 }
+function trendClass(pct) {
+  const n = parseFloat(pct);
+  if (isNaN(n) || n === 0) return 'flat';
+  return n > 0 ? 'up' : 'down';
+}
 
 function renderPanel(p) {
   const panel = document.getElementById('panel');
   if (!p) {
-    panel.innerHTML = '<div class="panel-empty"><div class="panel-empty-icon">⚕</div><div class="panel-empty-text">Select a conversion path on the left to see the real execution chain, an approach brief, and the credibility score.</div></div>';
+    panel.innerHTML = '<div class="panel-empty"><div class="panel-empty-icon">⚕</div><div class="panel-empty-text">Select a conversion path on the left to see the real execution chain, an approach brief, the credibility score, and the statutory/limit/benchmark brief behind it.</div></div>';
     return;
   }
   const contact = p.contact, role = p.role, e = p.edge, gap = p.gap;
@@ -518,7 +708,7 @@ function renderPanel(p) {
       '<div class="chain-node">' +
         '<div class="chain-dot" style="background:var(--accent)"></div>' +
         '<div class="chain-body">' +
-          '<div class="chain-role">1 · Known SFDC Contact (real relationship_weight ' + p.rw.relationship_weight.toFixed(1) + ')</div>' +
+          '<div class="chain-role">1 · Known SFDC Contact (' + escapeXML(VERTICAL_LABELS[contact.vertical]) + ' · real relationship_weight ' + p.rw.relationship_weight.toFixed(1) + ')</div>' +
           '<div class="chain-name">' + escapeXML(contact.label) + '</div>' +
           '<div class="chain-sub">' + badgeRing(contact.ring) + ' ' + badgeCoi(contact.coi_type) + ' · last activity ' + escapeXML(p.rw.last_activity_date) + ' · ' + p.rw.activity_count_90d + ' touches/90d</div>' +
         '</div>' +
@@ -526,11 +716,12 @@ function renderPanel(p) {
       '<div class="chain-link">' +
         '<div class="chain-link-why">“' + escapeXML(e.why) + '”</div>' +
         '<span class="chain-link-freq">' + escapeXML(e.freq) + '</span>' +
+        (p.crossVertical ? '<div class="cross-tag" style="margin-top:8px">⇄ Cross-vertical jump — ' + VERTICAL_LABELS[contact.vertical] + ' → ' + VERTICAL_LABELS[role.vertical] + '</div>' : '') +
       '</div>' +
       '<div class="chain-node">' +
         '<div class="chain-dot" style="background:' + (gap.kind==='unbound' ? 'var(--status-unbound)' : 'var(--status-deficient)') + '"></div>' +
         '<div class="chain-body">' +
-          '<div class="chain-role">2 · 360 Structural Role (responsible_node_id)</div>' +
+          '<div class="chain-role">2 · 360 Structural Role (' + escapeXML(VERTICAL_LABELS[role.vertical]) + ' · responsible_node_id)</div>' +
           '<div class="chain-name">' + escapeXML(role.label) + '</div>' +
           '<div class="chain-sub">' + badgeRing(role.ring) + ' ' + badgeCoi(role.coi_type) + ' ' + badgeDomain(role.category) + '</div>' +
         '</div>' +
@@ -570,97 +761,323 @@ function renderPanel(p) {
     '</div>' +
     '<div class="disc-disclaimer">Approach style suggested by this role’s real authority pattern (ring × conflict-of-interest type × functional category) on file — not this person’s DISC profile. No individual psychological data exists in this dataset or is used here.</div>';
 
-  // ── 3. Financial credibility score ─────────────────────────────────
+  // ── 3. Trojan Opportunity Score + preserved Financial credibility score ────
   const conf = edgeConfidence(e.freq);
   const gapUnit = gap.gapDollar / 10000;
   const scoreHtml =
-    '<div class="sc-composite"><div class="sc-composite-lbl">Financial Credibility Score</div><div class="sc-composite-val">' + p.score.toFixed(1) + '</div></div>' +
+    '<div class="sc-composite"><div class="sc-composite-lbl">Trojan Opportunity Score ($)</div><div class="sc-composite-val">' + fmt$Full(p.tos) + '</div></div>' +
+    '<div class="formula-box">' +
+      '<div class="formula-row"><span>Priced gap</span><b>' + fmt$Full(gap.gapDollar) + '</b></div>' +
+      '<div class="formula-row"><span>Relationship weight ÷ 10</span><b>× ' + (p.rw.relationship_weight/10).toFixed(2) + '</b></div>' +
+      '<div class="formula-row"><span>Edge confidence (freq: “' + escapeXML(e.freq) + '”)</span><b>× ' + conf.toFixed(2) + '</b></div>' +
+      '<div class="formula-eq"><span>Trojan Opportunity Score</span><span>' + fmt$Full(p.tos) + '</span></div>' +
+    '</div>' +
+    '<p style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px">The rail is ranked on this figure — same three real inputs as the Financial Credibility Score below, rescaled into an accessible-dollar estimate instead of a unitless index.</p>' +
+    '<div class="sc-composite" style="margin-top:14px"><div class="sc-composite-lbl">Financial Credibility Score</div><div class="sc-composite-val">' + p.score.toFixed(1) + '</div></div>' +
     '<div class="formula-box">' +
       '<div class="formula-row"><span>Relationship weight (producer ↔ ' + escapeXML(shortName(contact.label)) + ')</span><b>' + p.rw.relationship_weight.toFixed(2) + '</b></div>' +
       '<div class="formula-row"><span>Edge confidence (freq: “' + escapeXML(e.freq) + '”)</span><b>× ' + conf.toFixed(2) + '</b></div>' +
       '<div class="formula-row"><span>Gap size (' + fmt$Full(gap.gapDollar) + ' ÷ $10,000)</span><b>× ' + gapUnit.toFixed(2) + '</b></div>' +
       '<div class="formula-eq"><span>Score</span><span>' + p.score.toFixed(1) + '</span></div>' +
-    '</div>' +
-    '<p style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px">Formula: relationship_weight × edge_confidence(freq) × (gap_dollar ÷ 10,000). All three inputs are real fields — RELATIONSHIP_WEIGHTS.relationship_weight, EDGES_720’s own freq cadence, and the coverage overlay’s real ' + (gap.kind==='unbound' ? 'gwp_estimate' : 'baseline_limit_usd − bound_limit_usd') + '. A warmer, more active path to a bigger real gap always scores higher.</p>';
+    '</div>';
+
+  // ── 4. Statutory citations, limit deficiency, GWP benchmark (NEW) ──
+  const corpus = covCatalogByKey.get(p.cov.vertical + '|' + p.cov.coverage_type_id);
+  const trend = rateTrendByType[p.cov.coverage_type_id];
+  let statuteHtml = '';
+  if (corpus) {
+    const triggers = (corpus.statutory_triggers || []).slice(0, 3);
+    statuteHtml += triggers.length
+      ? triggers.map(t => '<div class="statute-row"><div class="statute-jur">' + escapeXML(t.jurisdiction) + '</div><div class="statute-req">' + escapeXML(t.requirement) + '</div></div>').join('')
+      : '<p style="font-size:12px;color:var(--text3)">No statutory trigger on file for this coverage type — required_baseline_limit is market-convention-driven, not statute-driven.</p>';
+    if (corpus.sub_limit_exclusions && corpus.sub_limit_exclusions.length) {
+      statuteHtml += '<div class="sub-limit-row"><strong style="color:var(--text2)">' + escapeXML(corpus.sub_limit_exclusions[0].type) + ':</strong> ' + escapeXML(corpus.sub_limit_exclusions[0].detail) + '</div>';
+    }
+  } else {
+    statuteHtml = '<p style="font-size:12px;color:var(--text3)">No coverage-corpus catalog entry found for “' + escapeXML(p.cov.coverage_type_id) + '” in ' + escapeXML(p.cov.vertical) + '.</p>';
+  }
+  const deficiencyHtml = gap.kind === 'deficient'
+    ? '<div class="statute-row"><div class="statute-jur">Limit Deficiency</div><div class="deficiency-line">' + fmt$Full(gap.gapDollar) + ' short of required</div><div class="statute-req">Bound at ' + fmt$Full(gap.ov.bound_limit_usd) + ' against a real required baseline of ' + fmt$Full(gap.baseline) + (p.asset.size_class ? ' (tier ' + escapeXML(p.asset.size_class) + ')' : '') + '.</div></div>'
+    : '<div class="statute-row"><div class="statute-jur">Whitespace — Never Bound</div><div class="deficiency-line" style="color:var(--status-unbound)">' + fmt$Full(gap.gapDollar) + ' estimated GWP at stake</div><div class="statute-req">' + (gap.ov.unbound_reason ? 'Reason on file: ' + escapeXML(gap.ov.unbound_reason.replace(/_/g,' ')) + '. ' : '') + (gap.ov.evidence_note ? escapeXML(gap.ov.evidence_note) : '') + '</div></div>';
+  const gwpChip = trend
+    ? '<div class="gwp-chip"><span class="gwp-chip-trend ' + trendClass(trend.annual_trend_pct) + '">' + escapeXML(trend.annual_trend_pct) + '</span><span><strong style="color:var(--text)">GWP_RateTrend_Table</strong> — ' + escapeXML(trend.source) + '</span></div>'
+    : '<div class="gwp-chip"><span class="no-source-flag">No rate index</span><span>No entry in this project’s own GWP_RateTrend_Table for “' + escapeXML(p.cov.coverage_type_id) + '.”</span></div>';
 
   panel.innerHTML =
     '<div class="panel-header"><div class="panel-title">Conversion Path</div>' +
-      '<div class="panel-meta-row">' + badgeGapKind(gap.kind) + '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + escapeXML(p.asset.label) + '</span></div>' +
+      '<div class="panel-meta-row">' + badgeGapKind(gap.kind) + '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + escapeXML(p.asset.label) + '</span>' + (p.crossVertical ? '<span class="badge" style="background:rgba(220,174,92,.16);color:var(--tj-gold);border-color:rgba(220,174,92,.4)">CROSS-VERTICAL</span>' : '') + '</div>' +
     '</div>' +
     '<div class="box"><h3>1 · Trojan Horse Execution Path</h3>' + chainHtml + '</div>' +
     '<div class="box"><h3>2 · DISC-Style Approach Brief</h3>' + discHtml + '</div>' +
-    '<div class="box"><h3>3 · Financial Credibility Score</h3>' + scoreHtml + '</div>';
+    '<div class="box"><h3>3 · Trojan Opportunity Score &amp; Financial Credibility Score</h3>' + scoreHtml + '</div>' +
+    '<div class="box"><h3>4 · Statutory Citations, Limit Deficiency &amp; GWP Benchmark</h3>' + deficiencyHtml + statuteHtml + gwpChip + '</div>';
 }
 
 // ════════════════════════════════════════════════════════════════════
-// CENTER CANVAS — reuses engine/render-core.js's RingEngine unmodified, same as every other
-// 720 dashboard. Draws every role on the selected account; the selected path's real knows-edge
-// is drawn bold in accent, exactly the cross-link / referral-path pattern dashboard0/dashboard1
-// already use, never a fabricated arrow.
+// CENTER CANVAS — PENTAGON OF 5 WHEELS, ported mechanism-for-mechanism from
+// dashboard0-ontology-foundation.html: five independent <svg> clusters, each its own
+// RingEngine.render() call over the PLAIN 9-segment domains, positioned on a shared
+// ORBIT_RADIUS pentagon, panned/zoomed as one CSS-transformed #canvas-inner. NOT one
+// combined wheel with vertical-offset domains. Sized here by real $ magnitude for the
+// selected account's own book in that vertical (not by role count, D0's own convention) —
+// per the founder's explicit item-1 instruction for D4/D5/D6.
 // ════════════════════════════════════════════════════════════════════
-function tokensForCanvas() {
-  const dark = document.body.classList.contains('theme-dark');
-  return { dark };
+const VERTICAL_ORDER = ['yacht', 'aviation', 'real_estate', 'auto', 'personal'];
+const ORBIT_RADIUS = 560;
+const CANVAS_SIZE = 1800;
+const svgByVertical = {};
+
+function currentPath() { return currentPaths.find(p => p.id === state.selectedPathId) || null; }
+
+function verticalDollarTotal(uboId, v) {
+  return rolesFor(uboId, v).reduce((s, r) => s + roleDollarTotal(r.id), 0);
 }
-function nodeColor(n, sel) {
-  if (sel && n.id === sel.role.id) return sel.gap.kind === 'unbound' ? getCss('--status-unbound') : getCss('--status-deficient');
-  if (sel && n.id === sel.contact.id) return getCss('--accent');
-  if (isKnown(state.producerId, n.id)) return '#3fa0c9';
-  return getCss('--text3');
+function pxFor(uboId, v, maxTotal) {
+  const MIN = 280, MAX = 560;
+  const total = verticalDollarTotal(uboId, v);
+  if (maxTotal <= 0) return MIN;
+  return Math.round(MIN + Math.sqrt(Math.max(0, total) / maxTotal) * (MAX - MIN));
 }
+
 function getCss(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || getComputedStyle(document.body).getPropertyValue(varName).trim(); }
 
-function drawGraph() {
-  const svg = document.getElementById('cv');
-  if (!svg || typeof RingEngine === 'undefined' || !state.uboId) { if (svg) svg.innerHTML=''; return; }
-  const nodes = rolesByAccount.get(state.uboId) || [];
-  const sel = currentPaths.find(p => p.id === state.selectedPathId) || null;
-
-  // Faint background context: every real knows-edge between two nodes that are BOTH present
-  // on this account's wheel (never a node the wheel doesn't show). The selected path's own
-  // edge is drawn again afterward, bold, in accent, on top.
+// A clicked role reveals ONLY its own real knows-edges to nodes present in the SAME vertical
+// wheel — D0's own click-to-reveal restraint, reused rather than the prior build's always-on
+// faint edge web. The selected rail path's own edge is a separate, always-visible layer (gold
+// dashed) drawn regardless of click-focus state — that edge IS the whole point of this page.
+function renderUniverse(v) {
+  const svg = svgByVertical[v];
+  if (!svg) return;
+  const uboId = state.uboId;
+  const nodes = rolesFor(uboId, v).slice();
+  const sel = currentPath();
   const presentIds = new Set(nodes.map(n => n.id));
-  const edges = [];
-  nodes.forEach(n => {
-    (knowsOut[n.id] || []).forEach(e => {
-      if (presentIds.has(e.to)) edges.push({ from: e.from, to: e.to, color: getCss('--text3'), width: '1', opacity: '0.22' });
-    });
-  });
+  // Inject the selected path's own contact/role into their OWN vertical's node set if this
+  // account's own roster for that vertical doesn't already include them (a known contact can
+  // sit on a different account's roster and still structurally know into this one).
   if (sel) {
-    // The known contact may not itself be one of this account's own role nodes (a contact can
-    // sit on a different account and still structurally know into this one) — add it to the
-    // drawn node set exactly as dashboard1's neighborhood pattern does, never hidden.
-    if (!presentIds.has(sel.contact.id)) { nodes.push(sel.contact); presentIds.add(sel.contact.id); }
-    edges.push({ from: sel.edge.from, to: sel.edge.to, color: getCss('--accent'), width: '3', opacity: '0.95' });
+    if (sel.contact.vertical === v && !presentIds.has(sel.contact.id)) { nodes.push(sel.contact); presentIds.add(sel.contact.id); }
+    if (sel.role.vertical === v && !presentIds.has(sel.role.id)) { nodes.push(sel.role); presentIds.add(sel.role.id); }
   }
 
-  // Fit-to-canvas zoom — same formula dashboard1-tactical-map-v2.dc.html uses (min viewport
-  // dimension over the full ring diameter), so a 3-node account and a 40-node account both
-  // render legibly instead of the raw un-scaled wheel spilling off a small SVG viewport.
-  const W = svg.clientWidth || 1200, H = svg.clientHeight || 900;
-  const fitZoom = Math.max(0.4, Math.min(W, H) / (2 * (RingEngine.DEFAULT_RING.RO[4] + 110)));
+  const edges = [];
+  const focusId = state.focus && state.focus.vertical === v ? state.focus.id : null;
+  if (focusId) {
+    [...(knowsOut[focusId] || []), ...(knowsIn[focusId] || [])].forEach(e => {
+      const other = e.from === focusId ? e.to : e.from;
+      if (presentIds.has(other)) edges.push({ from: focusId, to: other, color: getCss('--text3'), width: '1.4', opacity: '0.6' });
+    });
+  }
+  // Same-vertical Trojan conversion edge — gold dashed, always visible while this path is
+  // selected, drawn straight inside this one wheel (both endpoints live here).
+  if (sel && !sel.crossVertical && sel.contact.vertical === v) {
+    edges.push({ from: sel.edge.from, to: sel.edge.to, color: 'var(--tj-gold)', width: '3', opacity: '0.95', dash: '7 5' });
+  }
 
-  RingEngine.render(svg, {
-    nodes, domains, colorFn: n => nodeColor(n, sel), sizeFn: nR, scoreFn: compScore,
+  const activeId = sel ? (sel.contact.vertical === v ? sel.contact.id : (sel.role.vertical === v ? sel.role.id : null)) : focusId;
+  const px = pxFor(uboId, v, maxVertTotalForAccount(uboId));
+  const fitZoom = px / (2 * (RingEngine.DEFAULT_RING.RO[4] + 40));
+
+  const { layout } = RingEngine.render(svg, {
+    nodes, domains,
+    colorFn: n => roleNodeState(n, state.producerId).color,
+    sizeFn: n => nodeRadius(n),
+    scoreFn: n => compScore(n),
     ringOf: n => n.ring, domainOf: n => categoryDomainId.get(n.category) || 1,
     labelFn: n => shortName(n.label), edges,
-    activeId: sel ? sel.role.id : null, showLabels: true, vz: fitZoom,
-    onSelect: n => {}, // canvas is read-only navigation here; selection happens via the rail
-    onHover: (evt, n) => RingEngine.tooltip.show(evt, n.label, 'Ring ' + n.ring + ' · ' + n.category, n.desc),
+    activeId, showLabels: true, vz: Math.max(0.18, fitZoom), vx: 0, vy: 0,
+    onSelect: n => { state.focus = (state.focus && state.focus.id === n.id) ? null : { vertical: v, id: n.id }; renderUniverse(v); drawTrojanCrossLink(); },
+    onHover: (evt, n) => {
+      const st = roleNodeState(n, state.producerId);
+      const dollar = roleDollarTotal(n.id);
+      RingEngine.tooltip.show(evt, n.label, 'Ring ' + n.ring + ' · ' + n.category + ' · ' + st.label, (dollar > 0 ? fmt$Full(dollar) + ' real (bound + estimated) · ' : '') + (n.desc || ''));
+    },
     onLeave: RingEngine.tooltip.hide,
   });
+  drawSatellitesAndBreaches(svg, layout);
+  updateClusterMeta(v, nodes, uboId);
 }
-window.addEventListener('resize', drawGraph);
+
+// Satellites + fiduciary breach lines — same technique dashboard2-whitespace-gap-engine.html's
+// drawSatellitesAndBreaches() proved out, read directly off THIS render's own returned (x,y,r).
+function drawSatellitesAndBreaches(svg, layout) {
+  const scene = svg.querySelector('g');
+  if (!scene) return;
+  layout.forEach(p => {
+    const role = p.n;
+    const rows = overlayRowsByRole.get(role.id) || [];
+    if (!rows.length) return;
+    const n = rows.length;
+    const orbitBase = p.r + 6;
+    rows.forEach((o, i) => {
+      const covNode = nodeById.get(o.coverage_id);
+      if (!covNode) return;
+      const st = satelliteState(covNode, o);
+      const value = (o.status === 'unbound' ? o.gwp_estimate : o.bound_premium) || 0;
+      const sr = satRadius(value);
+      const angle = n === 1 ? -Math.PI / 2 : (i / n) * Math.PI * 2;
+      const orbitR = orbitBase + sr + 2;
+      const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
+      const dot = RingEngine.svgEl('circle', { cx: sx, cy: sy, r: sr, fill: st.color, 'fill-opacity': st.op || 0.95, stroke: 'var(--surface)', 'stroke-width': 1 });
+      dot.addEventListener('mouseenter', evt => RingEngine.tooltip.show(evt, covNode.label, st.label, value ? fmt$(value) : ''));
+      dot.addEventListener('mouseleave', RingEngine.tooltip.hide);
+      scene.appendChild(dot);
+
+      // Fiduciary breach line — solid, fixed #ef4444, for the most severe real case: a Ring-1
+      // signatory-level role carrying an open coverage gap (never-written OR bound-deficient).
+      if (role.ring === 1 && (st.label === 'Whitespace gap' || st.label === 'Deficient limit')) {
+        const bx = p.x + Math.cos(angle) * (orbitR + sr + 8), by = p.y + Math.sin(angle) * (orbitR + sr + 8);
+        scene.appendChild(RingEngine.svgEl('line', {
+          x1: p.x, y1: p.y, x2: bx, y2: by, stroke: 'var(--tj-red)', 'stroke-width': '2.5', 'stroke-opacity': '0.9',
+        }));
+      }
+    });
+  });
+}
+
+function maxVertTotalForAccount(uboId) {
+  let max = 0;
+  VERTICAL_ORDER.forEach(v => { max = Math.max(max, verticalDollarTotal(uboId, v)); });
+  return max;
+}
+function updateClusterMeta(v, nodes, uboId) {
+  const meta = document.getElementById('meta-' + v);
+  if (!meta) return;
+  const total = verticalDollarTotal(uboId, v);
+  meta.innerHTML = '<strong>' + nodes.length + '</strong> role' + (nodes.length === 1 ? '' : 's') + ' · <strong>' + fmt$(total) + '</strong> real GWP';
+}
+
+// ── Cross-vertical Trojan jump — the SAME drawCrossLinks() mechanism
+// dashboard0-ontology-foundation.html uses for its own gatekeeper links (gold dashed line
+// jumping straight from one petal's own rendered node to another petal's own rendered node),
+// reused here for the genuine case this dashboard's own mission calls for: the selected
+// conversion path's known contact and target role sit in two DIFFERENT verticals. ────────────
+function findNodeEl(id, vertical) {
+  const svg = svgByVertical[vertical];
+  if (!svg) return null;
+  return Array.from(svg.querySelectorAll('[data-nid]')).find(el => el.getAttribute('data-nid') === id) || null;
+}
+function nodeCenterInCanvas(id, vertical) {
+  const el = findNodeEl(id, vertical);
+  const canvas = document.getElementById('universe-canvas');
+  if (!el || !canvas) return null;
+  const er = el.getBoundingClientRect(), cr = canvas.getBoundingClientRect();
+  return { x: er.left + er.width / 2 - cr.left + canvas.scrollLeft, y: er.top + er.height / 2 - cr.top + canvas.scrollTop };
+}
+function drawTrojanCrossLink() {
+  const canvas = document.getElementById('universe-canvas');
+  const old = document.getElementById('cross-link-overlay');
+  if (old) old.remove();
+  const sel = currentPath();
+  if (!sel || !sel.crossVertical) return;
+  const from = nodeCenterInCanvas(sel.contact.id, sel.contact.vertical);
+  const to = nodeCenterInCanvas(sel.role.id, sel.role.vertical);
+  if (!from || !to) return;
+  const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  overlay.id = 'cross-link-overlay';
+  overlay.setAttribute('width', canvas.scrollWidth);
+  overlay.setAttribute('height', canvas.scrollHeight);
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', from.x); line.setAttribute('y1', from.y);
+  line.setAttribute('x2', to.x); line.setAttribute('y2', to.y);
+  line.setAttribute('stroke', '#dcae5c'); line.setAttribute('stroke-width', '3');
+  line.setAttribute('stroke-dasharray', '7 5'); line.setAttribute('opacity', '0.95');
+  overlay.appendChild(line);
+  [from, to].forEach(p => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', '9');
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#dcae5c'); c.setAttribute('stroke-width', '2.5');
+    overlay.appendChild(c);
+  });
+  canvas.appendChild(overlay);
+}
+
+function renderAll() {
+  const inner = document.getElementById('canvas-inner');
+  inner.innerHTML = '';
+  inner.style.width = CANVAS_SIZE + 'px';
+  inner.style.height = CANVAS_SIZE + 'px';
+  const cx = CANVAS_SIZE / 2, cy = CANVAS_SIZE / 2;
+  const uboId = state.uboId;
+  const maxTotal = maxVertTotalForAccount(uboId);
+  VERTICAL_ORDER.forEach((v, i) => {
+    const px = pxFor(uboId, v, maxTotal);
+    const angle = (2 * Math.PI * i / VERTICAL_ORDER.length) - Math.PI / 2;
+    const clusterCx = cx + ORBIT_RADIUS * Math.cos(angle);
+    const clusterCy = cy + ORBIT_RADIUS * Math.sin(angle);
+    const cluster = document.createElement('div');
+    cluster.className = 'ucluster';
+    cluster.style.left = (clusterCx - px / 2) + 'px';
+    cluster.style.top = (clusterCy - px / 2) + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', px); svg.setAttribute('height', px);
+    svgByVertical[v] = svg;
+    cluster.appendChild(svg);
+    const label = document.createElement('div');
+    label.className = 'ucluster-label';
+    label.innerHTML = '<span class="ucluster-name">' + VERTICAL_LABELS[v] + '</span><span class="ucluster-meta" id="meta-' + v + '">—</span>';
+    cluster.appendChild(label);
+    inner.appendChild(cluster);
+  });
+  VERTICAL_ORDER.forEach(v => renderUniverse(v));
+  applyZoom();
+  drawTrojanCrossLink();
+}
+
+/* ── Zoom & pan — identical interaction model to dashboard0-ontology-foundation.html: plain
+   scroll wheel zooms viewport-center-anchored, click-drag pans, applied as a CSS transform on
+   #canvas-inner. ── */
+function applyZoom() {
+  document.getElementById('canvas-inner').style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  drawTrojanCrossLink();
+}
+function zoomBy(delta) {
+  const newZoom = Math.max(0.3, Math.min(2.5, state.zoom + delta));
+  if (newZoom === state.zoom) return;
+  const canvas = document.getElementById('universe-canvas');
+  const vx = canvas.clientWidth / 2, vy = canvas.clientHeight / 2;
+  const contentX = (vx - state.panX) / state.zoom, contentY = (vy - state.panY) / state.zoom;
+  state.panX = vx - newZoom * contentX;
+  state.panY = vy - newZoom * contentY;
+  state.zoom = newZoom;
+  applyZoom();
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomBy(0.15));
+document.getElementById('zoom-out').addEventListener('click', () => zoomBy(-0.15));
+document.getElementById('zoom-reset').addEventListener('click', () => { state.zoom = 1; centerView(); applyZoom(); });
+
+function centerView() {
+  const canvas = document.getElementById('universe-canvas');
+  state.panX = canvas.clientWidth / 2 - (CANVAS_SIZE / 2) * state.zoom;
+  state.panY = canvas.clientHeight / 2 - (CANVAS_SIZE / 2) * state.zoom;
+}
+
+const canvasEl = document.getElementById('universe-canvas');
+canvasEl.addEventListener('wheel', (e) => { e.preventDefault(); zoomBy(e.deltaY > 0 ? -0.12 : 0.12); }, { passive: false });
+let drag = null;
+canvasEl.addEventListener('mousedown', (e) => { drag = { x: e.clientX, y: e.clientY, panX: state.panX, panY: state.panY, moved: false }; canvasEl.classList.add('dragging'); });
+canvasEl.addEventListener('mousemove', (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) drag.moved = true;
+  if (drag.moved) { state.panX = drag.panX + dx; state.panY = drag.panY + dy; applyZoom(); }
+});
+function endDrag() { drag = null; canvasEl.classList.remove('dragging'); }
+canvasEl.addEventListener('mouseup', endDrag);
+canvasEl.addEventListener('mouseleave', endDrag);
+
+window.addEventListener('resize', () => { renderAll(); });
 
 // lr collapse toggle — same chrome behavior as dashboard2/dashboard4
 document.getElementById('lr-toggle').addEventListener('click', () => {
   document.getElementById('lr-wrap').classList.toggle('collapsed');
-  setTimeout(drawGraph, 260);
+  setTimeout(renderAll, 260);
 });
 
 // ════════════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════════════
+centerView();
 recompute();
 </script>
 </body>

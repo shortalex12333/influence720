@@ -132,3 +132,30 @@ a, .menu-nav1:hover, .footer-link:hover {
    .menu-nav1, .single-item-title, .single-item-client, .single-item-desc, .about-subtext,
    .pre-about-text. .about-text2's inline color:rgb(212,212,212) (12.76:1) also verified fine
    and left as-is. */
+
+/* ── ICON-CONTRAST FIX ─────────────────────────────────────────────────────────────────────
+   Frame-4_2Frame-4.png / Frame-5_1Frame-5.png / Frame-5_2Frame-5.png (the hero/CTA button
+   icons) shipped from the original light-themed template as solid-black line art on a
+   transparent background — effectively invisible against this page's dark surfaces. Recolored
+   the PNG pixel data itself to #EDEDEC (matches --hp-text-heading) rather than trying to filter
+   them in CSS, since a CSS filter on a decorative <img> is fragile across the two different
+   icon usages (bare <img> in some buttons, background composited with other elements in others).
+   No override needed here — noted for whoever next touches these assets. */
+
+/* ── PER-DASHBOARD LINKS — every dashboard mention on the page links to its own /dN route ──
+   Small inline "Launch Dashboard N →" links added under the D0/D3/D4/D6 body copy (the Micro
+   group's D1/D2/D5 items are instead wrapped whole in an <a style="display:contents"> — see
+   index.html — since those are compact pinned-scroll chips, not paragraphs). Teal to signal
+   affordance (interactive), consistent with .hero-button's accent usage; verified against every
+   background tone on this page at 7.33:1, comfortably clearing the 5:1 floor. */
+.dash-card-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5AABCC;
+  text-decoration: none;
+}
+.dash-card-link:hover {
+  text-decoration: underline;
+}

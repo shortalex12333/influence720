@@ -85,14 +85,14 @@ a, .menu-nav1:hover, .footer-link:hover {
    and the image-placeholder gradient) — both clear 5:1 with real margin, none of them borderline:
 
      --hp-text-heading: #EDEDEC   14.3–16.2 : 1 across all four backgrounds
-     --hp-text-body:    #ABADB0    7.4–8.4  : 1 across all four backgrounds
+     --hp-text-body:    #D9DADB    12.0–13.5 : 1 across all four backgrounds (moved lighter after a live visual report -- see :root block below for why)
 
    (For reference: this page's body-text floor deliberately sits above the --txt3 alpha token
    used in the dashboard suite, which verification already flagged at 4.38:1 — see question.md
    Q28. Don't reuse dashboard low-emphasis tokens here; they were never rated for this bar.) */
 :root {
   --hp-text-heading: #EDEDEC;
-  --hp-text-body: #ABADB0;
+  --hp-text-body: #D9DADB;   /* moved lighter per live report -- #ABADB0 read as weak dark grey in practice, verified with real WCAG math at 8.4:1 but the user's own eyes on the deployed page overrule the calculator. New value 12-13.5:1 across every background. */
 }
 
 /* Was --colors---surface (== the page background) -> was literally invisible, 1:1. */

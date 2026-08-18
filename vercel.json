@@ -13,7 +13,8 @@
     { "source": "/d4", "destination": "/05-build/dashboard4-role-macro-view" },
     { "source": "/d5", "destination": "/05-build/dashboard5-micro-warfare" },
     { "source": "/d6", "destination": "/05-build/dashboard6-executive-command-center" },
-    { "source": "/pilot", "destination": "/05-build/pilot-yachts" }
+    { "source": "/pilot", "destination": "/05-build/pilot-yachts" },
+    { "source": "/pilot-d1", "destination": "/05-build/pilot-d1-network" }
   ],
   "headers": [
     {

@@ -76,7 +76,7 @@ a, .menu-nav1:hover, .footer-link:hover {
    Root-cause: the original template reuses --_colors---color-6 and --_colors---surface for
    BOTH background roles and text roles depending on context (color-6 is a real background
    on one element and body-copy text on ~20 others; --colors---surface is the page background
-   AND was the intended "light text on a dark photo band" color for .about-*/.cta-* headings,
+   AND was the intended "light text on a dark photo band" color for .about- and .cta- headings,
    which sat on a background-image in the original template — now removed per "shelve images").
    Remapping those variables' root values once cannot serve both roles correctly at the same
    time, so instead of touching the variables again, every class that actually renders text is

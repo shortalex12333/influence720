@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <base href="/05-build/">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Influence 720 — Trojan Horse Micro Warfare Canvas</title>
+<title>Influence 720 — Vector Conversion Engine</title>
 <link rel="stylesheet" href="engine/style-core.css" />
 <style>
 /* Dashboard-5-specific rules only — shared chrome/tokens live in engine/style-core.css.
@@ -146,10 +146,10 @@
 
 <header>
   <div class="h-left">
-    <div class="h-title">Trojan Horse — Micro Warfare Canvas</div>
-    <div class="h-sub">One account, one producer, five vertical wheels. Every rail row is a real path: a Salesforce contact this producer already knows, a real knows-edge into the role that owns a specific priced coverage gap on this account — possibly in a different vertical entirely — and the gap itself. Click a path to see the execution chain, an approach brief, a credibility score, and the real statutory/limit/benchmark brief behind the number.</div>
+    <div class="h-title">Vector Conversion Engine</div>
+    <div class="h-sub">A known contact, the role they reach, and the priced gap at the end of that path — one vector, priced. One account, one producer, five vertical wheels. Every rail row is a real path: a Salesforce contact this producer already knows, a real knows-edge into the role that owns a specific priced coverage gap on this account — possibly in a different vertical entirely — and the gap itself. Click a path to see the execution chain, an approach brief, a credibility score, and the real statutory/limit/benchmark brief behind the number.</div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
-      <a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d2" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D5 Micro — Trojan Horse</span>
+      <a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Coordinate Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Vector Routing</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d2" target="_blank" rel="noopener noreferrer">D2 Fiduciary Exposure Audit</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Keystone Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Magnitude Rollup</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D5 Vector Conversion</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d6" target="_blank" rel="noopener noreferrer">D6 Synthesis Engine</a>
     </nav>
   </div>
   <div class="h-ctrl">
@@ -244,7 +244,7 @@
       <div class="legend-row"><span class="legend-swatch" style="background:var(--state-deficient);opacity:.65"></span>Deficient limit</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--state-breach)"></span>Whitespace/deficient on a Ring 0/1 signatory</div>
       <div class="legend-head">Edges</div>
-      <div class="legend-row"><span class="legend-line" style="border-top:3px dashed var(--tj-gold)"></span>Selected Trojan Horse conversion path</div>
+      <div class="legend-row"><span class="legend-line" style="border-top:3px dashed var(--tj-gold)"></span>Selected vector conversion path</div>
       <div class="legend-row"><span class="legend-line" style="border-top:3px solid var(--tj-red)"></span>Fiduciary breach — Ring 1 signatory, open gap</div>
       <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--tj-gold);background:transparent"></span>Cross-vertical jump endpoint</div>
     </div>
@@ -734,7 +734,7 @@ function renderRail() {
   const defN = currentPaths.filter(p => p.gap.kind === 'deficient').length;
   const crossN = currentPaths.filter(p => p.crossVertical).length;
   document.getElementById('lrh-sub').textContent =
-    currentPaths.length ? (currentPaths.length + ' real Trojan Horse paths — ' + unboundN + ' unbound · ' + defN + ' deficient · ' + crossN + ' cross-vertical') : 'No known-contact path into a priced gap on this account';
+    currentPaths.length ? (currentPaths.length + ' real vector paths — ' + unboundN + ' unbound · ' + defN + ' deficient · ' + crossN + ' cross-vertical') : 'No known-contact path into a priced gap on this account';
   document.getElementById('whole-book-tag').textContent = accountLabel(state.uboId) ? ('Account: ' + accountLabel(state.uboId)) : '—';
 
   if (!list.length) {
@@ -904,7 +904,7 @@ function renderPanel(p) {
     '<div class="panel-header"><div class="panel-title">Conversion Path</div>' +
       '<div class="panel-meta-row">' + badgeGapKind(gap.kind) + '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + escapeXML(p.asset.label) + '</span>' + (p.crossVertical ? '<span class="badge" style="background:rgba(220,174,92,.16);color:var(--tj-gold);border-color:rgba(220,174,92,.4)">CROSS-VERTICAL</span>' : '') + '</div>' +
     '</div>' +
-    '<div class="box"><h3>1 · Trojan Horse Execution Path</h3>' + chainHtml + '</div>' +
+    '<div class="box"><h3>1 · Vector Execution Path</h3>' + chainHtml + '</div>' +
     '<div class="box"><h3>2 · DISC-Style Approach Brief</h3>' + discHtml + '</div>' +
     '<div class="box"><h3>3 · Trojan Opportunity Score &amp; Financial Credibility Score</h3>' + scoreHtml + '</div>' +
     '<div class="box"><h3>4 · Statutory Citations, Limit Deficiency &amp; GWP Benchmark</h3>' + deficiencyHtml + statuteHtml + gwpChip + '</div>';

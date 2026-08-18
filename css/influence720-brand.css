@@ -152,12 +152,36 @@ a, .menu-nav1:hover, .footer-link:hover {
 
 /* Verified fine already (inherit --colors---text-color at 0.92 alpha, ~16:1) — listed here only
    so the next person auditing this file can see they were checked, not skipped:
-   .heading, .heading-service, .heading-item1-srv, .heading-srv2, .footer-heading,
+   .heading, .heading-service, .heading-item1-srv, .heading-srv2,
    .heading--benefits, .impact-heading, .heading-portofolio, .bnf-i2-text, .bnf-i3-text,
    ._92, ._3x, .boosted, .percent, .x, .number-benefits, .text-block-19, .footer-link,
    .menu-nav1, .single-item-title, .single-item-client, .single-item-desc, .about-subtext,
-   .pre-about-text. .about-text2's inline color:rgb(212,212,212) (12.76:1) also verified fine
-   and left as-is. */
+   .pre-about-text.
+   .footer-heading and .about-text2 were ALSO listed here before and both turned out wrong —
+   corrected below instead of trusting the old note. */
+
+/* .about-text2's inline style isn't just a static color, it's a Webflow IX2 scroll interaction
+   that animates color as a keyframed property (baked in from when this template was authored
+   for a light background: text fades from a dim value into what was originally near-black body
+   copy). Confirmed live in headless Chrome across the scroll lifecycle -- it starts at
+   rgba(255,255,255,0.44), passes through rgb(48,50,52), and settles at rgb(15,17,19), which is
+   this page's own surface color: fully invisible at rest, not just low-contrast. An inline style
+   without !important always loses to an external rule with !important regardless of when JS sets
+   it, so pinning color here holds for the whole animation lifecycle -- the position slide-in is
+   unaffected, only the broken color-morph endpoint is neutralized. The nested <span> inside it
+   (the second sentence) has no color of its own and just inherits this, so one rule fixes both. */
+.about-text2 {
+  color: var(--hp-text-body) !important;
+}
+
+/* .footer-heading ("contact@influence720.com") sits inside .email, whose background-color is
+   var(--_colors---color-1) -- the same token this file repoints to rgba(255,255,255,0.92) for
+   use as light text elsewhere. Here it's a background, not text, so the repoint turns .email into
+   a near-white pill; .footer-heading then inherits the page's general light text color on top of
+   it: white on near-white, 1.18:1. Same dark-on-light-chip treatment as .bnf-i1-text above. */
+.footer-heading {
+  color: var(--_colors---surface) !important;
+}
 
 /* ── ICON-CONTRAST FIX ─────────────────────────────────────────────────────────────────────
    Frame-4_2Frame-4.png / Frame-5_1Frame-5.png / Frame-5_2Frame-5.png (the hero/CTA button

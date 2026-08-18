@@ -112,16 +112,42 @@ a, .menu-nav1:hover, .footer-link:hover {
   color: var(--hp-text-body) !important;
 }
 
-/* .bnf-i1-text is the ONE exception to the rule above: it sits inside .benefits-item1-text,
-   whose own background-color is the light chip (--colors---color-2, our translucent-white,
-   composites to ~#A7A8A9) — the opposite context from every other body-text class on this page.
-   Its sibling .bnf-i2-text/.bnf-i3-text/.bnf-i4-text correctly inherit their parent's dark
-   (--colors---surface) text color for that light chip; .bnf-i1-text alone had its own explicit
-   color:var(--colors---color-6) override, which would otherwise collide with the "light body
-   text" rule above and put light-grey text on a light-grey chip. Normalized to match its
-   siblings: dark text on light chip, 7.94:1. */
-.bnf-i1-text {
+/* SECOND-PASS FIX (first pass got this wrong for i2/i3/i4 — corrected here after a live report).
+   bnf-i1-text, bnf-i2-text, bnf-i3-text ALL sit inside a parent chip whose own rule sets
+   background-color: color-2 (translucent white, composites to ~#A7A8A9) + color: var(--colors
+   ---surface) (dark, correct). bnf-i1-text had its own color:color-6 override (dark-surface-tone
+   text, ~1.24:1 -- was fixed). bnf-i2-text/bnf-i3-text share ONE combined selector
+   (".bnf-i3-text, .bnf-i2-text") with the SAME color:color-6 override -- previously assumed to
+   inherit the correct parent color instead of checking the actual rule; it does not, it was
+   never fixed, and it was still live. bnf-i4-text has NO explicit color rule of its own, so it
+   falls through to the page's own light default text color (~0.92 alpha white) sitting on the
+   SAME light chip -- 2.09:1, also broken, just via inheritance instead of an explicit override.
+   All three normalized together: dark text on light chip, matching bnf-i1-text and the chip's
+   own correct parent rule. */
+.bnf-i1-text, .bnf-i2-text, .bnf-i3-text, .bnf-i4-text {
   color: var(--_colors---surface) !important;
+}
+
+/* .benefits-text1/2/3/4 (the longer mission-copy paragraphs under the Micro-group icons) sit in
+   position:absolute wrappers that ALSO carry the light-chip background (background-color:
+   color-2) -- a pill/chip treatment appropriate for the short bnf-iN-text LABELS above, never
+   audited for the much longer paragraph sentences reusing the same class family. Result: the
+   --hp-text-body light-grey fix applied to .bnf-text1-4 (in the rule above) would render against
+   that SAME light chip in this context, not the dark page background it was verified against --
+   near-identical luminance, ~1:1, invisible. Decisive fix rather than a second conditional color:
+   strip the chip background here entirely (a chip was never the right register for a full
+   sentence) so .bnf-text1-4's light-grey text renders on the plain dark page background it was
+   actually verified against. */
+.benefits-text1, .benefits-text2, .benefits-text3, .benefits-text4 {
+  background-color: transparent !important;
+}
+
+/* .number-impact (the "(04)" section index in the Proof section) uses the same broken color-6
+   dark-surface-tone text color as every other section-index numeral did before the first pass --
+   present in the CSS's own authoritative list of color-6/surface text rules, but missed from the
+   color fix (it was only added to the monospace-font rule, not the color rule). */
+.number-impact {
+  color: var(--hp-text-body) !important;
 }
 
 /* Verified fine already (inherit --colors---text-color at 0.92 alpha, ~16:1) — listed here only

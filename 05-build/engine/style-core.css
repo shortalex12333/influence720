@@ -85,6 +85,9 @@ body.theme-dark .theme-switch-thumb{transform:translateX(18px)}
 .suite-nav-item:hover{color:var(--mark);text-decoration:underline}
 .suite-nav-current{font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--mark);white-space:nowrap;cursor:default}
 .suite-nav-sep{font-size:10px;color:var(--border2)}
+.suite-nav-label{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);white-space:nowrap;cursor:default}
+.suite-nav-item.pilot-link{color:var(--mark);font-weight:700}
+.suite-nav-item.pilot-link:hover{color:var(--text1,var(--mark))}
 
 .main{flex:1;display:flex;overflow:hidden;position:relative;background:var(--bg)}
 .lr-wrap{position:relative;display:flex;flex-shrink:0;overflow:visible;transition:width .25s cubic-bezier(.4,0,.2,1);width:340px}

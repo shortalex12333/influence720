@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<base href="/05-build/">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Pilot Z1 Vessel Network (standalone)</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Pilot Z1 — page-specific rules only; every shared token/component (header, .btn,
+   .lr-wrap/#lr/#lrb/.lr-row, #cv-wrap/#cv, .panel-wrap/#panel, .box, .badge, .chip,
+   .legend, theme vars) comes from engine/style-core.css unchanged. This page is a
+   standalone Z-axis (asset) pilot — NOT wired into the other 6 dashboards' suite-nav,
+   and it never reads their person/relationship data files. Only two views live here:
+   Vessel Gallery (the "account" view — a vessel with 6 chain-completeness slots) and
+   Entity Network (the "role/person" view — the owners/managers/brokers/lenders/SPVs/
+   insurers that fill those slots, rendered as a RingEngine radial graph). */
+
+.donut-wrap{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:32px;height:32px}
+.donut-wrap svg{display:block}
+.gallery-scope-row{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.gallery-scope-row .btn{flex:1;min-width:0;font-size:10.5px;height:30px;padding:0 4px}
+.gallery-search-row{padding:8px 12px;border-bottom:1px solid var(--border)}
+.gallery-search-input{width:100%;height:32px;padding:0 10px;border:1px solid var(--border2);border-radius:6px;background:var(--surface2);color:var(--text);font-size:12px;outline:none}
+.gallery-search-input:focus{border-color:var(--accent)}
+.gallery-search-input::placeholder{color:var(--text3)}
+.gallery-note{padding:8px 12px 4px 12px;font-size:11px;color:var(--text3);line-height:1.5}
+
+/* Stats bar — always-visible Z1_META readout, pinned to the top of whichever view's
+   canvas is showing. pointer-events:none so it never blocks graph drag/click below it. */
+#z1-stats-bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:10;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--text2);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.14);max-width:min(720px,88%);line-height:1.5;pointer-events:none}
+.z1-stats-slots{display:block;margin-top:4px;font-size:10.5px;color:var(--text3);letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-left-row">
+      <a href="/" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
+      <div class="h-title">Pilot Z1 — Vessel Network (standalone)</div>
+      <span class="vtag">STANDALONE PILOT</span>
+    </div>
+    <div class="h-sub">Superyacht ownership / SPV / lender / manager / broker / insurer chains — asset-side (Z-axis) data, structurally distinct from the person-relationship ontology the other 6 dashboards visualize. Not yet linked into that graph. <a href="/" style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Back to Influence 720 home</a></div>
+  </div>
+  <div class="h-ctrl">
+    <button class="btn on" id="btn-view-gallery">Vessel Gallery</button>
+    <button class="btn" id="btn-view-network">Entity Network</button>
+    <button class="btn" id="btn-names" style="display:none">Show Names</button>
+    <div class="theme-switch-wrap" title="Switch between light and dark mode">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh"><div id="lrh-title">Vessel Gallery</div><div id="lrh-sub"></div></div>
+      <div class="gallery-scope-row">
+        <button class="btn on" id="btn-scope-touched">Touched only</button>
+        <button class="btn" id="btn-scope-full">Full corpus</button>
+      </div>
+      <div class="gallery-search-row"><input type="text" class="gallery-search-input" id="gallery-search" placeholder="Search vessels by name…" /></div>
+      <div class="gallery-note" id="gallery-note"></div>
+      <div id="lrb"></div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <svg id="cv"></svg>
+    <div id="z1-stats-bar"></div>
+    <div class="legend" id="gallery-legend"></div>
+    <div class="legend" id="network-legend" style="display:none"></div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+  </div>
+</div>
+
+<script src="data/z1-vessel-network.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA CONTRACT (read directly off data/z1-vessel-network.js — see that
+   file's own header comment: auto-generated, never hand-edited):
+     Z1_META               — {generated_at, total_corpus, total_touched,
+                               total_confirmed_links, by_slot:{6 counts}}
+     Z1_ENTITIES            — ~68 {name, role, fleet_value_eur, vessel_ids,
+                               confidence} sorted by fleet_value_eur desc.
+     Z1_VESSELS_TOUCHED      — 211 full vessel objects w/ per-slot chain detail.
+     Z1_VESSELS_ALL_MINIMAL — 13,266 {id, name, value_eur, touched,
+                               chain_found_count} — the honest full-corpus
+                               denominator, minimal fields only.
+   CHAIN_SLOTS order below matches Z1_META.by_slot's own key order exactly
+   (verified against the source file) — reused everywhere: donut slice
+   order, chain-detail box order, and Entity Network's 6 sectors.
+   ══════════════════════════════════════════════════════════════════ */
+const CHAIN_SLOTS = ['owner', 'spv', 'lender', 'manager', 'broker', 'insurer'];
+const SLOT_LABEL = { owner: 'Owner', spv: 'SPV / Holding Entity', lender: 'Lender', manager: 'Manager', broker: 'Broker', insurer: 'Insurer' };
+const svgNS = 'http://www.w3.org/2000/svg';
+
+RingEngine.theme.apply();
+
+/* ══════════════════════════════════════════════════════════════════
+   SHARED HELPERS
+   ══════════════════════════════════════════════════════════════════ */
+function resolveColor(varName) { return getComputedStyle(document.body).getPropertyValue(varName).trim(); }
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+function fmtEUR(v) {
+  if (v == null) return '—';
+  if (v >= 1e9) return '€' + (v / 1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '€' + (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '€' + (v / 1e3).toFixed(0) + 'K';
+  return '€' + v.toLocaleString();
+}
+// confidence is either an R-tier string (managers/brokers/lenders/SPVs/insurers,
+// e.g. "R1_two_source_agreement_plus_year") or a bare 0-100 number (every owner
+// entity in this corpus — verified directly against the data: all 26 owner-role
+// entities carry a numeric confidence, everything else carries an Rn string).
+function formatConfidence(c) {
+  if (c == null || c === '') return '—';
+  if (typeof c === 'number') return c + '% confidence';
+  const m = /^R([0-4])_?(.*)$/.exec(c);
+  if (m) return `R${m[1]}${m[2] ? ' — ' + m[2].replace(/_/g, ' ') : ''}`;
+  return String(c).replace(/_/g, ' ');
+}
+// Ring-tier parser for the Entity Network view — pulls the leading R0-R4 digit off
+// a confidence string. Per spec: empty string, no leading Rn match (this includes
+// every numeric/percentage confidence, i.e. every owner entity), all default to
+// ring 4 ("R4 GAP") — a real, literal consequence of owner confidence being stored
+// as a bare percentage rather than an Rn tier string, not a bug in this parser.
+function ringOfEntity(e) {
+  const c = e.confidence;
+  if (typeof c === 'string') { const m = /^R([0-4])/.exec(c); if (m) return Number(m[1]); }
+  return 4;
+}
+
+// Annulus (donut) slice path — n equal slices starting at 12 o'clock, clockwise.
+function polar(cx, cy, r, a) { return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
+function donutSlicePath(cx, cy, rInner, rOuter, a0, a1) {
+  const po0 = polar(cx, cy, rOuter, a0), po1 = polar(cx, cy, rOuter, a1);
+  const pi1 = polar(cx, cy, rInner, a1), pi0 = polar(cx, cy, rInner, a0);
+  const large = (a1 - a0) > Math.PI ? 1 : 0;
+  return `M ${po0.x} ${po0.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${po1.x} ${po1.y} L ${pi1.x} ${pi1.y} A ${rInner} ${rInner} 0 ${large} 0 ${pi0.x} ${pi0.y} Z`;
+}
+function buildDonutSVGString(states, size, thickness, colors) {
+  const cx = size / 2, cy = size / 2, rOuter = size / 2 - 1, rInner = rOuter - thickness;
+  const anglePer = (2 * Math.PI) / 6;
+  let start = -Math.PI / 2, paths = '';
+  for (let i = 0; i < 6; i++) {
+    const end = start + anglePer;
+    const st = states[i];
+    const fill = st === 'found' ? colors.found : st === 'searched_absent' ? colors.absent : colors.neutral;
+    paths += `<path d="${donutSlicePath(cx, cy, rInner, rOuter, start, end)}" fill="${fill}"/>`;
+    start = end;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}</svg>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VESSEL INDICES
+   ══════════════════════════════════════════════════════════════════ */
+const touchedById = new Map(Z1_VESSELS_TOUCHED.map(v => [v.id, v]));
+const minimalById = new Map(Z1_VESSELS_ALL_MINIMAL.map(v => [v.id, v]));
+function chainStatesFor(vesselLike) {
+  const full = touchedById.get(vesselLike.id);
+  if (full) return CHAIN_SLOTS.map(s => (full.chain[s] || { state: 'never_attempted' }).state);
+  return CHAIN_SLOTS.map(() => 'never_attempted');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════════ */
+const state = {
+  view: 'gallery',
+  gallery: { scope: 'touched', search: '', selectedVesselId: null },
+  network: { selectedEntityKey: null, showLabels: false },
+};
+let currentDomainColBySlot = {}, currentDomainIdBySlot = {};
+
+/* ══════════════════════════════════════════════════════════════════
+   STATS BAR — always-visible Z1_META readout, real numbers only.
+   ══════════════════════════════════════════════════════════════════ */
+function initStatsBar() {
+  const bs = Z1_META.by_slot;
+  document.getElementById('z1-stats-bar').innerHTML = `
+    <strong>${Z1_META.total_confirmed_links}</strong> confirmed ownership-chain links found across <strong>${Z1_META.total_touched}</strong> vessels searched — out of <strong>${Z1_META.total_corpus.toLocaleString()}</strong> vessels in the full corpus.
+    <span class="z1-stats-slots">Owner ${bs.owner} &middot; SPV ${bs.spv} &middot; Lender ${bs.lender} &middot; Manager ${bs.manager} &middot; Broker ${bs.broker} &middot; Insurer ${bs.insurer}</span>`;
+}
+function renderLegends() {
+  document.getElementById('gallery-legend').innerHTML = `
+    <div class="legend-row"><span class="legend-swatch" style="background:${resolveColor('--status-bound')}"></span>Found — chain link confirmed</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:${resolveColor('--status-expiring')}"></span>Searched — not publicly found</div>
+    <div class="legend-row"><span class="legend-swatch" style="background:${resolveColor('--surface3')}"></span>Not yet searched</div>`;
+  const domains = buildDomains();
+  document.getElementById('network-legend').innerHTML = domains.map(d =>
+    `<div class="legend-row"><span class="legend-swatch" style="background:${d.col}"></span>${d.name}</div>`
+  ).join('') + `<div class="legend-row"><span class="legend-line" style="border-color:${resolveColor('--accent')};border-top-style:solid;border-top-width:2px"></span>Owner &rarr; confirmed chain-link entity</div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIEW A — VESSEL GALLERY
+   ══════════════════════════════════════════════════════════════════ */
+function initGalleryControls() {
+  document.getElementById('lrh-sub').textContent = `${Z1_META.total_touched} searched, out of ${Z1_META.total_corpus.toLocaleString()} in the corpus`;
+  document.getElementById('btn-scope-touched').textContent = `Touched only (${Z1_META.total_touched})`;
+  document.getElementById('btn-scope-full').textContent = `Full corpus (${Z1_META.total_corpus.toLocaleString()})`;
+  document.getElementById('gallery-search').placeholder = `Search all ${Z1_META.total_corpus.toLocaleString()} vessels by name…`;
+
+  document.getElementById('btn-scope-touched').addEventListener('click', () => {
+    state.gallery.scope = 'touched';
+    document.getElementById('btn-scope-touched').classList.add('on');
+    document.getElementById('btn-scope-full').classList.remove('on');
+    renderGalleryRail();
+  });
+  document.getElementById('btn-scope-full').addEventListener('click', () => {
+    state.gallery.scope = 'full';
+    document.getElementById('btn-scope-full').classList.add('on');
+    document.getElementById('btn-scope-touched').classList.remove('on');
+    renderGalleryRail();
+  });
+  document.getElementById('gallery-search').addEventListener('input', e => {
+    state.gallery.search = e.target.value;
+    renderGalleryRail();
+  });
+  document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+}
+
+// Search always runs against the FULL 13,266-row Z1_VESSELS_ALL_MINIMAL array (never
+// just the capped/touched rows) — so a user can find any vessel by name regardless of
+// which scope toggle is active. Default (no query) obeys the scope toggle: touched-only
+// (211, no cap needed) or full-corpus top-500-by-value (13,266 is too many DOM rows).
+function renderGalleryRail() {
+  const lrb = document.getElementById('lrb');
+  const noteEl = document.getElementById('gallery-note');
+  lrb.innerHTML = '';
+  const donutColors = { found: resolveColor('--status-bound'), absent: resolveColor('--status-expiring'), neutral: resolveColor('--surface3') };
+  const q = state.gallery.search.trim().toLowerCase();
+  let rows, noteText;
+  if (q) {
+    rows = Z1_VESSELS_ALL_MINIMAL.filter(v => v.name.toLowerCase().includes(q)).sort((a, b) => (b.value_eur || 0) - (a.value_eur || 0)).slice(0, 300);
+    noteText = rows.length
+      ? `${rows.length} match${rows.length === 1 ? '' : 'es'} for "${state.gallery.search}" — searched across the full ${Z1_META.total_corpus.toLocaleString()}-vessel corpus`
+      : `No matches for "${state.gallery.search}" in the ${Z1_META.total_corpus.toLocaleString()}-vessel corpus`;
+  } else if (state.gallery.scope === 'touched') {
+    rows = Z1_VESSELS_TOUCHED.slice().sort((a, b) => (b.value_eur || 0) - (a.value_eur || 0));
+    noteText = `${rows.length} vessels ever searched on at least one ownership-chain link`;
+  } else {
+    rows = Z1_VESSELS_ALL_MINIMAL.slice().sort((a, b) => (b.value_eur || 0) - (a.value_eur || 0)).slice(0, 500);
+    noteText = `Showing top 500 of ${Z1_META.total_corpus.toLocaleString()} by value — search above to find a specific vessel`;
+  }
+  noteEl.textContent = noteText;
+  rows.forEach(v => {
+    const states = chainStatesFor(v);
+    const row = document.createElement('div');
+    row.className = 'lr-row';
+    if (state.gallery.selectedVesselId === v.id) row.classList.add('active');
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        <div class="donut-wrap">${buildDonutSVGString(states, 32, 9, donutColors)}</div>
+        <div style="min-width:0;overflow:hidden">
+          <div class="lr-row-label" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(v.name)}</div>
+          <div class="lr-row-sub">${fmtEUR(v.value_eur)} &middot; ${v.chain_found_count}/6 links found</div>
+        </div>
+      </div>`;
+    row.addEventListener('click', () => selectVessel(v.id));
+    lrb.appendChild(row);
+  });
+}
+
+function renderGalleryCanvas() {
+  const svg = document.getElementById('cv');
+  svg.innerHTML = '';
+  const W = svg.clientWidth || 900, H = svg.clientHeight || 700;
+  const cx = W / 2, cy = H / 2 + 6;
+  const id = state.gallery.selectedVesselId;
+  if (!id) {
+    const t = document.createElementNS(svgNS, 'text');
+    t.setAttribute('x', cx); t.setAttribute('y', cy);
+    t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '14');
+    t.setAttribute('fill', resolveColor('--text3'));
+    t.textContent = 'Select a vessel from the list to see its ownership chain.';
+    svg.appendChild(t);
+    return;
+  }
+  const vessel = touchedById.get(id) || minimalById.get(id);
+  if (!vessel) return;
+  const states = chainStatesFor(vessel);
+  const rOuter = Math.min(W, H) * 0.26, rInner = rOuter * 0.52;
+  const g = document.createElementNS(svgNS, 'g');
+  const anglePer = (2 * Math.PI) / 6;
+  let start = -Math.PI / 2;
+  const colorFound = resolveColor('--status-bound'), colorAbsent = resolveColor('--status-expiring'), colorNeutral = resolveColor('--surface3'), strokeCol = resolveColor('--surface');
+  for (let i = 0; i < 6; i++) {
+    const end = start + anglePer, slot = CHAIN_SLOTS[i], st = states[i];
+    const fill = st === 'found' ? colorFound : st === 'searched_absent' ? colorAbsent : colorNeutral;
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', donutSlicePath(cx, cy, rInner, rOuter, start, end));
+    path.setAttribute('fill', fill); path.setAttribute('stroke', strokeCol); path.setAttribute('stroke-width', '2');
+    g.appendChild(path);
+    const midA = start + anglePer / 2, labelR = rOuter + 26;
+    const lp = polar(cx, cy, labelR, midA);
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', lp.x); label.setAttribute('y', lp.y);
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('dominant-baseline', 'middle');
+    label.setAttribute('font-size', '11'); label.setAttribute('font-weight', '700'); label.setAttribute('letter-spacing', '.04em');
+    label.setAttribute('fill', resolveColor('--text2'));
+    label.textContent = SLOT_LABEL[slot].toUpperCase();
+    g.appendChild(label);
+    start = end;
+  }
+  svg.appendChild(g);
+  const nameText = document.createElementNS(svgNS, 'text');
+  nameText.setAttribute('x', cx); nameText.setAttribute('y', cy - 6);
+  nameText.setAttribute('text-anchor', 'middle'); nameText.setAttribute('font-size', '16'); nameText.setAttribute('font-weight', '800');
+  nameText.setAttribute('fill', resolveColor('--text'));
+  nameText.textContent = vessel.name.length > 22 ? vessel.name.slice(0, 21) + '…' : vessel.name;
+  svg.appendChild(nameText);
+  const valText = document.createElementNS(svgNS, 'text');
+  valText.setAttribute('x', cx); valText.setAttribute('y', cy + 16);
+  valText.setAttribute('text-anchor', 'middle'); valText.setAttribute('font-size', '13'); valText.setAttribute('font-weight', '600');
+  valText.setAttribute('fill', resolveColor('--text3'));
+  valText.textContent = fmtEUR(vessel.value_eur);
+  svg.appendChild(valText);
+}
+
+function renderGalleryPanel() {
+  const panel = document.getElementById('panel');
+  const id = state.gallery.selectedVesselId;
+  if (!id) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">&#9673;</div><div class="panel-empty-text">Click any vessel — from the list or the donut — to see its full 6-slot ownership chain.</div></div>`;
+    return;
+  }
+  const full = touchedById.get(id);
+  const min = minimalById.get(id);
+  const vessel = full || min;
+  if (!vessel) return;
+  const header = `<div class="panel-header">
+    <div class="panel-title">${escapeHtml(vessel.name)}</div>
+    <div class="panel-meta-row">
+      <span class="badge" style="background:var(--surface3);color:var(--text2)">${fmtEUR(vessel.value_eur)}</span>
+      ${full && full.loa_m != null ? `<span class="badge badge-ring">${full.loa_m} m LOA</span>` : ''}
+      ${full && full.flag_state ? `<span class="chip">${escapeHtml(full.flag_state)}</span>` : ''}
+      ${full && full.hra === true ? `<span class="badge badge-status expiring">HRA</span>` : ''}
+    </div>
+  </div>`;
+  let specsBox;
+  if (full) {
+    specsBox = `<div class="box"><h3>Vessel Specs</h3><div class="info-table">
+      <div class="info-row"><span class="info-key">Builder</span><span class="info-val">${full.builder ? escapeHtml(full.builder) : '—'}</span></div>
+      <div class="info-row"><span class="info-key">Built</span><span class="info-val">${full.builder_year ?? '—'}</span></div>
+      <div class="info-row"><span class="info-key">LOA</span><span class="info-val">${full.loa_m != null ? full.loa_m + ' m' : '—'}</span></div>
+      <div class="info-row"><span class="info-key">GT</span><span class="info-val">${full.gt ?? '—'}</span></div>
+      <div class="info-row"><span class="info-key">Flag</span><span class="info-val">${full.flag_state ? escapeHtml(full.flag_state) : '—'}</span></div>
+      <div class="info-row"><span class="info-key">ID</span><span class="info-val" style="font-family:monospace">${escapeHtml(full.id)}</span></div>
+    </div></div>`;
+  } else {
+    specsBox = `<div class="box"><h3>Vessel Specs</h3><p>Not yet searched — this vessel exists in the ${Z1_META.total_corpus.toLocaleString()}-vessel corpus but has never had a chain-link search run against it. Only id/name/value are on file.</p>
+      <div class="info-table" style="margin-top:8px"><div class="info-row"><span class="info-key">ID</span><span class="info-val" style="font-family:monospace">${escapeHtml(vessel.id)}</span></div></div></div>`;
+  }
+  const chainBoxes = CHAIN_SLOTS.map(slot => {
+    const c = full ? (full.chain[slot] || { state: 'never_attempted' }) : { state: 'never_attempted' };
+    let body;
+    if (c.state === 'found') {
+      body = `<span class="badge badge-status bound">FOUND</span>
+        <p style="margin-top:8px"><strong>${escapeHtml(c.value)}</strong></p>
+        <p style="margin-top:4px;font-size:11px;color:var(--text3)">${escapeHtml(formatConfidence(c.confidence))}</p>
+        ${c.source_url ? `<p style="margin-top:6px"><a href="${escapeHtml(c.source_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-size:12px">Source &#8599;</a></p>` : ''}`;
+    } else if (c.state === 'searched_absent') {
+      body = `<span class="badge badge-status expiring">SEARCHED</span><p style="margin-top:8px">Searched — not publicly found.</p>`;
+    } else {
+      body = `<span class="badge" style="background:var(--surface3);color:var(--text3)">NOT YET SEARCHED</span><p style="margin-top:8px">No search has been run against this chain link yet.</p>`;
+    }
+    return `<div class="box"><h3>${SLOT_LABEL[slot]}</h3>${body}</div>`;
+  }).join('');
+  panel.innerHTML = header + specsBox + chainBoxes;
+}
+
+function selectVessel(id) {
+  state.gallery.selectedVesselId = (state.gallery.selectedVesselId === id) ? null : id;
+  renderGalleryRail();
+  renderGalleryCanvas();
+  renderGalleryPanel();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIEW B — ENTITY NETWORK (RingEngine radial graph over Z1_ENTITIES)
+   ══════════════════════════════════════════════════════════════════ */
+const NETWORK_NODES = Z1_ENTITIES.map(e => ({ ...e, id: e.role + '::' + e.name }));
+const NETWORK_NODE_ID_SET = new Set(NETWORK_NODES.map(n => n.id));
+const MAX_FLEET_VALUE = Math.max(...Z1_ENTITIES.map(e => e.fleet_value_eur));
+
+function sizeForEntity(n, ring) {
+  const minR = ({ 0: 16, 1: 11, 2: 8, 3: 6, 4: 5 })[ring] ?? 5;
+  const maxR = ({ 0: 32, 1: 22, 2: 16, 3: 12, 4: 9 })[ring] ?? 9;
+  const t = 0.35 + 0.65 * Math.sqrt(n.fleet_value_eur / MAX_FLEET_VALUE);
+  return minR + Math.min(1, t) * (maxR - minR);
+}
+
+// Custom ring config for THIS dashboard's own confidence-tier vocabulary — deliberately
+// NOT RingEngine.DEFAULT_RING (whose RL labels are APEX/OPERATIONAL authority semantics,
+// meaningless for a sourcing-confidence axis). Radii bands are the same proven geometry
+// every other 720 dashboard uses; only RC/RL are new here.
+const Z1_RING = {
+  RI: { 0: 80, 1: 210, 2: 400, 3: 630, 4: 840 },
+  RO: { 0: 200, 1: 390, 2: 620, 3: 830, 4: 1020 },
+  RC: { 0: '#3aa76d', 1: '#6a9de0', 2: '#c9a84c', 3: '#e0793a', 4: '#8a8a8a' },
+  RL: { 0: 'R0 HARDCODED', 1: 'R1 DIRECTLY SOURCED', 2: 'R2 DERIVED', 3: 'R3 BENCHMARKED', 4: 'R4 GAP' },
+};
+
+function buildDomains() {
+  return [
+    { id: 1, name: SLOT_LABEL.owner, slot: 'owner', col: resolveColor('--domain5') },
+    { id: 2, name: SLOT_LABEL.spv, slot: 'spv', col: resolveColor('--domain4') },
+    { id: 3, name: SLOT_LABEL.lender, slot: 'lender', col: resolveColor('--domain3') },
+    { id: 4, name: SLOT_LABEL.manager, slot: 'manager', col: resolveColor('--domain7') },
+    { id: 5, name: SLOT_LABEL.broker, slot: 'broker', col: resolveColor('--domain2') },
+    { id: 6, name: SLOT_LABEL.insurer, slot: 'insurer', col: resolveColor('--domain9') },
+  ];
+}
+
+// Directed edges — the one deliberate deviation from RingEngine's own (never-directional)
+// edge model, drawn manually on top of the returned SVG after RingEngine.render(). Money/
+// authority flows one way through an ownership chain (owner -> SPV/lender/manager/broker/
+// insurer), unlike a symmetric "knows" relationship in the other dashboards. Computed once
+// at load — vessel/entity data is static for this pilot. Per spec: only vessels with an
+// owner slot found AND 2+ total slots found produce edges; a slot whose found value has no
+// matching entity node (10 SPV + 1 insurer value in this corpus don't) is silently skipped,
+// never the whole vessel.
+function computeDirectedEdges() {
+  const edges = [];
+  Z1_VESSELS_TOUCHED.forEach(v => {
+    const foundSlots = CHAIN_SLOTS.filter(s => v.chain[s] && v.chain[s].state === 'found');
+    if (foundSlots.length < 2) return;
+    if (!v.chain.owner || v.chain.owner.state !== 'found') return;
+    const ownerId = 'owner::' + v.chain.owner.value;
+    if (!NETWORK_NODE_ID_SET.has(ownerId)) return;
+    foundSlots.forEach(slot => {
+      if (slot === 'owner') return;
+      const targetId = slot + '::' + v.chain[slot].value;
+      if (!NETWORK_NODE_ID_SET.has(targetId)) return;
+      edges.push({ from: ownerId, to: targetId, vessel: v.name });
+    });
+  });
+  return edges;
+}
+const DIRECTED_EDGES = computeDirectedEdges();
+
+function renderDirectedEdges(svg, byId) {
+  const scene = svg.querySelector('g');
+  if (!scene) return;
+  const defs = document.createElementNS(svgNS, 'defs');
+  const marker = document.createElementNS(svgNS, 'marker');
+  marker.setAttribute('id', 'z1-arrow');
+  marker.setAttribute('viewBox', '0 0 10 10');
+  marker.setAttribute('refX', '8.5'); marker.setAttribute('refY', '5');
+  marker.setAttribute('markerWidth', '6'); marker.setAttribute('markerHeight', '6');
+  marker.setAttribute('orient', 'auto-start-reverse');
+  const arrowPath = document.createElementNS(svgNS, 'path');
+  arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+  arrowPath.setAttribute('fill', resolveColor('--accent'));
+  marker.appendChild(arrowPath);
+  defs.appendChild(marker);
+  svg.insertBefore(defs, svg.firstChild);
+
+  const layer = document.createElementNS(svgNS, 'g');
+  layer.id = 'z1-edge-layer';
+  const strokeCol = resolveColor('--accent');
+  DIRECTED_EDGES.forEach(e => {
+    const a = byId.get(e.from), b = byId.get(e.to);
+    if (!a || !b) return;
+    const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy) || 1;
+    const ux = dx / dist, uy = dy / dist;
+    const x1 = a.x + ux * (a.r + 3), y1 = a.y + uy * (a.r + 3);
+    const x2 = b.x - ux * (b.r + 7), y2 = b.y - uy * (b.r + 7);
+    const line = document.createElementNS(svgNS, 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', strokeCol); line.setAttribute('stroke-width', '1.6'); line.setAttribute('stroke-opacity', '0.6');
+    line.setAttribute('marker-end', 'url(#z1-arrow)');
+    layer.appendChild(line);
+  });
+  scene.appendChild(layer); // appended on top so arrowheads are never hidden under node dots
+}
+
+function renderNetworkCanvas() {
+  const svg = document.getElementById('cv');
+  const domains = buildDomains();
+  currentDomainColBySlot = {}; currentDomainIdBySlot = {};
+  domains.forEach(d => { currentDomainColBySlot[d.slot] = d.col; currentDomainIdBySlot[d.slot] = d.id; });
+  const W = svg.clientWidth || 1200, H = svg.clientHeight || 900;
+  const fitZoom = Math.min(W, H) / (2 * (Z1_RING.RO[4] + 130));
+  const { byId } = RingEngine.render(svg, {
+    nodes: NETWORK_NODES,
+    domains,
+    ring: Z1_RING,
+    colorFn: n => currentDomainColBySlot[n.role] || resolveColor('--text3'),
+    sizeFn: n => sizeForEntity(n, ringOfEntity(n)),
+    scoreFn: n => n.fleet_value_eur,
+    ringOf: ringOfEntity,
+    domainOf: n => currentDomainIdBySlot[n.role] || 1,
+    labelFn: n => n.name,
+    activeId: state.network.selectedEntityKey,
+    showLabels: state.network.showLabels,
+    vz: Math.max(0.18, fitZoom),
+    onSelect: n => selectEntity(n.id),
+    onHover: (evt, n) => RingEngine.tooltip.show(evt, n.name, `${SLOT_LABEL[n.role]} &middot; ${Z1_RING.RL[ringOfEntity(n)]}`, `${fmtEUR(n.fleet_value_eur)} fleet value across ${n.vessel_ids.length} vessel${n.vessel_ids.length === 1 ? '' : 's'}`),
+    onLeave: RingEngine.tooltip.hide,
+  });
+  renderDirectedEdges(svg, byId);
+}
+
+function renderNetworkPanel() {
+  const panel = document.getElementById('panel');
+  const id = state.network.selectedEntityKey;
+  if (!id) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">&#9673;</div><div class="panel-empty-text">Click any entity node to see its role, fleet value, confidence tier, and the vessels it's linked to.</div></div>`;
+    return;
+  }
+  const n = NETWORK_NODES.find(x => x.id === id);
+  if (!n) return;
+  const ring = ringOfEntity(n);
+  const col = currentDomainColBySlot[n.role] || resolveColor('--text3');
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-title">${escapeHtml(n.name)}</div>
+      <div class="panel-meta-row">
+        <span class="badge badge-domain" style="background:${col}">${SLOT_LABEL[n.role]}</span>
+        <span class="badge badge-ring">${Z1_RING.RL[ring]}</span>
+      </div>
+    </div>
+    <div class="box"><h3>Fleet Value</h3><p style="font-size:22px;font-weight:800;color:var(--text)">${fmtEUR(n.fleet_value_eur)}</p></div>
+    <div class="box"><h3>Confidence</h3><p>${escapeHtml(formatConfidence(n.confidence))}</p></div>
+    <div class="box"><h3>Linked Vessels (${n.vessel_ids.length})</h3>
+      <div class="chips">${n.vessel_ids.map(vid => {
+        const v = touchedById.get(vid);
+        return `<span class="chip" style="cursor:pointer" data-vessel="${escapeHtml(vid)}">${escapeHtml(v ? v.name : vid)}</span>`;
+      }).join('')}</div>
+    </div>`;
+  panel.querySelectorAll('[data-vessel]').forEach(el => {
+    el.addEventListener('click', () => {
+      const vid = el.getAttribute('data-vessel');
+      switchView('gallery');
+      selectVessel(vid);
+    });
+  });
+}
+
+function selectEntity(id) {
+  state.network.selectedEntityKey = (state.network.selectedEntityKey === id) ? null : id;
+  renderNetworkCanvas();
+  renderNetworkPanel();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VIEW SWITCH / HEADER / THEME
+   ══════════════════════════════════════════════════════════════════ */
+function switchView(v) {
+  state.view = v;
+  document.getElementById('btn-view-gallery').classList.toggle('on', v === 'gallery');
+  document.getElementById('btn-view-network').classList.toggle('on', v === 'network');
+  document.getElementById('lr-wrap').style.display = v === 'gallery' ? '' : 'none';
+  document.getElementById('btn-names').style.display = v === 'network' ? '' : 'none';
+  document.getElementById('gallery-legend').style.display = v === 'gallery' ? '' : 'none';
+  document.getElementById('network-legend').style.display = v === 'network' ? '' : 'none';
+  if (v === 'gallery') { renderGalleryRail(); renderGalleryCanvas(); renderGalleryPanel(); }
+  else { renderNetworkCanvas(); renderNetworkPanel(); }
+}
+function rerenderCurrentView() {
+  if (state.view === 'gallery') { renderGalleryCanvas(); renderGalleryPanel(); }
+  else { renderNetworkCanvas(); renderNetworkPanel(); }
+}
+
+document.getElementById('btn-view-gallery').addEventListener('click', () => switchView('gallery'));
+document.getElementById('btn-view-network').addEventListener('click', () => switchView('network'));
+document.getElementById('btn-names').addEventListener('click', () => {
+  state.network.showLabels = !state.network.showLabels;
+  document.getElementById('btn-names').textContent = state.network.showLabels ? 'Hide Names' : 'Show Names';
+  document.getElementById('btn-names').classList.toggle('on', state.network.showLabels);
+  renderNetworkCanvas();
+});
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  RingEngine.theme.toggle();
+  document.getElementById('theme-toggle').setAttribute('aria-checked', document.body.classList.contains('theme-dark'));
+  renderLegends();
+  if (state.view === 'gallery') renderGalleryRail();
+  rerenderCurrentView();
+});
+window.addEventListener('resize', rerenderCurrentView);
+
+/* ══════════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════════ */
+initGalleryControls();
+initStatsBar();
+renderLegends();
+switchView('gallery');
+
+})();
+</script>
+</body>
+</html>

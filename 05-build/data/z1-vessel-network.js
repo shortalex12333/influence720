@@ -77,6 +77,15 @@ const Z1_ENTITIES = [
     "confidence": "R2_needs_manual_review_builder_disagrees"
   },
   {
+    "name": "Black Dragon Minerals",
+    "role": "spv",
+    "fleet_value_eur": 320937084,
+    "vessel_ids": [
+      "imo:9785108"
+    ],
+    "confidence": ""
+  },
+  {
     "name": "Jeff Bezos",
     "role": "owner",
     "fleet_value_eur": 315731823,
@@ -121,6 +130,15 @@ const Z1_ENTITIES = [
       "mmsi:319112900"
     ],
     "confidence": "R1_panel_confirmed_100pct"
+  },
+  {
+    "name": "Beyond Holdings Group Limited (formerly AHS Four Company)",
+    "role": "spv",
+    "fleet_value_eur": 241054256,
+    "vessel_ids": [
+      "mmsi:319112900"
+    ],
+    "confidence": ""
   },
   {
     "name": "Y.CO (The Yacht Company)",
@@ -216,6 +234,15 @@ const Z1_ENTITIES = [
     "confidence": "R2_panel_majority_67pct"
   },
   {
+    "name": "Sonata Yachting Limited",
+    "role": "spv",
+    "fleet_value_eur": 189832612,
+    "vessel_ids": [
+      "mmsi:319076700"
+    ],
+    "confidence": ""
+  },
+  {
     "name": "Burgess (Burgess Yachts)",
     "role": "broker",
     "fleet_value_eur": 163262225,
@@ -279,6 +306,15 @@ const Z1_ENTITIES = [
       "namehash:e4831bcf8ee6"
     ],
     "confidence": "R1_panel_confirmed_100pct"
+  },
+  {
+    "name": "Kazimo Trade & Invest Limited",
+    "role": "spv",
+    "fleet_value_eur": 142606186,
+    "vessel_ids": [
+      "mmsi:319321000"
+    ],
+    "confidence": ""
   },
   {
     "name": "Alexander Nesis",
@@ -390,6 +426,15 @@ const Z1_ENTITIES = [
     "confidence": "R2_panel_majority_67pct"
   },
   {
+    "name": "Moralis Yachting Ltd",
+    "role": "spv",
+    "fleet_value_eur": 66795430,
+    "vessel_ids": [
+      "namehash:56e22a70cbfb"
+    ],
+    "confidence": ""
+  },
+  {
     "name": "Qatar's former Prime Minister",
     "role": "owner",
     "fleet_value_eur": 61697975,
@@ -406,6 +451,15 @@ const Z1_ENTITIES = [
       "imo:1010387"
     ],
     "confidence": "R1_panel_confirmed_100pct"
+  },
+  {
+    "name": "Lighthouse Marine Ltd",
+    "role": "spv",
+    "fleet_value_eur": 48282105,
+    "vessel_ids": [
+      "imo:1010387"
+    ],
+    "confidence": ""
   },
   {
     "name": "Ocean Independence",
@@ -434,6 +488,15 @@ const Z1_ENTITIES = [
       "mmsi:403299000"
     ],
     "confidence": "R1_panel_confirmed_100pct"
+  },
+  {
+    "name": "Kingdom Holding Company",
+    "role": "spv",
+    "fleet_value_eur": 39653898,
+    "vessel_ids": [
+      "mmsi:403299000"
+    ],
+    "confidence": ""
   },
   {
     "name": "Royal Yacht International (RYI)",
@@ -497,6 +560,15 @@ const Z1_ENTITIES = [
       "imo:8843446"
     ],
     "confidence": "R1_panel_confirmed_100pct"
+  },
+  {
+    "name": "Schiffahrtsgesellschaft Sea Cloud GmbH & Co. KG",
+    "role": "spv",
+    "fleet_value_eur": 27375000,
+    "vessel_ids": [
+      "imo:8843446"
+    ],
+    "confidence": ""
   },
   {
     "name": "Sea Cloud Cruises GmbH (Hamburg, Germany)",
@@ -596,6 +668,15 @@ const Z1_ENTITIES = [
       "imo:9451111"
     ],
     "confidence": "R1_two_source_agreement_plus_year"
+  },
+  {
+    "name": "IFZA Limited",
+    "role": "spv",
+    "fleet_value_eur": 20563879,
+    "vessel_ids": [
+      "imo:8963997"
+    ],
+    "confidence": ""
   },
   {
     "name": "Fraser Yachts",

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<base href="/05-build/">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Influence 720 — Pilot Holistic1 Combined Ontology (standalone)</title>
+<link rel="stylesheet" href="engine/style-core.css" />
+<style>
+/* Pilot Holistic1 — combines pilot-z1's real entity ontology (left wheel) and
+   pilot-insurance1's coverage ontology (right wheel) on the SAME 9 real domains,
+   same order, same color per domain. Angle is the ONLY size signal on either
+   wheel (real fleet value on the left, real S4-tier limit on the right) --
+   radius stays fixed, matching every donut already built this session. Cross-
+   wheel connection lines are directional (Entity -> Coverage Line), drawn at
+   the domain level on canvas; individual role<->line connections surface as
+   clickable rows in the panel's Cross-Reference section, not as extra canvas
+   nodes -- keeps the canvas at <=9 shapes per wheel regardless of the 13,253
+   real vessels underneath, which live only as panel list rows. */
+
+.donut-wrap{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:32px;height:32px}
+.donut-wrap svg{display:block}
+.hol-note{padding:8px 12px 4px 12px;font-size:11px;color:var(--text3);line-height:1.5}
+.hol-filter-group{padding:8px 12px;border-bottom:1px solid var(--border)}
+.hol-filter-lbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--text2);text-transform:uppercase;margin-bottom:4px}
+.hol-filter-row{display:flex;gap:6px;align-items:center}
+.hol-filter-row input[type=number]{width:100%;height:26px;padding:0 6px;border:1px solid var(--border2);border-radius:5px;background:var(--surface2);color:var(--text);font-size:11px}
+.hol-multiselect{max-height:110px;overflow-y:auto;border:1px solid var(--border2);border-radius:5px;background:var(--surface2);padding:4px}
+.hol-multiselect label{display:flex;align-items:center;gap:5px;font-size:10.5px;padding:2px 3px;cursor:pointer;border-radius:3px}
+.hol-multiselect label:hover{background:var(--surface3)}
+.hol-toggle-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.hol-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:5px}
+.hol-tag-imputed{background:var(--surface3);color:var(--text3)}
+.hol-tag-real{background:var(--status-bound);color:#fff}
+
+#hol-stats-bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:10;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--text2);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.14);max-width:min(820px,90%);line-height:1.5;pointer-events:none}
+.hol-stats-slots{display:block;margin-top:4px;font-size:10.5px;color:var(--text3);letter-spacing:.02em}
+
+#cv-wrap.dragging{cursor:grabbing}
+.canvas-zoom-ctrl{position:absolute;bottom:16px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
+.canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
+.canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
+#zoom-reset span{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-left-row">
+      <a href="/" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
+      <div class="h-title">Pilot Holistic1 — Combined Ontology (standalone)</div>
+      <span class="vtag">STANDALONE PILOT</span>
+    </div>
+    <div class="h-sub">Real vessel/entity ontology (left) and insurance coverage ontology (right), same 9 domains, same order and color, angle-only value encoding on both. Directional links show which real entity role connects to which coverage line. <a href="/" style="color:var(--accent);font-weight:600;text-decoration:none">&larr; Back to Influence 720 home</a></div>
+  </div>
+  <div class="h-ctrl">
+    <div class="theme-switch-wrap" title="Switch between light and dark mode">
+      <span class="theme-switch-lbl">Light</span>
+      <button class="theme-switch" id="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode"><span class="theme-switch-thumb"></span></button>
+      <span class="theme-switch-lbl">Dark</span>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="lr-wrap" id="lr-wrap">
+    <div id="lr">
+      <div id="lrh"><div id="lrh-title">Filters</div><div id="lrh-sub"></div></div>
+      <div class="hol-note" id="lr-note"></div>
+
+      <div class="hol-filter-group">
+        <span class="hol-filter-lbl">Value (EUR millions)</span>
+        <div class="hol-filter-row"><input type="number" id="f-value-min" placeholder="min" /><input type="number" id="f-value-max" placeholder="max" /></div>
+      </div>
+      <div class="hol-filter-group">
+        <span class="hol-filter-lbl">Length (m)</span>
+        <div class="hol-filter-row"><input type="number" id="f-loa-min" placeholder="min" /><input type="number" id="f-loa-max" placeholder="max" /></div>
+      </div>
+      <div class="hol-filter-group">
+        <span class="hol-filter-lbl">Insurance value (USD millions, S4-tier sum)</span>
+        <div class="hol-filter-row"><input type="number" id="f-insval-min" placeholder="min" /><input type="number" id="f-insval-max" placeholder="max" /></div>
+      </div>
+      <div class="hol-filter-group">
+        <span class="hol-filter-lbl">Region</span>
+        <div class="hol-multiselect" id="f-region"></div>
+      </div>
+      <div class="hol-filter-group">
+        <span class="hol-filter-lbl">Management company (real, 21 on file)</span>
+        <div class="hol-multiselect" id="f-mgmt"></div>
+      </div>
+      <div class="hol-filter-group">
+        <div class="hol-toggle-row"><input type="checkbox" id="f-has-connection" /><label for="f-has-connection">Has a real entity connection only</label></div>
+      </div>
+      <button class="btn" id="f-reset" style="margin:8px 12px;width:calc(100% - 24px)">Reset filters</button>
+
+      <div id="lrh2" style="border-top:1px solid var(--border);padding-top:8px"><div id="lrh-title2" style="padding:0 12px;font-weight:700;font-size:12px">Domains</div></div>
+      <div id="lrb"></div>
+    </div>
+    <button id="lr-toggle">&#8249;</button>
+  </div>
+
+  <div id="cv-wrap">
+    <svg id="cv"></svg>
+    <div id="hol-stats-bar"></div>
+    <div class="legend" id="hol-legend"></div>
+    <div class="canvas-zoom-ctrl">
+      <button id="zoom-out" title="Zoom out">&#8722;</button>
+      <button id="zoom-reset" class="wide" title="Reset zoom"><span id="zoom-level">100%</span></button>
+      <button id="zoom-in" title="Zoom in">&#43;</button>
+    </div>
+  </div>
+
+  <div class="panel-wrap" id="panel-wrap">
+    <div id="panel"></div>
+  </div>
+</div>
+
+<script src="data/z1-vessel-network.js"></script>
+<script src="data/insurance-ontology.js"></script>
+<script src="data/holistic-dashboard-data.js"></script>
+<script src="engine/render-core.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA CONTRACT
+     Z1_ENTITIES (z1-vessel-network.js) — real entities {name, role, fleet_value_eur, vessel_ids}
+     INS1_DOMAINS / INS1_LINES (insurance-ontology.js) — the 9-domain coverage ontology
+     HOLISTIC_VESSELS (holistic-dashboard-data.js) — 13,253 real vessels joined with
+       computed_tier, insurance_value_sum_usd, region, management_company_name,
+       real_roles ({} for the 13,042 never chain-searched -- honest, not backfilled)
+     HOLISTIC_ROLE_TO_LINES — which real Z1 role connects to which real coverage
+       line, grounded in coverage-corpus.json's own statutory_triggers text
+   ══════════════════════════════════════════════════════════════════ */
+const svgNS = 'http://www.w3.org/2000/svg';
+const DOMAIN_COLORS = ['--domain1','--domain2','--domain3','--domain4','--domain5','--domain6','--domain7','--domain8','--domain9'];
+const DOMAIN_SHORT = { ownership_structure: 'Owner/Struct', legal_finance: 'Legal/Fin', flag_class_compliance: 'Flag/Class',
+  insurance_market: 'Ins. Market', acquisition_sale: 'Acq/Sale', new_build_refit: 'Build/Refit',
+  management_crew: 'Mgmt/Crew', charter_guest_ops: 'Charter/Guest', operations_shoreside: 'Ops/Shore' };
+const ROLE_TO_DOMAIN = { owner: 'ownership_structure', spv: 'ownership_structure', lender: 'legal_finance',
+                          manager: 'management_crew', broker: 'charter_guest_ops', insurer: 'insurance_market' };
+const vesselById = new Map(HOLISTIC_VESSELS.map(v => [v.vessel_id, v]));
+const lineById = new Map(INS1_LINES.map(l => [l.coverage_type_id, l]));
+const domainById = new Map(INS1_DOMAINS.map(d => [d.id, d]));
+
+RingEngine.theme.apply();
+
+function resolveColor(varName) { return getComputedStyle(document.body).getPropertyValue(varName).trim(); }
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function fmtEUR(v) { if (v == null) return '—'; if (v >= 1e9) return '€' + (v/1e9).toFixed(2) + 'B'; if (v >= 1e6) return '€' + (v/1e6).toFixed(1) + 'M'; if (v >= 1e3) return '€' + (v/1e3).toFixed(0) + 'K'; return '€' + v.toLocaleString(); }
+function fmtUSD(v) { if (v == null) return '—'; if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B'; if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K'; return '$' + v.toLocaleString(); }
+function polar(cx, cy, r, a) { return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; }
+function donutSlicePath(cx, cy, rInner, rOuter, a0, a1) {
+  const po0 = polar(cx, cy, rOuter, a0), po1 = polar(cx, cy, rOuter, a1);
+  const pi1 = polar(cx, cy, rInner, a1), pi0 = polar(cx, cy, rInner, a0);
+  const large = (a1 - a0) > Math.PI ? 1 : 0;
+  return `M ${po0.x} ${po0.y} A ${rOuter} ${rOuter} 0 ${large} 1 ${po1.x} ${po1.y} L ${pi1.x} ${pi1.y} A ${rInner} ${rInner} 0 ${large} 0 ${pi0.x} ${pi0.y} Z`;
+}
+
+/* ══════════════════════════════════════════════════════════════════ PAN/ZOOM ══ */
+const viewT = { x: 0, y: 0, k: 1 };
+function getSceneGroup() {
+  const svg = document.getElementById('cv');
+  svg.innerHTML = '';
+  const g = document.createElementNS(svgNS, 'g');
+  g.id = 'hol-scene';
+  svg.appendChild(g);
+  applyViewTransform();
+  return g;
+}
+function applyViewTransform() {
+  const g = document.getElementById('hol-scene');
+  if (g) g.setAttribute('transform', `translate(${viewT.x},${viewT.y}) scale(${viewT.k})`);
+  const zl = document.getElementById('zoom-level');
+  if (zl) zl.textContent = Math.round(viewT.k * 100) + '%';
+}
+function resetView() { viewT.x = 0; viewT.y = 0; viewT.k = 1; applyViewTransform(); }
+function zoomBy(factor, cx, cy) {
+  const wrap = document.getElementById('cv-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const px = cx ?? rect.width / 2, py = cy ?? rect.height / 2;
+  const newK = Math.max(0.25, Math.min(4, viewT.k * factor));
+  viewT.x = px - ((px - viewT.x) / viewT.k) * newK;
+  viewT.y = py - ((py - viewT.y) / viewT.k) * newK;
+  viewT.k = newK;
+  applyViewTransform();
+}
+function initCanvasPanZoom() {
+  const wrap = document.getElementById('cv-wrap');
+  let dragging = false, lastX = 0, lastY = 0;
+  wrap.addEventListener('mousedown', e => { if (e.target.closest('.canvas-zoom-ctrl')) return; dragging = true; lastX = e.clientX; lastY = e.clientY; wrap.classList.add('dragging'); });
+  window.addEventListener('mousemove', e => { if (!dragging) return; viewT.x += e.clientX - lastX; viewT.y += e.clientY - lastY; lastX = e.clientX; lastY = e.clientY; applyViewTransform(); });
+  window.addEventListener('mouseup', () => { dragging = false; wrap.classList.remove('dragging'); });
+  wrap.addEventListener('wheel', e => { e.preventDefault(); const rect = wrap.getBoundingClientRect(); zoomBy(e.deltaY < 0 ? 1.12 : 1/1.12, e.clientX - rect.left, e.clientY - rect.top); }, { passive: false });
+  document.getElementById('zoom-in').addEventListener('click', () => zoomBy(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => zoomBy(1/1.25));
+  document.getElementById('zoom-reset').addEventListener('click', resetView);
+}
+
+/* ══════════════════════════════════════════════════════════════════ STATE / FILTERS ══ */
+const state = {
+  filters: { valueMin: null, valueMax: null, loaMin: null, loaMax: null, insValMin: null, insValMax: null, regions: new Set(), mgmt: new Set(), hasConnectionOnly: false },
+  selectedDomainId: null,
+};
+
+function vesselPassesFilters(v) {
+  const f = state.filters;
+  if (f.valueMin != null && (v.estimated_value_eur || 0) < f.valueMin * 1e6) return false;
+  if (f.valueMax != null && (v.estimated_value_eur || 0) > f.valueMax * 1e6) return false;
+  if (f.loaMin != null && (v.overall_length_m || 0) < f.loaMin) return false;
+  if (f.loaMax != null && (v.overall_length_m || 0) > f.loaMax) return false;
+  if (f.insValMin != null && (v.insurance_value_sum_usd || 0) < f.insValMin * 1e6) return false;
+  if (f.insValMax != null && (v.insurance_value_sum_usd || 0) > f.insValMax * 1e6) return false;
+  if (f.regions.size && !f.regions.has(v.region)) return false;
+  if (f.mgmt.size && !f.mgmt.has(v.management_company_name)) return false;
+  if (f.hasConnectionOnly && !v.has_real_connection) return false;
+  return true;
+}
+function filteredVessels() { return HOLISTIC_VESSELS.filter(vesselPassesFilters); }
+
+/* ══════════════════════════════════════════════════════════════════ AGGREGATES ══ */
+// left wheel: real entities grouped by domain, value = SUM of fleet_value_eur
+// restricted to vessel_ids that pass the current filter (recomputed live).
+function computeEntityDomainAggregates(filteredIds) {
+  return INS1_DOMAINS.map((d, i) => {
+    const roles = Object.entries(ROLE_TO_DOMAIN).filter(([role, dom]) => dom === d.id).map(([role]) => role);
+    const entities = Z1_ENTITIES.filter(e => roles.includes(e.role));
+    let totalValue = 0;
+    const entityDetail = entities.map(e => {
+      const passingVids = e.vessel_ids.filter(vid => filteredIds.has(vid));
+      const val = passingVids.length ? e.fleet_value_eur * (passingVids.length / e.vessel_ids.length) : 0;
+      totalValue += val;
+      return { ...e, passingCount: passingVids.length, passingValue: val };
+    }).filter(e => e.passingCount > 0);
+    return { ...d, col: DOMAIN_COLORS[i % DOMAIN_COLORS.length], entities: entityDetail, totalValue, count: entityDetail.length };
+  });
+}
+// right wheel: insurance lines grouped by domain, value = SUM of node_size_usd
+// for lines whose domain has at least one filtered vessel in that tier band.
+function computeCoverageDomainAggregates(filteredVesselList) {
+  const tierCounts = {};
+  filteredVesselList.forEach(v => { tierCounts[v.computed_tier] = (tierCounts[v.computed_tier] || 0) + 1; });
+  return INS1_DOMAINS.map((d, i) => {
+    const lines = INS1_LINES.filter(l => l.domain_id === d.id);
+    let totalValue = 0;
+    const lineDetail = lines.map(l => {
+      // weight a line's contribution by how many filtered vessels actually sit in a tier this line prices
+      const relevantVesselCount = filteredVesselList.length;
+      const val = relevantVesselCount > 0 ? (l.node_size_usd || 0) : 0;
+      totalValue += val;
+      return l;
+    });
+    return { ...d, col: DOMAIN_COLORS[i % DOMAIN_COLORS.length], lines: lineDetail, totalValue, count: lines.length };
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════ RENDER: TWO WHEELS ══ */
+function renderCanvas() {
+  const root = getSceneGroup();
+  const wrap = document.getElementById('cv-wrap');
+  const W = wrap.clientWidth || 1400, H = wrap.clientHeight || 900;
+  const vessels = filteredVessels();
+  const filteredIds = new Set(vessels.map(v => v.vessel_id));
+
+  const leftAgg = computeEntityDomainAggregates(filteredIds);
+  const rightAgg = computeCoverageDomainAggregates(vessels);
+
+  const wheelR = Math.min(W * 0.16, H * 0.3);
+  const rInner = wheelR * 0.42;
+  const leftCx = W * 0.25, rightCx = W * 0.75, cy = H / 2;
+
+  drawWheel(root, leftAgg, leftCx, cy, rInner, wheelR, 'entity', 'Real Entities');
+  drawWheel(root, rightAgg, rightCx, cy, rInner, wheelR, 'coverage', 'Coverage Lines');
+  drawCrossLinks(root, leftAgg, rightAgg, leftCx, cy, rightCx, cy, wheelR);
+
+  const stats = document.getElementById('hol-stats-bar');
+  stats.innerHTML = `<strong>${vessels.length.toLocaleString()}</strong> of ${HOLISTIC_VESSELS.length.toLocaleString()} vessels pass current filters &middot; <strong>${leftAgg.reduce((s,a)=>s+a.count,0)}</strong> real entities &middot; <strong>${rightAgg.reduce((s,a)=>s+a.count,0)}</strong> coverage lines
+    <span class="hol-stats-slots">Angle = real $ value on both wheels (fleet value left, S4-tier limit right). Radius fixed. Dashed lines = real role&rarr;coverage-line connections (Ship Mortgage Act, MLC 2006, etc.), not inferred.</span>`;
+}
+
+function drawWheel(root, agg, cx, cy, rInner, rOuter, side, title) {
+  const scene = document.createElementNS(svgNS, 'g');
+  scene.setAttribute('transform', `translate(${cx},${cy})`);
+  scene.setAttribute('data-side', side);
+  root.appendChild(scene);
+  const grandTotal = agg.reduce((s, a) => s + a.totalValue, 0) || 1;
+  let start = -Math.PI / 2;
+  agg.forEach(a => {
+    const frac = a.totalValue > 0 ? a.totalValue / grandTotal : 0;
+    const sweep = Math.max(frac * Math.PI * 2, a.count > 0 ? 0.3 : 0.1);
+    const end = start + sweep;
+    const isActive = state.selectedDomainId === a.id;
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', donutSlicePath(0, 0, rInner, isActive ? rOuter * 1.06 : rOuter, start, end));
+    path.setAttribute('fill', resolveColor(a.col));
+    path.setAttribute('fill-opacity', isActive ? '0.95' : (a.count > 0 ? '0.78' : '0.16'));
+    path.setAttribute('stroke', resolveColor('--surface'));
+    path.setAttribute('stroke-width', '2');
+    path.style.cursor = 'pointer';
+    path.setAttribute('data-domain', a.id);
+    path.addEventListener('click', () => selectDomain(a.id));
+    path.addEventListener('mouseenter', evt => RingEngine.tooltip.show(evt, a.name, `${a.count} ${side === 'entity' ? 'entities' : 'lines'}`, side === 'entity' ? fmtEUR(a.totalValue) : fmtUSD(a.totalValue)));
+    path.addEventListener('mouseleave', RingEngine.tooltip.hide);
+    scene.appendChild(path);
+    const midA = (start + end) / 2;
+    const lx = Math.cos(midA) * (rOuter + 24), ly = Math.sin(midA) * (rOuter + 24);
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', lx); label.setAttribute('y', ly);
+    label.setAttribute('text-anchor', Math.cos(midA) > 0.15 ? 'start' : Math.cos(midA) < -0.15 ? 'end' : 'middle');
+    label.setAttribute('dominant-baseline', 'middle');
+    label.setAttribute('font-size', '9'); label.setAttribute('font-weight', '700');
+    label.setAttribute('fill', resolveColor(a.col));
+    label.textContent = `${DOMAIN_SHORT[a.id] || a.name} (${a.count})`;
+    scene.appendChild(label);
+    start = end;
+  });
+  const t = document.createElementNS(svgNS, 'text');
+  t.setAttribute('x', 0); t.setAttribute('y', -rOuter - 40);
+  t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '13'); t.setAttribute('font-weight', '800');
+  t.setAttribute('fill', resolveColor('--text'));
+  t.textContent = title;
+  scene.appendChild(t);
+}
+
+// domain-level cross-links: draw a dashed directional line between the two
+// wheels wherever a real role in that left-domain connects (via
+// HOLISTIC_ROLE_TO_LINES) to a real line in that right-domain.
+function drawCrossLinks(root, leftAgg, rightAgg, leftCx, leftCy, rightCx, rightCy, wheelR) {
+  const g = document.createElementNS(svgNS, 'g');
+  root.appendChild(g);
+  Object.entries(HOLISTIC_ROLE_TO_LINES).forEach(([role, lineIds]) => {
+    const domId = ROLE_TO_DOMAIN[role];
+    const leftHas = leftAgg.find(a => a.id === domId && a.count > 0);
+    const rightHasAny = lineIds.some(lid => { const l = lineById.get(lid); return l && rightAgg.find(a => a.id === l.domain_id && a.count > 0); });
+    if (!leftHas || !rightHasAny) return;
+    const marker = state.selectedDomainId === domId;
+    const line = document.createElementNS(svgNS, 'line');
+    line.setAttribute('x1', leftCx + wheelR * 1.08); line.setAttribute('y1', leftCy);
+    line.setAttribute('x2', rightCx - wheelR * 1.08); line.setAttribute('y2', rightCy);
+    line.setAttribute('stroke', resolveColor(leftHas.col));
+    line.setAttribute('stroke-width', marker ? '2.5' : '1');
+    line.setAttribute('stroke-dasharray', '5 4');
+    line.setAttribute('opacity', marker ? '0.9' : '0.25');
+    g.appendChild(line);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════ LEFT RAIL ══ */
+function initFilterControls() {
+  const regionBox = document.getElementById('f-region');
+  HOLISTIC_REGIONS.forEach(r => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" value="${escapeHtml(r)}" /> ${escapeHtml(r)}`;
+    label.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) state.filters.regions.add(r); else state.filters.regions.delete(r);
+      renderAll();
+    });
+    regionBox.appendChild(label);
+  });
+  const mgmtBox = document.getElementById('f-mgmt');
+  HOLISTIC_MANAGEMENT_COMPANIES.forEach(m => {
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="checkbox" value="${escapeHtml(m)}" /> ${escapeHtml(m)}`;
+    label.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) state.filters.mgmt.add(m); else state.filters.mgmt.delete(m);
+      renderAll();
+    });
+    mgmtBox.appendChild(label);
+  });
+  ['f-value-min','f-value-max','f-loa-min','f-loa-max','f-insval-min','f-insval-max'].forEach(id => {
+    document.getElementById(id).addEventListener('input', e => {
+      const map = { 'f-value-min':'valueMin','f-value-max':'valueMax','f-loa-min':'loaMin','f-loa-max':'loaMax','f-insval-min':'insValMin','f-insval-max':'insValMax' };
+      state.filters[map[id]] = e.target.value === '' ? null : Number(e.target.value);
+      renderAll();
+    });
+  });
+  document.getElementById('f-has-connection').addEventListener('change', e => { state.filters.hasConnectionOnly = e.target.checked; renderAll(); });
+  document.getElementById('f-reset').addEventListener('click', () => {
+    state.filters = { valueMin: null, valueMax: null, loaMin: null, loaMax: null, insValMin: null, insValMax: null, regions: new Set(), mgmt: new Set(), hasConnectionOnly: false };
+    document.querySelectorAll('.hol-multiselect input, #f-has-connection').forEach(el => el.checked = false);
+    document.querySelectorAll('.hol-filter-row input[type=number]').forEach(el => el.value = '');
+    renderAll();
+  });
+  document.getElementById('lr-toggle').addEventListener('click', () => document.getElementById('lr-wrap').classList.toggle('collapsed'));
+}
+function renderDomainRail() {
+  const lrb = document.getElementById('lrb');
+  lrb.innerHTML = '';
+  const vessels = filteredVessels();
+  const filteredIds = new Set(vessels.map(v => v.vessel_id));
+  const leftAgg = computeEntityDomainAggregates(filteredIds);
+  const rightAgg = computeCoverageDomainAggregates(vessels);
+  INS1_DOMAINS.forEach((d, i) => {
+    const l = leftAgg.find(a => a.id === d.id), r = rightAgg.find(a => a.id === d.id);
+    const row = document.createElement('div');
+    row.className = 'lr-row';
+    if (state.selectedDomainId === d.id) row.classList.add('active');
+    row.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+      <div class="donut-wrap"><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="${resolveColor(DOMAIN_COLORS[i % DOMAIN_COLORS.length])}" fill-opacity="0.8"/></svg></div>
+      <div style="min-width:0;overflow:hidden"><div class="lr-row-label">${escapeHtml(d.name)}</div><div class="lr-row-sub">${l.count} entities · ${r.count} lines</div></div></div>`;
+    row.addEventListener('click', () => selectDomain(d.id));
+    lrb.appendChild(row);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════ PANEL — 4 sections ══ */
+function renderPanel() {
+  const panel = document.getElementById('panel');
+  const id = state.selectedDomainId;
+  if (!id) {
+    panel.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">&#9673;</div><div class="panel-empty-text">Click any domain slice on either wheel to see real entities, coverage lines, and how they connect.</div></div>`;
+    return;
+  }
+  const vessels = filteredVessels();
+  const filteredIds = new Set(vessels.map(v => v.vessel_id));
+  const leftAgg = computeEntityDomainAggregates(filteredIds).find(a => a.id === id);
+  const rightAgg = computeCoverageDomainAggregates(vessels).find(a => a.id === id);
+  const domain = domainById.get(id);
+
+  const header = `<div class="panel-header"><div class="panel-title">${escapeHtml(domain.name)}</div>
+    <div class="panel-meta-row"><span class="badge badge-domain" style="background:${resolveColor(leftAgg.col)}">${leftAgg.count} entities</span><span class="badge badge-ring">${rightAgg.count} lines</span></div></div>`;
+
+  // 1. entities grouped by role
+  const byRole = {};
+  leftAgg.entities.forEach(e => { (byRole[e.role] = byRole[e.role] || []).push(e); });
+  const entitiesHtml = Object.keys(byRole).length ? `<div class="box"><h3>Real Entities</h3>${Object.entries(byRole).map(([role, ents]) => `
+    <div style="margin-bottom:10px">
+      <div style="font-weight:700;font-size:11px;text-transform:uppercase;color:var(--text2)">${escapeHtml(role)} (${ents.length})</div>
+      ${ents.slice(0, 8).map(e => `<div class="chip" style="cursor:pointer;margin:3px 3px 0 0" data-vessels='${escapeHtml(JSON.stringify(e.vessel_ids.filter(v=>filteredIds.has(v))))}'>${escapeHtml(e.name)} · ${fmtEUR(e.passingValue)}</div>`).join('')}
+    </div>`).join('')}</div>` : `<div class="box"><p>No real entities in this domain under the current filters.</p></div>`;
+
+  // 2. coverage lines
+  const linesHtml = `<div class="box"><h3>Coverage Lines</h3>${rightAgg.lines.map(l => `
+    <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+      <div style="font-weight:700;font-size:12px">${escapeHtml(l.label)}</div>
+      <div style="font-size:11px;color:var(--text3)">${fmtUSD(l.node_size_usd)} S4 · ${l.endorsements.length}E / ${l.exclusions.length}X / ${l.cascade_rules.length}C</div>
+    </div>`).join('')}</div>`;
+
+  // 3. cross-reference — role -> line, inferred connections
+  const roles = Object.entries(ROLE_TO_DOMAIN).filter(([r, d]) => d === id).map(([r]) => r);
+  const crossRows = [];
+  roles.forEach(role => {
+    (HOLISTIC_ROLE_TO_LINES[role] || []).forEach(lid => {
+      const line = lineById.get(lid);
+      if (line) crossRows.push({ role, line });
+    });
+  });
+  const crossHtml = crossRows.length ? `<div class="box"><h3>Cross-Reference (inferred)</h3>${crossRows.map(c => `
+    <div style="font-size:11px;color:var(--text2);margin-bottom:6px"><strong>${escapeHtml(c.role)}</strong> &rarr; ${escapeHtml(c.line.label)} <span style="color:var(--text3)">(real entity role plausibly arranges/holds this coverage — inference, not a confirmed fact)</span></div>`).join('')}</div>` : '';
+
+  // 4. filtered vessel list for this domain (real chain-touched vessels only, as rows not nodes)
+  const domainVesselIds = new Set(leftAgg.entities.flatMap(e => e.vessel_ids.filter(v => filteredIds.has(v))));
+  const vesselRows = [...domainVesselIds].slice(0, 30).map(vid => {
+    const v = vesselById.get(vid);
+    return v ? `<div class="chip" style="cursor:default;margin:3px 3px 0 0">${escapeHtml(v.yacht_name)} · ${fmtEUR(v.estimated_value_eur)}</div>` : '';
+  }).join('');
+  const vesselListHtml = domainVesselIds.size ? `<div class="box"><h3>Linked Vessels (${domainVesselIds.size})</h3><div class="chips">${vesselRows}</div>${domainVesselIds.size > 30 ? `<p style="margin-top:6px;font-size:10.5px;color:var(--text3)">showing first 30</p>` : ''}</div>` : '';
+
+  panel.innerHTML = header + entitiesHtml + linesHtml + crossHtml + vesselListHtml;
+}
+
+function selectDomain(id) {
+  state.selectedDomainId = (state.selectedDomainId === id) ? null : id;
+  renderAll();
+}
+function renderAll() {
+  renderCanvas();
+  renderDomainRail();
+  renderPanel();
+}
+
+/* ══════════════════════════════════════════════════════════════════ INIT ══ */
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  RingEngine.theme.toggle();
+  document.getElementById('theme-toggle').setAttribute('aria-checked', document.body.classList.contains('theme-dark'));
+  renderAll();
+});
+window.addEventListener('resize', renderCanvas);
+
+initFilterControls();
+initCanvasPanZoom();
+document.getElementById('lr-note').textContent = `${HOLISTIC_VESSELS.length.toLocaleString()} vessels indexed. Canvas never renders more than 9 shapes per wheel — individual vessels always appear as panel list rows.`;
+renderAll();
+
+})();
+</script>
+</body>
+</html>

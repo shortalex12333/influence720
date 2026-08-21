@@ -337,7 +337,7 @@ Phase 3 (producer/referral overlays)   archetypes.js (parallel with Phase 2, not
 
 **This MVP's dashboards have no real access control, and structurally cannot have any.** Every dashboard
 is a static HTML file with the *entire* mock dataset embedded inline via `<script src="data/*.js">`. A
-producer selector, a "logged in as Alex" label, an "[Admin/Demo Override: View As...]" dropdown — all of
+producer selector, a "logged in as Sabine" label, an "[Admin/Demo Override: View As...]" dropdown — all of
 these are **cosmetic UI state**, not a security boundary. Every byte of every producer's book ships to
 every viewer's browser regardless of what the dropdown says, because there is no server, no auth, and no
 partitioned query — opening the file in a text editor shows all of it. This is fine and expected for a

@@ -480,11 +480,11 @@ def assemble(narrative_by_account):
     rng2 = random.Random(720725)
     ARCHETYPE_AFFINITY = {
         # producer_id: {ring_band: (p_known, activity_lo, activity_hi, days_lo, days_hi)}
-        "REP.ALEX": {"senior": (0.85, 5, 20, 0, 60), "mid": (0.35, 2, 8, 10, 90), "junior": (0.08, 1, 5, 20, 150)},
-        "REP.RAHUL": {"senior": (0.25, 3, 10, 20, 120), "mid": (0.55, 8, 25, 5, 60), "junior": (0.75, 20, 60, 0, 30)},
-        "REP.JACOB": {"senior": (0.45, 2, 9, 60, 240), "mid": (0.30, 2, 8, 60, 200), "junior": (0.15, 1, 6, 90, 250)},
-        "REP.CRISTIAN": {"senior": (0.80, 5, 16, 0, 60), "mid": (0.35, 2, 7, 15, 90), "junior": (0.05, 1, 4, 30, 180)},
-        "REP.NAOMI": {"senior": (0.12, 1, 5, 20, 150), "mid": (0.20, 2, 8, 15, 120), "junior": (0.35, 5, 20, 5, 70)},
+        "REP.SABINE": {"senior": (0.85, 5, 20, 0, 60), "mid": (0.35, 2, 8, 10, 90), "junior": (0.08, 1, 5, 20, 150)},
+        "REP.VAUGHN": {"senior": (0.25, 3, 10, 20, 120), "mid": (0.55, 8, 25, 5, 60), "junior": (0.75, 20, 60, 0, 30)},
+        "REP.THEA": {"senior": (0.45, 2, 9, 60, 240), "mid": (0.30, 2, 8, 60, 200), "junior": (0.15, 1, 6, 90, 250)},
+        "REP.ELLERY": {"senior": (0.80, 5, 16, 0, 60), "mid": (0.35, 2, 7, 15, 90), "junior": (0.05, 1, 4, 30, 180)},
+        "REP.BECKETT": {"senior": (0.12, 1, 5, 20, 150), "mid": (0.20, 2, 8, 15, 120), "junior": (0.35, 5, 20, 5, 70)},
     }
 
     def ring_band(ring):
@@ -501,11 +501,11 @@ def assemble(narrative_by_account):
     # tie-breaking, in a fixed position immediately after activity/days_since are drawn, so the
     # whole loop stays reproducible for a fixed seed.
     ARCHETYPE_RATIOS = {
-        "REP.ALEX":     (0.35, 0.20, 0.45),
-        "REP.RAHUL":    (0.45, 0.40, 0.15),
-        "REP.JACOB":    (0.25, 0.50, 0.25),
-        "REP.CRISTIAN": (0.35, 0.20, 0.45),
-        "REP.NAOMI":    (0.40, 0.45, 0.15),
+        "REP.SABINE":     (0.35, 0.20, 0.45),
+        "REP.VAUGHN":    (0.45, 0.40, 0.15),
+        "REP.THEA":    (0.25, 0.50, 0.25),
+        "REP.ELLERY": (0.35, 0.20, 0.45),
+        "REP.BECKETT":    (0.40, 0.45, 0.15),
     }
     RING_ADJUST = {
         "senior": (-0.05, -0.05, +0.10),
@@ -546,10 +546,10 @@ def assemble(narrative_by_account):
         producer_id = apm_by_ubo.get(n["account_ref"])
         if not producer_id:
             continue
-        # Silo archetype (Cristian): sharply discount roles outside the account's primary/anchor vertical
+        # Silo archetype (Ellery): sharply discount roles outside the account's primary/anchor vertical
         affinity = ARCHETYPE_AFFINITY[producer_id][ring_band(n["ring"])]
         p_known, act_lo, act_hi, days_lo, days_hi = affinity
-        if producer_id == "REP.CRISTIAN" and n["vertical"] not in ("yacht", "real_estate"):
+        if producer_id == "REP.ELLERY" and n["vertical"] not in ("yacht", "real_estate"):
             p_known *= 0.15
         if rng2.random() >= p_known:
             continue
@@ -595,7 +595,7 @@ def assemble(narrative_by_account):
             senior_half = candidates[:max(1, len(candidates) // 2)]
             frm = rng.choice(senior_half) if rng.random() < 0.7 else rng.choice(candidates)
             producer_row = next((m for m in all_apm if m["ubo_id"] == acc_id), None)
-            producer_id = producer_row["producer_id"] if producer_row else "REP.ALEX"
+            producer_id = producer_row["producer_id"] if producer_row else "REP.SABINE"
             month = rng.randint(1, 8)
             day = rng.randint(1, 28)
             all_referrals.append({

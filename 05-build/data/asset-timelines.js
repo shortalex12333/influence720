@@ -4998,9 +4998,9 @@ const ASSET_OWNERSHIP_TIMELINE = [
     "seq": 2,
     "date": "2020-11-19",
     "event_type": "major_refit",
-    "role_ref_hint": "Naomi Kessler",
+    "role_ref_hint": "Beckett Kessler",
     "role_ref_resolved_id": null,
-    "note": "Naomi Kessler commissioned a major refit adding an extended beach club and upgraded stabilization systems."
+    "note": "Beckett Kessler commissioned a major refit adding an extended beach club and upgraded stabilization systems."
   },
   {
     "event_id": "EVT.00252",
@@ -6508,9 +6508,9 @@ const ASSET_OWNERSHIP_TIMELINE = [
     "seq": 1,
     "date": "2018-08-30",
     "event_type": "acquired",
-    "role_ref_hint": "Naomi Feldstein",
+    "role_ref_hint": "Beckett Feldstein",
     "role_ref_resolved_id": null,
-    "note": "Naomi Feldstein founded the collection with a period classic and a modern hypercar."
+    "note": "Beckett Feldstein founded the collection with a period classic and a modern hypercar."
   },
   {
     "event_id": "EVT.00403",

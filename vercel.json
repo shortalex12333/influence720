@@ -13,6 +13,8 @@
     { "source": "/d4", "destination": "/05-build/dashboard4-role-macro-view" },
     { "source": "/d5", "destination": "/05-build/dashboard5-micro-warfare" },
     { "source": "/d6", "destination": "/05-build/dashboard6-executive-command-center" },
+    { "source": "/pilot", "destination": "/05-build/pilot-yachts" },
+    { "source": "/pilot-d1", "destination": "/05-build/pilot-d1-network" },
     { "source": "/pilot-z1", "destination": "/05-build/pilot-z1-vessel-network" },
     { "source": "/pilot-insurance1", "destination": "/05-build/pilot-insurance1-coverage-ontology" },
     { "source": "/pilot-holistic1", "destination": "/05-build/pilot-holistic1-combined-ontology" }

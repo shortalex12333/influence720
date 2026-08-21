@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <base href="/05-build/">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Influence 720 — Whitespace / Gap Engine</title>
+<title>Influence 720 — Fiduciary Exposure Audit</title>
 <link rel="stylesheet" href="engine/style-core.css" />
 <style>
 /* Dashboard-2-specific rules only — shared chrome/tokens live in engine/style-core.css.
@@ -13,6 +13,14 @@
    the unbound-reason badge trio, the undiscovered-exposure marker). */
 
 .h-filters{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:9px 20px;border-bottom:1px solid var(--border2);background:var(--surface)}
+
+/* Figures — dollar amounts, dates, penetration % — get the shared canonical mono face (Phase 4)
+   so numeric data reads as genuinely tabular data, not merely tabular-spaced sans. style-core.css's
+   shared .num rule only sets font-variant-numeric:tabular-nums; layered here (never edited there)
+   because the mono treatment is this dashboard's own typography pass, not yet a suite-wide default.
+   Human-authored text (account names, narrative quotes/descriptions) carries no .num class and is
+   untouched, staying on --font (sans) throughout. */
+.num{font-family:var(--font-mono)}
 
 /* Forensic drawer — slimmed to a max 320px, matching D1/D3's narrower right-panel width
    (300-380px there, denser than style-core.css's shared 420px default). Overriding the shared
@@ -47,7 +55,7 @@ body.theme-dark .lr-row{background:#141618}
 /* Worklist rows — built on the shared .lr-row container, own internal layout only */
 .wl-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wl-top + .wl-top{margin-top:5px}
-.wl-amt{font-size:14px;font-weight:800;color:var(--status-unbound)}
+.wl-amt{font-size:14px;font-weight:800;color:var(--state-unbound)}
 .lr-row.active .wl-amt{color:var(--btnactivetext)}
 .wl-meta{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 
@@ -61,7 +69,7 @@ body.theme-dark .lr-row{background:#141618}
 .wl-pen-track{flex:1;height:6px;background:var(--surface3);border-radius:999px;overflow:hidden}
 .lr-row.active .wl-pen-track{background:rgba(255,255,255,.25)}
 .wl-pen-fill{height:6px;border-radius:999px}
-.wl-pen-val{font-size:11.5px;font-weight:800;min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.wl-pen-val{font-size:11.5px;font-weight:800;min-width:34px;text-align:right;font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
 .lr-row.active .wl-pen-val{color:var(--btnactivetext)}
 .wl-rank{font-size:10px;font-weight:800;color:var(--text3);min-width:16px}
 .lr-row.active .wl-rank{color:var(--btnactivetext)}
@@ -78,23 +86,23 @@ body.theme-dark .badge-reason.competitor_held{color:#a58af0;border-color:rgba(16
 /* Undiscovered-exposure marker — deliberately NOT red/green/amber: this is not a known
    gap on a known asset, it is the absence of any asset record at all for that vertical. */
 .badge-unmapped{background:transparent;border:1px dashed var(--text3);color:var(--text3);font-weight:600}
-.badge-cluster{background:rgba(39,179,227,.10);color:var(--accent);border-color:rgba(39,179,227,.35)}
+.badge-cluster{background:rgba(90,171,204,.10);color:var(--mark);border-color:rgba(90,171,204,.35)}
 
 /* Center canvas: banner / toolbar / gallery-or-zoom / legend, stacked */
 #cv-wrap{display:flex;flex-direction:column;overflow:hidden}
-#cluster-banner{display:none;margin:14px 18px 0;padding:10px 14px;background:rgba(39,179,227,.10);border:1px solid rgba(39,179,227,.4);border-radius:9px;font-size:12.5px;color:var(--text2);flex-shrink:0}
-#cluster-banner strong{color:var(--accent)}
+#cluster-banner{display:none;margin:14px 18px 0;padding:10px 14px;background:rgba(90,171,204,.10);border:1px solid rgba(90,171,204,.4);border-radius:9px;font-size:12.5px;color:var(--text2);flex-shrink:0}
+#cluster-banner strong{color:var(--mark)}
 #cv-toolbar{display:none;align-items:center;gap:10px;padding:12px 18px 0;flex-shrink:0}
-.back-link{font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:4px;background:none;border:none;padding:0}
+.back-link{font-size:11px;font-weight:700;color:var(--mark);cursor:pointer;display:inline-flex;align-items:center;gap:4px;background:none;border:none;padding:0}
 .back-link:hover{text-decoration:underline}
 #zoom-crumb{font-size:11px;color:var(--text3)}
 
 #gallery{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;padding:18px;align-content:start}
 .gcard{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:11px 9px;border-radius:11px;border:1px solid var(--border);background:var(--surface)}
-.gcard:hover{border-color:var(--accent);background:var(--surface2)}
+.gcard:hover{border-color:var(--mark);background:var(--surface2)}
 .gcard svg{width:92px;height:92px}
 .gcard-name{font-size:11.5px;font-weight:700;text-align:center;color:var(--text);line-height:1.25}
-.gcard-amt{font-size:12px;font-weight:800;color:var(--status-unbound)}
+.gcard-amt{font-size:12px;font-weight:800;color:var(--state-unbound)}
 .gcard-badges{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:1px}
 .gcard-badges .badge{font-size:9px;padding:2px 6px}
 
@@ -111,7 +119,7 @@ body.theme-dark .badge-reason.competitor_held{color:#a58af0;border-color:rgba(16
 /* Structural-connection rows (knows-edges revealed on role click) — ported verbatim from
    dashboard0-ontology-foundation.html's own .conn-row/.conn-name/.conn-why/.conn-freq. */
 .conn-row{padding:10px 12px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer}
-.conn-row:hover{border-color:var(--accent)}
+.conn-row:hover{border-color:var(--mark)}
 .conn-name{font-size:12.5px;font-weight:700;color:var(--text)}
 .conn-why{font-size:11.5px;color:var(--text2);line-height:1.5;margin-top:3px}
 .conn-freq{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
@@ -125,15 +133,14 @@ body.theme-dark .badge-reason.competitor_held{color:#a58af0;border-color:rgba(16
    tier's baseline_limit_usd (from the deepened ~50-type catalog's baseline_limit_usd /
    baseline_limit_by_tier). Deliberately NOT the same red as a fully-unbound coverage — this is
    a written, in-force policy with a real limit-adequacy gap, a different remediation (increase
-   the limit at next renewal) from true whitespace (write it for the first time). Scoped as a
-   dashboard-local token, not a style-core.css shared status, since no other dashboard reads
-   bound_limit_usd/baseline_limit_usd yet. */
-:root{--status-deficient:#a15a2e}
-body.theme-dark{--status-deficient:#e0916a}
+   the limit at next renewal) from true whitespace (write it for the first time). Previously a
+   dashboard-local :root/body.theme-dark token; now reads the shared --state-deficient token
+   engine/style-core.css defines (Phase 1 color-unify), so no local redeclaration lives here
+   anymore — this dashboard is simply the first consumer of that shared token. */
 
-.badge-deficient{background:rgba(161,90,46,.14);color:var(--status-deficient);border-color:rgba(161,90,46,.4);font-weight:700}
-body.theme-dark .badge-deficient{color:#e0916a;border-color:rgba(224,145,106,.4)}
-.leg-dot.deficient{background:var(--status-deficient)}
+.badge-deficient{background:rgba(161,90,46,.14);color:var(--state-deficient);border-color:rgba(161,90,46,.4);font-weight:700}
+body.theme-dark .badge-deficient{border-color:rgba(224,145,106,.4)}
+.leg-dot.deficient{background:var(--state-deficient)}
 
 /* Forensic audit drawer — additive box(es) appended to the existing coverage panel, never a
    replacement of statusBox/crossBox/peersBox above it. */
@@ -142,7 +149,7 @@ body.theme-dark .badge-deficient{color:#e0916a;border-color:rgba(224,145,106,.4)
 .forensic-item{padding:8px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--surface)}
 .forensic-item-head{font-size:11.5px;font-weight:700;color:var(--text)}
 .forensic-item-body{font-size:11.5px;color:var(--text2);margin-top:3px;line-height:1.5}
-.rate-trend-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:999px;background:rgba(39,179,227,.10);color:var(--accent);border:1px solid rgba(39,179,227,.35)}
+.rate-trend-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:999px;background:rgba(90,171,204,.10);color:var(--mark);border:1px solid rgba(90,171,204,.35)}
 .rate-trend-source{font-size:10.5px;color:var(--text3);margin-top:5px;line-height:1.5}
 
 /* Persona & Scale simulation — a hypothetical overlay on the REAL zoomed wheel, never a second
@@ -164,10 +171,10 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
 /* Right-panel content lists, all built on the shared .box/.info-table primitives */
 .cov-list,.peer-list{display:flex;flex-direction:column;gap:6px}
 .cov-row,.peer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface);border-radius:7px;border:1px solid var(--border);cursor:pointer}
-.cov-row:hover,.peer-row:hover{border-color:var(--accent)}
+.cov-row:hover,.peer-row:hover{border-color:var(--mark)}
 .cov-row-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
 .cov-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.narrative-quote{font-size:12.5px;font-style:italic;color:var(--text2);line-height:1.6;border-left:3px solid var(--accent);padding-left:10px;margin:2px 0 8px}
+.narrative-quote{font-size:12.5px;font-style:italic;color:var(--text2);line-height:1.6;border-left:3px solid var(--mark);padding-left:10px;margin:2px 0 8px}
 .exposure-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px dashed var(--border2);border-radius:7px;margin-bottom:6px;background:var(--surface)}
 .exposure-item .ev-name{font-size:12.5px;font-weight:600;color:var(--text2)}
 </style>
@@ -178,12 +185,12 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
   <div class="h-left">
     <div class="h-left-row">
       <a href="/" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
-      <div class="h-title">Whitespace / Gap Engine</div>
+      <div class="h-title">Fiduciary Exposure Audit</div>
     </div>
-    <div class="h-sub">Every account's <strong>unbound</strong> coverage, ranked by opportunity. Red means <strong>unbound with us</strong> — never "uninsured" — the badge on click tells you why.</div>
+    <div class="h-sub">Filtered against the required Ontology. Every account's <strong>unbound</strong> coverage, ranked by opportunity. Grey means <strong>unbound with us</strong> — never "uninsured" — the badge on click tells you why. Red is reserved for a fiduciary breach: a Ring 0/1 signatory carrying an open gap.</div>
     <div class="h-sub" id="h-book-total"></div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
-      <a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D2 Whitespace Gap Engine</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d5" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+      <span class="suite-nav-label">Concept</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Coordinate Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Vector Routing</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D2 Fiduciary Exposure Audit</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Keystone Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Magnitude Rollup</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d5" target="_blank" rel="noopener noreferrer">D5 Vector Conversion</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d6" target="_blank" rel="noopener noreferrer">D6 Synthesis Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item pilot-link" href="/pilot" target="_blank" rel="noopener noreferrer">Pilot — Working Principle</a><span class="suite-nav-sep">·</span><a class="suite-nav-item pilot-link" href="/pilot-d1" target="_blank" rel="noopener noreferrer">Pilot-D1 — Your Network</a>
     </nav>
   </div>
   <div class="h-ctrl">
@@ -252,7 +259,7 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
   <div id="cv-wrap">
     <div id="cluster-banner"></div>
     <div id="cv-toolbar">
-      <button class="back-link" id="btn-back-gallery" style="display:none">◂ All Accounts</button>
+      <button class="back-link" id="btn-back-gallery">◂ All Accounts</button>
       <span id="zoom-crumb"></span>
       <div class="sim-control" id="sim-control" style="display:none;margin-left:auto">
         <label for="sim-select">Persona &amp; Scale —</label>
@@ -260,15 +267,15 @@ body.theme-dark #sim-banner{color:#c3a8f7;background:rgba(195,168,247,.10);borde
       </div>
     </div>
     <div id="sim-banner"></div>
-    <div id="gallery" style="display:none !important"></div>
+    <div id="gallery"></div>
     <div id="zoomstage"><div id="wheel-inner"><svg id="zoom-wheel"></svg></div></div>
     <div id="legend">
-      <div class="leg-item"><span class="leg-dot" style="background:var(--status-bound)"></span>Satellite — Bound, at or above required limit</div>
+      <div class="leg-item"><span class="leg-dot" style="background:var(--state-bound)"></span>Satellite — Bound, at or above required limit</div>
       <div class="leg-item"><span class="leg-dot deficient"></span>Satellite — Bound, below required limit (deficient)</div>
-      <div class="leg-item"><span class="leg-dot" style="background:var(--status-unbound)"></span>Satellite — Unbound (with us) — click for reason</div>
-      <div class="leg-item"><span class="leg-dot" style="background:var(--status-expiring)"></span>Satellite — Expiring &lt;90 days</div>
+      <div class="leg-item"><span class="leg-dot" style="background:var(--state-unbound)"></span>Satellite — Unbound (with us) — click for reason</div>
+      <div class="leg-item"><span class="leg-dot" style="background:var(--state-expiring)"></span>Satellite — Expiring &lt;90 days</div>
       <div class="leg-item"><span class="leg-dot" style="border:2px solid var(--text2);background:transparent"></span>Node = structural role (size = authority Ring 0 Apex→4 Operational, color = lifecycle domain)</div>
-      <div class="leg-item"><span style="width:16px;height:2px;background:var(--status-unbound);display:inline-block;flex-shrink:0"></span>Fiduciary breach — signatory-level role (Ring 0/1) with an open coverage gap</div>
+      <div class="leg-item"><span style="width:16px;height:2px;background:var(--state-breach);display:inline-block;flex-shrink:0"></span>Fiduciary breach — signatory-level role (Ring 0/1) with an open coverage gap</div>
     </div>
   </div>
 
@@ -458,10 +465,10 @@ function coverageGapState(covNode, asset, tierOverride) {
   return 'unbound';
 }
 function gapStateColorVar(state) {
-  if (state === 'adequate') return 'var(--status-bound)';
-  if (state === 'expiring') return 'var(--status-expiring)';
-  if (state === 'deficient') return 'var(--status-deficient)';
-  return 'var(--status-unbound)';
+  if (state === 'adequate') return 'var(--state-bound)';
+  if (state === 'expiring') return 'var(--state-expiring)';
+  if (state === 'deficient') return 'var(--state-deficient)';
+  return 'var(--state-unbound)';
 }
 function simTierLabel(vertical, tier) {
   if (vertical === 'yacht') return 'Size Class ' + tier;
@@ -478,7 +485,7 @@ function daysUntil(dateStr) {
   return Math.round((new Date(dateStr + 'T00:00:00Z') - TODAY) / 86400000);
 }
 function statusColorVar(status) {
-  return status === 'bound' ? 'var(--status-bound)' : status === 'expiring' ? 'var(--status-expiring)' : 'var(--status-unbound)';
+  return status === 'bound' ? 'var(--state-bound)' : status === 'expiring' ? 'var(--state-expiring)' : 'var(--state-unbound)';
 }
 function statusBadgeHTML(status) {
   if (status === 'Expiring') return '<span class="badge badge-status expiring">Expiring</span>';
@@ -582,9 +589,9 @@ function peerCompFor(typeId, excludeCovId) {
 
 /* ══════════════════════════════════════════════════════════════════
    STATE + FILTERS — "current user" is a real producer-override
-   selector (Dashboard 1's pattern), defaulting to Alex.
+   selector (Dashboard 1's pattern), defaulting to Sabine.
    ══════════════════════════════════════════════════════════════════ */
-const state = { producerId: (PRODUCERS.find(p => p.name === 'Alex') || PRODUCERS[0]).producer_id, view: 'zoomed', selectedAccountId: null, selectedNode: null, sim: null };
+const state = { producerId: (PRODUCERS.find(p => p.name === 'Sabine') || PRODUCERS[0]).producer_id, view: 'gallery', selectedAccountId: null, selectedNode: null, sim: null };
 const filters = { missing: '', held: '', size: '', expiry: '', vertical: '', status: '' };
 function currentProducer() { return producerById.get(state.producerId); }
 
@@ -623,9 +630,9 @@ function rankedForRail(list) {
 }
 function penColorVar(pct) {
   if (pct == null) return 'var(--text3)';
-  if (pct < 0.4) return 'var(--status-unbound)';
-  if (pct < 0.7) return 'var(--status-expiring)';
-  return 'var(--status-bound)';
+  if (pct < 0.4) return 'var(--state-unbound)';
+  if (pct < 0.7) return 'var(--state-expiring)';
+  return 'var(--state-bound)';
 }
 
 /* ── Populate static controls (all live, none hardcoded) ─────────── */
@@ -808,7 +815,7 @@ function drawAccountHubLabel(scene, acc) {
     const t = RingEngine.svgEl('text', { x: 0, y: (i - (arr.length - 1) / 2) * 15 - 6, 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '800', fill: 'var(--text)' });
     t.textContent = line; g.appendChild(t);
   });
-  const amt = RingEngine.svgEl('text', { x: 0, y: (Math.max(1, wrapLabel(acc.prin.label, 13).length) - 1) * 7.5 + 22, 'text-anchor': 'middle', 'font-size': '17', 'font-weight': '900', fill: 'var(--accent)' });
+  const amt = RingEngine.svgEl('text', { x: 0, y: (Math.max(1, wrapLabel(acc.prin.label, 13).length) - 1) * 7.5 + 22, 'text-anchor': 'middle', 'font-size': '17', 'font-weight': '900', fill: 'var(--mark)', 'font-family': 'var(--font-mono)' });
   amt.textContent = fmt$(acc.totalGap) + ' whitespace';
   g.appendChild(amt);
   scene.appendChild(g);
@@ -862,7 +869,7 @@ function drawSatellitesAndBreaches(scene, layout, simVertical, simTier) {
         const bx = p.x + Math.cos(angle) * (orbitR + sr + 7), by = p.y + Math.sin(angle) * (orbitR + sr + 7);
         scene.appendChild(RingEngine.svgEl('line', {
           class: 'fiduciary-breach-line', x1: p.x, y1: p.y, x2: bx, y2: by,
-          stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.9',
+          stroke: 'var(--state-breach)', 'stroke-width': '2.5', 'stroke-opacity': '0.9',
         }));
       }
     });
@@ -1006,34 +1013,48 @@ document.getElementById('sim-select').addEventListener('change', e => {
 });
 
 let lastRenderedAccountId = null; // pan/zoom is only reset when the ZOOMED ACCOUNT itself changes
+// Center canvas switch — the DEFAULT/landing state is the gallery-of-small-pies (task 5): whenever
+// there is no valid selected account (initial page load, a producer switch that clears selection,
+// the "All Accounts" back-link), render the gallery and stop there — never guess/auto-select a
+// "top" account on the user's behalf. A zoomed wheel only ever appears once the user makes an
+// explicit choice: a rail-row click, a gallery mini-pie click (both selectAccount(), which sets
+// state.view='zoomed' itself), or an incoming ?account= deep link that pre-seeds selectedAccountId
+// before the first renderAll() runs.
 function renderCenter(list) {
   const gallery = document.getElementById('gallery');
   const zoomstage = document.getElementById('zoomstage');
   const toolbar = document.getElementById('cv-toolbar');
-  if ((!state.selectedAccountId || !accountById.has(state.selectedAccountId)) && list.length > 0) {
-    const top = rankedForRail(list)[0];
-    if (top) { state.selectedAccountId = top.id; state.selectedNode = { type: 'principal', id: top.id }; }
+  if (!state.selectedAccountId || !accountById.has(state.selectedAccountId)) {
+    state.view = 'gallery';
+    zoomstage.style.display = 'none'; toolbar.style.display = 'none';
+    gallery.style.display = 'grid';
+    renderGallery(list);
+    return;
   }
   state.view = 'zoomed';
-  if (state.selectedAccountId && accountById.has(state.selectedAccountId)) {
-    gallery.style.display = 'none'; zoomstage.style.display = 'block'; toolbar.style.display = 'flex';
-    const acc = accountById.get(state.selectedAccountId);
-    const roleCount = (rolesByAccount.get(acc.id) || []).length;
-    document.getElementById('zoom-crumb').textContent = acc.prin.label + ' — ' + roleCount + ' structural role' + (roleCount === 1 ? '' : 's') + ', ' + acc.coverages.length + ' coverage line' + (acc.coverages.length === 1 ? '' : 's');
-    populateSimSelect(acc);
-    updateSimBanner();
-    renderZoom(acc);
-    if (lastRenderedAccountId !== acc.id) resetWheelView(); else applyWheelTransform();
-    lastRenderedAccountId = acc.id;
-  }
+  gallery.style.display = 'none'; zoomstage.style.display = 'block'; toolbar.style.display = 'flex';
+  const acc = accountById.get(state.selectedAccountId);
+  const roleCount = (rolesByAccount.get(acc.id) || []).length;
+  document.getElementById('zoom-crumb').textContent = acc.prin.label + ' — ' + roleCount + ' structural role' + (roleCount === 1 ? '' : 's') + ', ' + acc.coverages.length + ' coverage line' + (acc.coverages.length === 1 ? '' : 's');
+  populateSimSelect(acc);
+  updateSimBanner();
+  renderZoom(acc);
+  if (lastRenderedAccountId !== acc.id) resetWheelView(); else applyWheelTransform();
+  lastRenderedAccountId = acc.id;
 }
 
 /* ══════════════════════════════════════════════════════════════════
    SELECTION / NAVIGATION
    ══════════════════════════════════════════════════════════════════ */
 function selectAccount(id) { state.view = 'zoomed'; state.selectedAccountId = id; state.selectedNode = { type: 'principal', id }; state.sim = null; renderAll(); }
+// "◂ All Accounts" — the explicit, deliberate reverse of selectAccount() above: drops the
+// selection back to null so renderCenter() lands on the gallery again (never re-guesses an
+// account). Visibility is governed entirely by #cv-toolbar's own display (flex only once zoomed;
+// see renderCenter()) — this button carries no display override of its own.
 const backBtn = document.getElementById('btn-back-gallery');
-if (backBtn) backBtn.style.display = 'none';
+if (backBtn) backBtn.addEventListener('click', () => {
+  state.selectedAccountId = null; state.selectedNode = null; state.sim = null; renderAll();
+});
 
 function selectNode(type, id) {
   state.selectedNode = { type, id };
@@ -1151,7 +1172,7 @@ function renderCoveragePanel(id) {
           <div class="info-row"><div class="info-key">Status</div><div class="info-val"><span class="badge badge-status ${ov.status}">${policyStatusLabel(ov.status)}</span></div></div>
           <div class="info-row"><div class="info-key">Premium</div><div class="info-val num"><strong>${fmt$(ov.bound_premium)}</strong></div></div>
           <div class="info-row"><div class="info-key">Carrier</div><div class="info-val">${ov.carrier || '—'}</div></div>
-          <div class="info-row"><div class="info-key">Expiry</div><div class="info-val num">${ov.expiry_date || '—'}${ov.status === 'expiring' && ov.expiry_date ? ` <span style="color:var(--status-expiring)">(${daysUntil(ov.expiry_date)} days out)</span>` : ''}</div></div>
+          <div class="info-row"><div class="info-key">Expiry</div><div class="info-val num">${ov.expiry_date || '—'}${ov.status === 'expiring' && ov.expiry_date ? ` <span style="color:var(--state-expiring)">(${daysUntil(ov.expiry_date)} days out)</span>` : ''}</div></div>
           <div class="info-row"><div class="info-key">Producer of Record</div><div class="info-val">${ov.producer_of_record || '—'}</div></div>
         </div>
       </div>`;
@@ -1245,7 +1266,7 @@ function renderCoveragePanel(id) {
           <div class="info-row"><div class="info-key">Required Baseline</div><div class="info-val num"><strong>${fmt$(realBaseline)}</strong></div></div>
           <div class="info-row"><div class="info-key">Tier Used</div><div class="info-val">${tierUsedLabel}</div></div>
           <div class="info-row"><div class="info-key">Bound Limit</div><div class="info-val num"><strong>${boundLimitDisplay}</strong> ${gState === 'deficient' ? '<span class="badge badge-deficient">DEFICIENT</span>' : gState === 'adequate' ? '<span class="badge badge-status bound">Adequate</span>' : !isBoundLike ? '<span class="badge badge-status unbound">WHITESPACE</span>' : ''}</div></div>
-          ${deficiency != null ? `<div class="info-row"><div class="info-key">Limit Deficiency</div><div class="info-val num" style="color:var(--status-deficient)"><strong>${fmt$(deficiency)}</strong> short of required</div></div>` : ''}
+          ${deficiency != null ? `<div class="info-row"><div class="info-key">Limit Deficiency</div><div class="info-val num" style="color:var(--state-deficient)"><strong>${fmt$(deficiency)}</strong> short of required</div></div>` : ''}
         </div>
         ${catEntry.required_baseline_limit ? `<div class="narrative-quote" style="margin-top:8px">${catEntry.required_baseline_limit}</div>` : ''}
         ${(catEntry.statutory_triggers || []).length ? `
@@ -1294,7 +1315,7 @@ function renderCoveragePanel(id) {
           <div class="info-row"><div class="info-key">Real Required Baseline</div><div class="info-val num">${fmt$(realBaseline)}</div></div>
           <div class="info-row"><div class="info-key">Simulated Required Baseline</div><div class="info-val num"><strong>${fmt$(simBaseline)}</strong></div></div>
           ${isBoundLike ? `<div class="info-row"><div class="info-key">Actual Bound Limit (real, unchanged)</div><div class="info-val num">${fmt$(ov.bound_limit_usd)}</div></div>` : ''}
-          ${simDeficiency != null ? `<div class="info-row"><div class="info-key">Simulated Deficiency</div><div class="info-val num" style="color:var(--status-deficient)"><strong>${fmt$(simDeficiency)}</strong></div></div>` : (isBoundLike ? `<div class="info-row"><div class="info-key">Simulated Verdict</div><div class="info-val">Would remain adequate at this tier</div></div>` : '')}
+          ${simDeficiency != null ? `<div class="info-row"><div class="info-key">Simulated Deficiency</div><div class="info-val num" style="color:var(--state-deficient)"><strong>${fmt$(simDeficiency)}</strong></div></div>` : (isBoundLike ? `<div class="info-row"><div class="info-key">Simulated Verdict</div><div class="info-val">Would remain adequate at this tier</div></div>` : '')}
         </div>
       </div>`;
   }

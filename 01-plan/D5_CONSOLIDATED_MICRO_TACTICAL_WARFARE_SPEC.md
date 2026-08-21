@@ -33,7 +33,7 @@
 
 ### 2.2 Filtration Metrics & Headers
 
-1. **Header Controls**: Cross-navigation links (D0-D6), Theme Switcher (Dark/Light), Producer Override Selector (Alex, Rahul, Jacob, Cristian, Naomi).
+1. **Header Controls**: Cross-navigation links (D0-D6), Theme Switcher (Dark/Light), Producer Override Selector (Sabine, Vaughn, Thea, Ellery, Beckett).
 2. **Left Rail Trojan Queue (300px)**: Ranked target accounts sorted by *Highest Trojan Opportunity Score ($)*, *Lowest Penetration %*, or *Expiring Retention Risk (<90d)*.
 3. **Filter Toolbar**:
    * **Vertical Petal Filter**: Filter canvas by vertical (All, Yacht, Aviation, Real Estate, Auto, Personal Risk).

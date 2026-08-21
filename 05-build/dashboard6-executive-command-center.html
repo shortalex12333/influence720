@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <base href="/05-build/">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Influence 720 — Executive Command Center</title>
+<title>Influence 720 — The Synthesis Engine</title>
 <link rel="stylesheet" href="engine/style-core.css" />
 <style>
 /* Dashboard-6-specific rules only — everything shared lives in engine/style-core.css.
@@ -50,8 +50,20 @@
    Node dollar sizing/coloring (both color modes), the Effort-vs-Yield
    classification, and the Silent Churn detection math are all UNCHANGED —
    only the canvas geometry and the edge-drawing mechanism moved. */
-:root{--status-deficient:#a15a2e;--pcy-green:#2ec478;--pcy-amber:#e0a640;--pcy-legacy:#8b5cdc}
-body.theme-dark{--status-deficient:#e0916a;--pcy-green:#4ed48a;--pcy-amber:#e0b060;--pcy-legacy:#b699f5}
+/* --status-deficient local copy removed (token-cleanup pass) — every reference
+   in this file now reads the shared engine/style-core.css --state-deficient
+   token directly. --pcy-green/--pcy-amber/--pcy-legacy stay as local aliases
+   (Effort-vs-Yield mode's own flat-color vocabulary, distinct from Penetration
+   Ratio's colorScale()) but are now explicit, traceable repoints onto the
+   wheel's own canonical tokens instead of byte-identical hardcoded hex
+   collisions: green/amber alias the SAME --state-bound/--state-expiring the
+   wheel itself uses (the legend-group-lbl sectioning disambiguates the two
+   MODES for the user; sharing the token is intentional, not an accident), and
+   legacy/purple aliases --turf-4 (producer identity is the conceptually
+   correct home for "legacy book, decaying producer"). Aliasing var()s here
+   means no separate body.theme-dark block is needed — --state-bound/
+   --state-expiring/--turf-4 already vary by theme in the shared stylesheet. */
+:root{--pcy-green:var(--state-bound);--pcy-amber:var(--state-expiring);--pcy-legacy:var(--turf-4)}
 
 /* Rail/panel — override the shared engine's default (340px rail / 420px panel, used
    verbatim by D0/D4) to match D1's REAL measured styling, same fix already proven correct
@@ -78,30 +90,30 @@ body.theme-dark .lr-row{background:#141618}
 .rail-block{margin-bottom:18px}
 .rail-total{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-top:4px}
 .rail-total-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5}
-.vreset{cursor:pointer;color:var(--accent);font-weight:700;text-transform:none;letter-spacing:0;float:right}
+.vreset{cursor:pointer;color:var(--mark);font-weight:700;text-transform:none;letter-spacing:0;float:right}
 .vcard{border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;background:var(--surface);transition:border-color .15s,opacity .2s}
-.vcard:hover{border-color:var(--accent)}
+.vcard:hover{border-color:var(--mark)}
 .vcard.dim{opacity:.32}
-.vcard.isolated{border-color:var(--accent);background:var(--surface3)}
+.vcard.isolated{border-color:var(--mark);background:var(--surface3)}
 .vcard-top{display:flex;justify-content:space-between;align-items:baseline}
 .vcard-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)}
 .vcard-val{font-size:15px;font-weight:800;color:var(--text)}
 .vcard-bar{height:6px;border-radius:999px;background:var(--surface3);overflow:hidden;margin-top:6px;display:flex}
-.vcard-bar-sold{background:var(--status-bound);height:100%}
+.vcard-bar-sold{background:var(--state-bound);height:100%}
 .vcard-bar-prospect{background:var(--text3);opacity:.5;height:100%}
 .method-note{font-size:10px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:4px}
 .churn-summary{display:flex;flex-direction:column;gap:6px;margin-top:2px}
 .churn-summary-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text2)}
-.churn-summary-row strong{color:var(--status-unbound);font-size:16px;font-weight:900}
+.churn-summary-row strong{color:var(--state-breach);font-size:16px;font-weight:900}
 .color-hint{font-size:10px;color:var(--text3);line-height:1.5;margin-top:5px}
 .churn-row{display:flex;justify-content:space-between;gap:8px;padding:10px;border-radius:2px;cursor:pointer;background:#fff;border:1px solid transparent;border-bottom:1px solid var(--border);margin:0 0 6px;transition:border-color .15s}
 body.theme-dark .churn-row{background:#141618}
-.churn-row:hover{border-color:var(--status-unbound)}
+.churn-row:hover{border-color:var(--state-breach)}
 .churn-row-name{font-size:12.5px;font-weight:700;color:var(--text)}
 .churn-row-sub{font-size:10.5px;color:var(--text3);margin-top:2px;line-height:1.5}
-.churn-row-days{text-align:right;white-space:nowrap;font-size:11px;color:var(--status-unbound);font-weight:800}
-.churn-box{border:1px solid var(--status-unbound);border-radius:8px;padding:12px;background:rgba(177,56,46,0.07);margin-bottom:12px}
-.churn-box h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--status-unbound);margin-bottom:6px}
+.churn-row-days{text-align:right;white-space:nowrap;font-size:11px;color:var(--state-breach);font-weight:800}
+.churn-box{border:1px solid var(--state-breach);border-radius:8px;padding:12px;background:rgba(229,72,77,0.07);margin-bottom:12px}
+.churn-box h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--state-breach);margin-bottom:6px}
 .churn-box p{font-size:13px;color:var(--text2);line-height:1.6}
 .legend{position:absolute;bottom:14px;right:16px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--text2);display:flex;flex-direction:column;gap:5px;max-width:270px;max-height:calc(100% - 28px);overflow:auto}
 .legend-group-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-top:5px}
@@ -112,7 +124,7 @@ body.theme-dark .churn-row{background:#141618}
 .hatch-chip{display:inline-block;width:20px;height:12px;border-radius:3px;flex-shrink:0}
 .prod-table{width:100%;border-collapse:collapse;margin-top:4px}
 .prod-table th{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border2);cursor:pointer;user-select:none}
-.prod-table th:hover{color:var(--accent)}
+.prod-table th:hover{color:var(--mark)}
 .prod-table td{font-size:12px;padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:top}
 .prod-name{font-weight:700;color:var(--text)}
 .prod-sub{font-size:10px;color:var(--text3);margin-top:2px}
@@ -128,7 +140,7 @@ body.theme-dark .churn-row{background:#141618}
 .ucluster svg{overflow:visible;cursor:pointer;display:block}
 .ucluster-label{position:absolute;top:10px;left:14px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
 .ucluster-name{font-size:13px;font-weight:800;color:var(--text);letter-spacing:-.01em}
-.ucluster-meta{font-size:11px;font-weight:700;color:var(--accent)}
+.ucluster-meta{font-size:11px;font-weight:700;color:var(--mark)}
 .canvas-zoom-ctrl{position:absolute;bottom:14px;left:16px;display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px;z-index:10}
 .canvas-zoom-ctrl button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;cursor:pointer}
 .canvas-zoom-ctrl button.wide{width:auto;padding:0 10px;font-size:11px;font-weight:700}
@@ -137,7 +149,7 @@ body.theme-dark .churn-row{background:#141618}
    <svg>, exactly D0's #cross-link-overlay technique, recomputed every applyZoom()
    call so it stays glued to real node positions across pan/zoom/resize/selection. */
 #churn-breach-overlay{position:absolute;top:0;left:0;pointer-events:none}
-.rail-total,.vcard-val,.churn-row-days,.prod-table td{font-variant-numeric:tabular-nums}
+.rail-total,.vcard-val,.churn-row-days,.prod-table td,.churn-summary-row strong,.num{font-variant-numeric:tabular-nums;font-family:var(--font-mono)}
 </style>
 </head>
 <body>
@@ -146,16 +158,16 @@ body.theme-dark .churn-row{background:#141618}
   <div class="h-left">
     <div class="h-left-row">
       <a href="/" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" class="brand-logo-img"></a>
-      <div class="h-title">Executive Command Center</div>
+      <div class="h-title">The Synthesis Engine</div>
     </div>
-    <div class="h-sub">Five vertical wheels — <strong>yacht, aviation, real estate, auto, personal</strong> — arranged pentagon-style, same layout as D0. Ring=authority tier (0-4), 9-segment domain=real lifecycle category, node size=real Epic GWP $ (bound + estimated). Producers have no ring/domain of their own — pick a producer below and switch Node Color Mode to Effort vs Yield to recolor their own touched nodes by a real, computed classification. Red satellites + red edges are real, traced silent-churn risk: a Ring 0/1 signatory contact stale 120+ days with a real coverage line expiring inside 90 days — an at-risk role's account is frequently on a DIFFERENT vertical's wheel, so the edge crosses petals.</div>
+    <div class="h-sub">Effort and yield, laid over the same structure. Where the two agree, and where they don't. Five vertical wheels — <strong>yacht, aviation, real estate, auto, personal</strong> — arranged pentagon-style, same layout as D0. Ring=authority tier (0-4), 9-segment domain=real lifecycle category, node size=real Epic GWP $ (bound + estimated). Producers have no ring/domain of their own — pick a producer below and switch Node Color Mode to Effort vs Yield to recolor their own touched nodes by a real, computed classification. Red satellites + red edges are real, traced silent-churn risk: a Ring 0/1 signatory contact stale 120+ days with a real coverage line expiring inside 90 days — an at-risk role's account is frequently on a DIFFERENT vertical's wheel, so the edge crosses petals.</div>
     <nav class="suite-nav" aria-label="Influence 720 dashboard suite">
-      <a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Producer Tactical Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d2" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d5" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D6 Executive Command Center</span>
+      <span class="suite-nav-label">Concept</span><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d0" target="_blank" rel="noopener noreferrer">D0 Coordinate Foundation</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d1" target="_blank" rel="noopener noreferrer">D1 Vector Routing</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d2" target="_blank" rel="noopener noreferrer">D2 Fiduciary Exposure Audit</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d3" target="_blank" rel="noopener noreferrer">D3 Keystone Relationship Map</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d4" target="_blank" rel="noopener noreferrer">D4 Magnitude Rollup</a><span class="suite-nav-sep">·</span><a class="suite-nav-item" href="/d5" target="_blank" rel="noopener noreferrer">D5 Vector Conversion</a><span class="suite-nav-sep">·</span><span class="suite-nav-current">D6 Synthesis Engine</span><span class="suite-nav-sep">·</span><a class="suite-nav-item pilot-link" href="/pilot" target="_blank" rel="noopener noreferrer">Pilot — Working Principle</a><span class="suite-nav-sep">·</span><a class="suite-nav-item pilot-link" href="/pilot-d1" target="_blank" rel="noopener noreferrer">Pilot-D1 — Your Network</a>
     </nav>
   </div>
   <div class="h-ctrl">
     <span class="vtag" id="whole-book-tag">Whole Book —</span>
-    <span class="vtag">Trish · SVP</span>
+    <span class="vtag">Larkin · SVP</span>
     <div class="theme-switch-wrap">
       <span class="theme-switch-lbl">Light</span>
       <button class="theme-switch" id="theme-toggle" aria-label="Toggle theme"><span class="theme-switch-thumb"></span></button>
@@ -228,20 +240,21 @@ body.theme-dark .churn-row{background:#141618}
     </div>
     <div class="legend">
       <div class="legend-group-lbl">Penetration Ratio (default coloring)</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#2ec478"></span>Well-penetrated role — mostly bound</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#e0a640"></span>Partially penetrated</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:#8b93a3"></span>Untapped beachhead — all estimated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#3FAE60"></span>Well-penetrated role — mostly bound</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#DCAE5C"></span>Partially penetrated</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:#8B8F96"></span>Untapped beachhead — all estimated</div>
       <div class="legend-row"><span class="hatch-chip" style="background:repeating-linear-gradient(45deg,var(--text2) 0 2px,transparent 2px 5px)"></span>Hatched share = estimated, not bound</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-deficient)"></span>Solid rust = bound but under required limit</div>
-      <div class="legend-group-lbl">Producer Effort vs Yield (this producer's touched nodes only)</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-deficient)"></span>Solid rust = bound but under required limit</div>
+      <div class="legend-group-lbl">Producer Effort vs Yield — Yield per Vector, benchmarked against Network Efficiency (this producer's touched nodes only)</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-green)"></span>High-yield / low-touch — effort-efficient</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-amber)"></span>High-touch / low-yield — effort-heavy</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--pcy-legacy)"></span>Legacy book, decaying contact (churn_risk_score &ge; 5)</div>
       <div class="legend-group-lbl">Silent Churn Risk (always on, any color mode)</div>
-      <div class="legend-row"><span class="legend-swatch" style="background:var(--status-unbound)"></span>Red satellite — 120+ day stale Ring 0/1 contact + coverage expiring &lt;90d</div>
-      <div class="legend-row"><span class="legend-line" style="background:var(--status-unbound)"></span>Solid red edge — at-risk role → its account/principal</div>
+      <div class="legend-row"><span class="legend-swatch" style="background:var(--state-breach)"></span>Red satellite — 120+ day stale Ring 0/1 contact + coverage expiring &lt;90d</div>
+      <div class="legend-row"><span class="legend-line" style="background:var(--state-breach)"></span>Solid red edge — at-risk role → its account/principal</div>
       <div class="legend-row"><span class="legend-swatch" style="background:var(--text3);opacity:.4"></span>No modeled coverage responsibility</div>
       <div class="legend-row"><span class="legend-swatch" style="border:2px solid var(--text2);background:transparent"></span>Bold outline = account-level (UBO) bubble</div>
+      <div class="legend-row" id="legend-turf" style="flex-wrap:wrap;row-gap:4px"></div>
     </div>
   </div>
 
@@ -501,7 +514,7 @@ function producerBreakdown(n) {
 // correct if the roster ever changes.
 //   1. churn_risk_score >= LEGACY_CHURN_THRESHOLD -> "legacy/decaying"
 //      (purple). Real field, 0-10 scale (rosters.js) — of the 5 real
-//      producers only Jacob's 8.6 clears 5; the rest sit 1.2-3.4.
+//      producers only Thea's 8.6 clears 5; the rest sit 1.2-3.4.
 //   2. Otherwise: $ captured per touchpoint in the last 90 days
 //      (gwp_captured_90d / touchpoints_90d), ranked against the MEDIAN
 //      of that same ratio across the other non-legacy producers (computed
@@ -576,11 +589,64 @@ const CHURN_PREMIUM_AT_RISK = Array.from(churnRoles.values()).reduce((s, c) => s
 const CHURN_ACCOUNTS_AFFECTED = new Set(Array.from(churnRoles.keys()).map(rid => { const n = nodeById.get(rid); return n && n.account_ref; }).filter(Boolean)).size;
 
 // ════════════════════════════════════════════════════════════════════
+// TURF OUTLINE — ported verbatim from dashboard4-role-macro-view.html's
+// applyTurfOutline()/strongestTurfProducerId() (this file already reuses
+// D4's wheel-building code per the header comment above), shown in D6's
+// default "Whole Book" / Penetration Ratio view (D6's equivalent of D4's
+// Regional Aggregate). D6 has the SAME real per-(producer_id, node_id)
+// attribution source D4 uses to draw this — RELATIONSHIP_WEIGHTS via the
+// rwRowsFor(n) join already defined above (producerBreakdown() already
+// reads it) — so this is a genuine node-level field, not a fabricated one.
+// This is a DIFFERENT, simultaneous-multi-producer signal from the
+// --pcy-legacy:var(--turf-4) alias above: that alias only recolors a
+// SINGLE selected producer's own touched nodes purple under Effort vs
+// Yield (their book is decaying), whereas this outline shows, across
+// EVERY node at once with no producer selected, which of the 5 producers
+// currently holds the strongest real relationship foothold there — the
+// same "whose turf is this" question D3/D4 answer, now answered here too.
+// Steps aside the instant Producer Gap Skew picks a specific producer
+// (that re-tint already carries producer identity, same as D4).
+// ════════════════════════════════════════════════════════════════════
+const turfIndexByProducerId = new Map(PRODUCERS.map((p, i) => [p.producer_id, i]));
+const turfProducerCache = new Map();
+function strongestTurfProducerId(n) {
+  if (turfProducerCache.has(n.id)) return turfProducerCache.get(n.id);
+  const weightByProducer = new Map();
+  rwRowsFor(n).forEach(r => weightByProducer.set(r.producer_id, (weightByProducer.get(r.producer_id) || 0) + r.relationship_weight));
+  let best = null, bestWeight = -Infinity;
+  weightByProducer.forEach((w, pid) => { if (w > bestWeight) { bestWeight = w; best = pid; } });
+  turfProducerCache.set(n.id, best);
+  return best;
+}
+function applyTurfOutline(p, svg) {
+  if (state.producerId) return; // Producer Gap Skew active — its re-tint is the sole producer-identity signal while active
+  const producerId = strongestTurfProducerId(p.n);
+  if (!producerId) return;
+  const idx = turfIndexByProducerId.get(producerId);
+  if (idx == null) return;
+  const g = svg.querySelector('g[data-nid="' + CSS.escape(p.n.id) + '"]');
+  if (!g) return;
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ring.setAttribute('cx', p.x); ring.setAttribute('cy', p.y); ring.setAttribute('r', p.r + 3);
+  ring.setAttribute('fill', 'none');
+  ring.setAttribute('stroke', 'var(--turf-' + (idx + 1) + ')');
+  ring.setAttribute('stroke-width', '1.4');
+  ring.setAttribute('stroke-opacity', '0.6');
+  ring.setAttribute('pointer-events', 'none');
+  g.appendChild(ring);
+}
+
+// ════════════════════════════════════════════════════════════════════
 // VISUAL ENCODING
 // ════════════════════════════════════════════════════════════════════
 function colorScale(ratio) {
   if (ratio == null) return 'var(--text3)';
-  const grey = [139,147,163], amber = [224,166,64], green = [46,196,120];
+  // Canonical triplet (color-unify remediation) — ported verbatim from dashboard4-role-macro-view.html's
+  // already-fixed colorScale(), literal RGB not var() refs since this interpolates at runtime.
+  // Matches engine/style-core.css's dark-theme --state-unbound/--state-expiring/--state-bound exactly
+  // (#8B8F96/#DCAE5C/#3FAE60) so D4's Producer Gap Skew and D6's Penetration Ratio — the same
+  // underlying mechanic — render identically instead of disagreeing on grey/amber/green.
+  const grey = [139,143,150], amber = [220,174,92], green = [63,174,96];
   let c;
   if (ratio <= 0.5) { const k = ratio/0.5; c = grey.map((v,i) => Math.round(v + (amber[i]-v)*k)); }
   else { const k = (ratio-0.5)/0.5; c = amber.map((v,i) => Math.round(v + (green[i]-v)*k)); }
@@ -773,7 +839,7 @@ function splitFillNode(p, svg, v) {
     const sw = isPrincipal ? 2 : 1.2;
     const segs = [
       { frac: fin.soldAdequate / fin.total, fill: col, opacity: 0.92, hatch: false },
-      { frac: fin.soldDeficient / fin.total, fill: 'var(--status-deficient)', opacity: 0.92, hatch: false },
+      { frac: fin.soldDeficient / fin.total, fill: 'var(--state-deficient)', opacity: 0.92, hatch: false },
       { frac: fin.prospected / fin.total, fill: col, opacity: 0.22, hatch: true },
     ].filter(s => s.frac > 0.0005);
     if (segs.length <= 1) {
@@ -862,7 +928,7 @@ function drawChurnBreaches() {
     if (!from || !to) return;
     overlay.appendChild(RingEngine.svgEl('line', {
       class: 'fiduciary-breach-line', x1: from.x, y1: from.y, x2: to.x, y2: to.y,
-      stroke: 'var(--status-unbound)', 'stroke-width': '2.5', 'stroke-opacity': '0.85',
+      stroke: 'var(--state-breach)', 'stroke-width': '2.5', 'stroke-opacity': '0.85',
     }));
   });
   canvas.appendChild(overlay);
@@ -879,7 +945,7 @@ function drawChurnSatellite(scene, p) {
   const orbitR = p.r + 9;
   const sx = p.x + Math.cos(angle) * orbitR, sy = p.y + Math.sin(angle) * orbitR;
   const dot = RingEngine.svgEl('circle', {
-    cx: sx, cy: sy, r: 6, fill: 'var(--status-unbound)', stroke: 'var(--surface)', 'stroke-width': '1.4', cursor: 'pointer',
+    cx: sx, cy: sy, r: 6, fill: 'var(--state-breach)', stroke: 'var(--surface)', 'stroke-width': '1.4', cursor: 'pointer',
   });
   dot.addEventListener('click', evt => { evt.stopPropagation(); state.selectedId = p.n.id; renderAll(); });
   dot.addEventListener('mouseenter', evt => {
@@ -928,6 +994,7 @@ function renderUniverse(v) {
   const scene = svg.querySelector('g');
   injectDefs(svg, v);
   layout.forEach(p => { splitFillNode(p, svg, v); drawChurnSatellite(scene, p); });
+  layout.forEach(p => applyTurfOutline(p, svg)); // additive post-pass, after split-fill — see TURF OUTLINE section above
   updateClusterMeta(v);
 }
 
@@ -1041,7 +1108,7 @@ document.getElementById('lr-toggle').addEventListener('click', () => {
   setTimeout(() => { fitAndCenterView(); applyZoom(); }, 260);
 });
 
-// Producer Gap Skew — same 5 real producers (Alex/Rahul/Jacob/Cristian/Naomi)
+// Producer Gap Skew — same 5 real producers (Sabine/Vaughn/Thea/Ellery/Beckett)
 // D1/D4's own producer picker already loads. Selecting one re-colors/re-sizes
 // the whole wheel to THEIR own gap pattern (or, in Effort vs Yield mode, to
 // their real computed classification) instead of the regional aggregate.
@@ -1049,6 +1116,12 @@ const selProducer = document.getElementById('sel-producer');
 PRODUCERS.forEach(p => { const o = document.createElement('option'); o.value = p.producer_id; o.textContent = p.name; selProducer.appendChild(o); });
 selProducer.addEventListener('change', e => { state.producerId = e.target.value || null; renderAll(); });
 document.getElementById('sel-colormode').addEventListener('change', e => { state.colorMode = e.target.value; renderAll(); });
+
+// Turf outline legend key — same var(--turf-N) slot assignment applyTurfOutline()
+// uses above, so the color shown here is always the same producer as the ring
+// actually drawn on the wheel (D4's own legend-turf technique, ported verbatim).
+document.getElementById('legend-turf').innerHTML = '<span style="width:100%">Thin outline = strongest producer relationship (Whole Book only, no producer selected):</span>' +
+  PRODUCERS.map((p, i) => '<span style="display:inline-flex;align-items:center;gap:4px;margin-right:9px"><span class="legend-swatch" style="width:9px;height:9px;border:1.4px solid var(--turf-' + (i + 1) + ');background:transparent"></span>' + escapeXML(p.name) + '</span>').join('');
 
 // ════════════════════════════════════════════════════════════════════
 // RIGHT PANEL
@@ -1100,20 +1173,20 @@ function renderNodePanel(n) {
         '<span class="badge badge-ring">' + (isPrincipal ? 'Ring 0 · ' + ringLabel : 'Ring ' + n.ring + ' · ' + ringLabel) + '</span>' +
         (isPrincipal ? '' : '<span class="badge badge-coi ' + n.coi_type + '">' + n.coi_type + '</span>') +
         '<span class="badge" style="background:var(--surface3);color:var(--text2)">' + VERTICAL_LABELS[v] + ' · ' + escapeXML(domainName(n.vertical, n.domain)) + '</span>' +
-        (churnInfo ? '<span class="badge" style="background:rgba(177,56,46,0.14);color:var(--status-unbound);border-color:rgba(177,56,46,0.4)">SILENT CHURN RISK</span>' : '') +
+        (churnInfo ? '<span class="badge" style="background:rgba(229,72,77,0.14);color:var(--state-breach);border-color:rgba(229,72,77,0.4)">SILENT CHURN RISK</span>' : '') +
       '</div>' +
     '</div>' +
     (activeProducer ? '<p class="empty-note" style="margin:-4px 0 10px">Wheel is currently colored/sized to <strong style="color:var(--text2)">' + escapeXML(activeProducer.name) + "'s</strong> own " + (state.colorMode==='effort_yield' ? 'Effort vs Yield classification (<strong style="color:' + producerEffortYieldClass(activeProducer.producer_id).color + '">' + producerEffortYieldClass(activeProducer.producer_id).label + '</strong>)' : 'gap pattern') + " — the figures below are the full regional detail for this node (every producer), the same reference view regardless of the wheel toggle.</p>" : '') +
-    (churnInfo ? '<div class="churn-box"><h3>Silent Churn Risk — Real, Traced</h3><p>Last logged relationship contact on this Ring ' + n.ring + ' role: <strong>' + escapeXML(churnInfo.lastContact) + '</strong> (' + Math.round(churnInfo.daysStale) + ' days stale, past the ' + STALE_DAYS + '-day threshold). ' + churnInfo.expiring.length + ' real coverage line' + (churnInfo.expiring.length>1?'s':'') + ' on file for this role expire' + (churnInfo.expiring.length>1?'':'s') + ' inside ' + EXPIRY_WINDOW_DAYS + ' days:</p>' +
-      churnInfo.expiring.map(e => '<p style="margin-top:6px">&bull; <strong>' + escapeXML(e.label || e.coverage_id) + '</strong> — expires ' + e.expiry_date + ' (' + e.daysUntil + 'd out), ' + fmtMoney(e.bound_premium) + ' bound premium</p>').join('') +
+    (churnInfo ? '<div class="churn-box"><h3>Silent Churn Risk — Real, Traced</h3><p>Last logged relationship contact on this Ring ' + n.ring + ' role: <strong style="font-family:var(--font-mono)">' + escapeXML(churnInfo.lastContact) + '</strong> (' + Math.round(churnInfo.daysStale) + ' days stale, past the ' + STALE_DAYS + '-day threshold). ' + churnInfo.expiring.length + ' real coverage line' + (churnInfo.expiring.length>1?'s':'') + ' on file for this role expire' + (churnInfo.expiring.length>1?'':'s') + ' inside ' + EXPIRY_WINDOW_DAYS + ' days:</p>' +
+      churnInfo.expiring.map(e => '<p style="margin-top:6px">&bull; <strong>' + escapeXML(e.label || e.coverage_id) + '</strong> — expires <span style="font-family:var(--font-mono)">' + e.expiry_date + '</span> (' + e.daysUntil + 'd out), <span style="font-family:var(--font-mono)">' + fmtMoney(e.bound_premium) + '</span> bound premium</p>').join('') +
     '</div>' : '') +
     '<div class="box">' +
       '<h3>' + (isPrincipal ? 'Total $ Touching This Account' : 'Total $ Touching This Role') + '</h3>' +
       '<p class="num" style="font-size:26px;font-weight:900;color:var(--text)">' + fmtMoney(fin.total) + '</p>' +
       (fin.total > 0 ?
-        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--status-bound)"></div></div></div></div>' +
+        '<div class="score-chart" style="margin-top:8px"><div class="sc-row" style="grid-template-columns:1fr"><div class="sc-track"><div class="sc-fill" style="width:' + soldPct + '%;background:var(--state-bound)"></div></div></div></div>' +
         '<div class="info-row" style="grid-template-columns:1fr 1fr;margin-top:5px"><span class="info-val">Bound ' + fmtMoney(fin.sold) + '</span><span class="info-val" style="text-align:right">Estimated whitespace ' + fmtMoney(fin.prospected) + '</span></div>' +
-        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--status-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient)</span></div>' : '')
+        (fin.soldDeficient > 0 ? '<div class="info-row" style="grid-template-columns:1fr;margin-top:5px"><span class="info-val" style="color:var(--state-deficient)">' + fmtMoney(fin.soldDeficient) + ' of the bound total is under the required limit (deficient)</span></div>' : '')
         : '<p class="empty-note" style="margin-top:6px">No bound or estimated coverage is currently modeled as this ' + (isPrincipal ? 'account' : "role's") + ' responsibility.</p>') +
       (acct ? '<div style="margin-top:9px;font-size:11px;color:var(--text3)">Account: <strong style="color:var(--text2)">' + escapeXML(acct.label) + '</strong></div>' : '') +
     '</div>' +

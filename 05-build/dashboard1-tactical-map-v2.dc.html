@@ -41,13 +41,13 @@ body{margin:0}
     <div style="{{ s.identityLeft }}">
       <a href="/" title="Influence 720 Home"><img src="images/logo.jpeg" alt="Influence 720" style="height:28px;width:auto;border-radius:6px;border:1px solid rgba(255,255,255,0.15);vertical-align:middle;margin-right:8px"></a>
       <span style="{{ s.mark }}"></span>
-      <span style="{{ s.wordmark }}">PRODUCER TACTICAL MAP</span>
+      <span style="{{ s.wordmark }}">VECTOR ROUTING</span>
       <span style="{{ s.dividerV }}"></span>
-      <span style="{{ s.subtitle }}">Radial relationship graph — click any node to inspect the relationship, the structural knows-chain, and the next best action.</span>
+      <span style="{{ s.subtitle }}">A known Ring 4 contact and the Ring 1 signatory it can reach — the vector between them, rendered. Click any node to inspect the relationship and its structural knows-chain.</span>
     </div>
     <div style="{{ s.identityRight }}">
       <nav style="{{ s.suiteNav }}" aria-label="Influence 720 dashboard suite">
-        <a style="{{ s.suiteNavItem }}" href="/d0" target="_blank" rel="noopener noreferrer">D0 Ontology Foundation</a><span style="{{ s.suiteNavSep }}">·</span><span style="{{ s.suiteNavCurrent }}">D1 Producer Tactical Map</span><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d2" target="_blank" rel="noopener noreferrer">D2 Whitespace Gap Engine</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d3" target="_blank" rel="noopener noreferrer">D3 Department Relationship Map</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d4" target="_blank" rel="noopener noreferrer">D4 Role Macro View</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d5" target="_blank" rel="noopener noreferrer">D5 Micro — Trojan Horse</a>
+        <span style="{{ s.suiteNavLabel }}">Concept</span><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d0" target="_blank" rel="noopener noreferrer">D0 Coordinate Foundation</a><span style="{{ s.suiteNavSep }}">·</span><span style="{{ s.suiteNavCurrent }}">D1 Vector Routing</span><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d2" target="_blank" rel="noopener noreferrer">D2 Fiduciary Exposure Audit</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d3" target="_blank" rel="noopener noreferrer">D3 Keystone Relationship Map</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d4" target="_blank" rel="noopener noreferrer">D4 Magnitude Rollup</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d5" target="_blank" rel="noopener noreferrer">D5 Vector Conversion</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.suiteNavItem }}" href="/d6" target="_blank" rel="noopener noreferrer">D6 Synthesis Engine</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.pilotLink }}" href="/pilot" target="_blank" rel="noopener noreferrer">Pilot — Working Principle</a><span style="{{ s.suiteNavSep }}">·</span><a style="{{ s.pilotLink }}" href="/pilot-d1" target="_blank" rel="noopener noreferrer">Pilot-D1 — Your Network</a>
       </nav>
       <span style="{{ s.dividerV }}"></span>
       <span style="{{ s.lockTag }}">VIEWING AS <b style="{{ s.lockTagBold }}">{{ producerName }}</b></span>
@@ -208,7 +208,7 @@ body{margin:0}
           <button style="{{ s.zoomBtnWide }}" onClick="{{ zoomReset }}">Reset view</button>
         </div>
         <div style="{{ s.legend }}">
-          <div style="{{ s.legendRow }}"><span style="{{ s.legendGradient }}"></span>Green→red: most recent communication</div>
+          <div style="{{ s.legendRow }}"><span style="{{ s.legendGradient }}"></span>Green→amber: most recent communication</div>
           <div style="{{ s.legendRow }}"><span style="{{ s.legendSwatchUntapped }}"></span>Grey — not yet referred in (size still reflects COI value)</div>
           <div style="{{ s.legendRow }}"><span style="{{ s.legendLineKnows }}"></span>"Knows" — structural</div>
           <div style="{{ s.legendRow }}"><span style="{{ s.legendLineReferral }}"></span>Referred-by — historical</div>
@@ -298,7 +298,7 @@ body{margin:0}
               </div>
             </div>
           </sc-if>
-          <button style="{{ s.actionBtn }}">Draft Intro Request</button>
+          <button style="{{ s.actionBtn }}" onClick="{{ draftIntroRequest }}">{{ draftBtnLabel }}</button>
         </sc-if>
       </div>
     </div>
@@ -369,6 +369,7 @@ class Component extends DCLogic {
       zoom: 1, panX: 0, panY: 0,
       ring: 'all', rel: 'all', vertical: 'all', mode: 'person',
       coiType: 'all', coiWeight: 2, coiFreq: 2, decisionDist: 4,
+      draftedIds: {},
     };
     this.state.selectedNodeId = this.pickDefaultNode(firstProducerId);
 
@@ -387,7 +388,7 @@ class Component extends DCLogic {
     this.setModeCompany = () => this.setState({ mode: 'company' });
     this.toggleNames = () => this.setState(s => ({ showLabels: !s.showLabels }));
     this.back = () => this.setState({ view: 'book', accountId: null });
-    this.reset = () => { const id = PRODUCERS[0].producer_id; this.setState({ producerId: id, view: 'book', accountId: null, selectedNodeId: this.pickDefaultNode(id), showLabels: false, ring: 'all', rel: 'all', vertical: 'all', coiType: 'all', coiWeight: 2, coiFreq: 2, decisionDist: 4, mode: 'person', filtersOpen: false, zoom: 1, panX: 0, panY: 0 }); };
+    this.reset = () => { const id = PRODUCERS[0].producer_id; this.setState({ producerId: id, view: 'book', accountId: null, selectedNodeId: this.pickDefaultNode(id), showLabels: false, ring: 'all', rel: 'all', vertical: 'all', coiType: 'all', coiWeight: 2, coiFreq: 2, decisionDist: 4, mode: 'person', filtersOpen: false, zoom: 1, panX: 0, panY: 0, draftedIds: {} }); };
 
     this._drag = null;
     this.onCanvasDown = (e) => { this._drag = { x: e.clientX, y: e.clientY, panX: this.state.panX, panY: this.state.panY, moved: false }; };
@@ -407,6 +408,15 @@ class Component extends DCLogic {
     this.zoomOut = () => this.setState(s => ({ zoom: Math.max(0.35, (s.zoom || 1) - 0.25) }));
     this.zoomReset = () => this.setState({ zoom: 1, panX: 0, panY: 0 });
     this.closePanel = () => this.setState({ selectedNodeId: null });
+    // Draft Intro Request — brand's "preview, never auto-send" discipline: clicking never
+    // dispatches anything, it only stages a visible "Draft — not sent" acknowledgement tied to
+    // the CURRENTLY SELECTED node (keyed by id, not a bare global flag) so switching to a
+    // different node never inherits another node's drafted state.
+    this.draftIntroRequest = () => {
+      const id = this.state.selectedNodeId;
+      if (!id) return;
+      this.setState(s => ({ draftedIds: { ...s.draftedIds, [id]: true } }));
+    };
   }
 
   pickDefaultNode(producerId) {
@@ -444,14 +454,14 @@ class Component extends DCLogic {
   }
   displayLabel(n, pid) { return this.isKnown(pid, n.id) ? n.label : this.roleTitle(n); }
 
-  // Green (strong/active) -> red (known but cooling) gradient for known contacts only;
+  // Green (strong/active) -> amber (known but cooling) gradient for known contacts only;
   // untapped stays flat grey — that grey IS the white-space signal, never a data point.
-  // Pure recency of most recent communication, decayed to zero (full red) at 6 months stale —
+  // Pure recency of most recent communication, decayed to zero (fully cold) at 6 months stale —
   // this is the ONLY input to color. Node size is a separate signal (COI value).
   // Was a 365-day window against archetype-generated last_activity_date data that never exceeds
   // ~250 days stale for any producer (ARCHETYPE_AFFINITY's widest days_since band) — every known
   // node scored >=0.32, so hue never left yellow-green and the whole book read as flat green.
-  // 180 days lets the SAME underlying date data span the full green-to-red range.
+  // 180 days lets the SAME underlying date data span the full green-to-amber range.
   relationshipScore(rw) {
     const daysSince = (Date.now() - new Date(rw.last_activity_date).getTime()) / 86400000;
     return Math.max(0, Math.min(1, 1 - daysSince / 180));
@@ -459,7 +469,13 @@ class Component extends DCLogic {
   activityColor(n, pid, t) {
     const rw = this.rwIndex.get(pid + '|' + n.id);
     if (!rw) return t.untapped;
-    const hue = this.relationshipScore(rw) * 120; // 0=red (12mo+ stale) 120=green (recent)
+    // Color-unify remediation: red is reserved exclusively for --state-breach (a Ring 0/1
+    // signatory carrying an open coverage gap). Relationship-recency warmth is a different axis
+    // (CRM contact staleness, not fiduciary severity) and must never render true red. Hue floor
+    // raised from 0 (red) to 38 — the exact hue of --state-expiring/#DCAE5C — so the coldest,
+    // most-stale end of this gradient reads as the same amber the rest of the suite already uses
+    // for "needs attention," not as a second, unrelated meaning of red.
+    const hue = 38 + this.relationshipScore(rw) * 82; // 38=amber (6mo+ stale) 120=green (recent)
     return `hsl(${hue}, ${t.dark ? 55 : 60}%, ${t.dark ? 52 : 40}%)`;
   }
   producerAccounts(pid) { return this.ACCOUNTS.filter(a => a.producer_id === pid); }
@@ -506,31 +522,37 @@ class Component extends DCLogic {
     return { hi: pct([0, 1]), lo: pct([3, 4]), count: rows.length, total: total.toFixed(1) };
   }
 
-  visibleNodesForBook() {
+  // Filter law (D0's dim-only pattern, ported here): ONE predicate is the single source of
+  // truth for whether a role currently matches the active Ring / Relationship / Vertical /
+  // Conflict Type / three range-slider filters. drawGraph() now uses this as a dimFn instead
+  // of an array filter, so the canvas never re-layouts on a filter change; everything else
+  // that still wants "the filtered set" (stat tiles, etc.) calls visibleNodesForBook/Account
+  // below, which are now thin wrappers around the same predicate — one law, never two.
+  roleMatchesFilters(n) {
     const st = this.state;
-    let nodes = this.producerAccounts(st.producerId).flatMap(a => a.people);
-    if (st.vertical !== 'all') nodes = nodes.filter(n => n.vertical === st.vertical);
-    if (st.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(st.ring));
-    if (st.rel === 'known') nodes = nodes.filter(n => this.isKnown(st.producerId, n.id));
-    if (st.rel === 'untapped') nodes = nodes.filter(n => !this.isKnown(st.producerId, n.id));
-    if (st.coiType !== 'all') nodes = nodes.filter(n => n.coi_type === st.coiType);
-    if (st.coiWeight > 2) nodes = nodes.filter(n => (n.coi_weight || 0) >= st.coiWeight);
-    if (st.coiFreq > 2) nodes = nodes.filter(n => (n.coi_freq || 0) >= st.coiFreq);
-    if (st.decisionDist < 4) nodes = nodes.filter(n => (n.decision_dist ?? 4) <= st.decisionDist);
-    return nodes;
+    if (st.vertical !== 'all' && n.vertical !== st.vertical) return false;
+    if (st.ring !== 'all' && n.ring !== Number(st.ring)) return false;
+    if (st.rel === 'known' && !this.isKnown(st.producerId, n.id)) return false;
+    if (st.rel === 'untapped' && this.isKnown(st.producerId, n.id)) return false;
+    if (st.coiType !== 'all' && n.coi_type !== st.coiType) return false;
+    if (st.coiWeight > 2 && (n.coi_weight || 0) < st.coiWeight) return false;
+    if (st.coiFreq > 2 && (n.coi_freq || 0) < st.coiFreq) return false;
+    if (st.decisionDist < 4 && (n.decision_dist ?? 4) > st.decisionDist) return false;
+    return true;
+  }
+  filtersAreDefault() {
+    const st = this.state;
+    return st.ring === 'all' && st.rel === 'all' && st.vertical === 'all' && st.coiType === 'all'
+      && st.coiWeight === 2 && st.coiFreq === 2 && st.decisionDist === 4;
+  }
+  visibleNodesForBook() {
+    const nodes = this.producerAccounts(this.state.producerId).flatMap(a => a.people);
+    return nodes.filter(n => this.roleMatchesFilters(n));
   }
   visibleNodesForAccount() {
-    const st = this.state;
-    const acct = this.accountByUbo.get(st.accountId);
-    let nodes = acct ? acct.people : [];
-    if (st.ring !== 'all') nodes = nodes.filter(n => n.ring === Number(st.ring));
-    if (st.rel === 'known') nodes = nodes.filter(n => this.isKnown(st.producerId, n.id));
-    if (st.rel === 'untapped') nodes = nodes.filter(n => !this.isKnown(st.producerId, n.id));
-    if (st.coiType !== 'all') nodes = nodes.filter(n => n.coi_type === st.coiType);
-    if (st.coiWeight > 2) nodes = nodes.filter(n => (n.coi_weight || 0) >= st.coiWeight);
-    if (st.coiFreq > 2) nodes = nodes.filter(n => (n.coi_freq || 0) >= st.coiFreq);
-    if (st.decisionDist < 4) nodes = nodes.filter(n => (n.decision_dist ?? 4) <= st.decisionDist);
-    return nodes;
+    const acct = this.accountByUbo.get(this.state.accountId);
+    const nodes = acct ? acct.people : [];
+    return nodes.filter(n => this.roleMatchesFilters(n));
   }
 
   tokens() {
@@ -538,14 +560,18 @@ class Component extends DCLogic {
     const ch = d ? '255,255,255' : '0,0,0';
     return {
       dark: d,
-      bg: d ? '#0b0c0e' : '#f1f1ee', surface: d ? '#141618' : '#ffffff', surface2: d ? '#1b1e21' : '#eeeeea', surface3: d ? '#25282c' : '#e2e2dc',
+      bg: d ? '#0F1113' : '#FFFFFF', surface: d ? '#141618' : '#F7F8F8', surface2: d ? '#1b1e21' : '#eeeeea', surface3: d ? '#25282c' : '#e2e2dc',
       border: d ? '#2a2d31' : '#dddad4', borderStrong: d ? '#3a3e43' : '#c7c4bc',
       ink: `rgba(${ch},0.92)`, ink2: `rgba(${ch},0.55)`, ink3: `rgba(${ch},0.70)`, inkGhost: `rgba(${ch},0.40)`,
       shadowDrop: d ? '0 8px 24px rgba(0,0,0,0.50)' : '0 8px 24px rgba(0,0,0,0.12)',
-      accent: d ? '#3ab6e8' : '#1f8fc7', accentSoft: d ? 'rgba(58,182,232,0.16)' : 'rgba(31,143,199,0.10)',
-      good: d ? '#3fd087' : '#166a41', goodSoft: d ? 'rgba(63,208,135,0.16)' : 'rgba(22,106,65,0.10)',
-      warn: d ? '#dcae5c' : '#8a6510', bad: d ? '#f0766e' : '#a12e22',
+      accent: d ? '#5AABCC' : '#2B7BA3', accentSoft: d ? 'rgba(90,171,204,0.16)' : 'rgba(43,123,163,0.10)',
+      good: d ? '#3FAE60' : '#2F8F4C', goodSoft: d ? 'rgba(63,174,96,0.16)' : 'rgba(47,143,76,0.10)',
+      warn: d ? '#dcae5c' : '#B0862F', bad: d ? '#8B8F96' : '#6E747C',
       untapped: d ? '#5a5f64' : '#9a9d9f',
+      breach: d ? '#E5484D' : '#CC3239',
+      deficient: d ? '#A15A2E' : '#8A4A22',
+      turf: d ? ['#5B8DEF','#E07A30','#3FAE60','#8B5CDC','#3FA9AE'] : ['#3F6FD0','#B85F1E','#2F8F4C','#6E44B8','#2C8288'],
+      fontMono: "'SF Mono', ui-monospace, 'Fira Code', monospace",
     };
   }
 
@@ -554,7 +580,14 @@ class Component extends DCLogic {
     if (!svg || typeof RingEngine === 'undefined') return;
     const t = this.tokens();
     const st = this.state;
-    let nodes = st.view === 'book' ? this.visibleNodesForBook() : this.visibleNodesForAccount();
+    // Filter law: the canvas always receives the FULL ambient population for the current
+    // book/account scope — Ring/Relationship/Vertical/Conflict Type/sliders no longer remove
+    // nodes here (that used to trigger a full 60-pass re-layout and visible rearrangement on
+    // every filter change). Non-matching nodes are dimmed below via dimFn instead; the node
+    // count and layout stay stable across a filter change.
+    let nodes = st.view === 'book'
+      ? this.producerAccounts(st.producerId).flatMap(a => a.people)
+      : (this.accountByUbo.get(st.accountId)?.people || []);
     const edges = [];
     // A selected node's FULL structural neighborhood — including grey/untapped/filtered-out
     // targets — is where the actual referral opportunity lives, and it must never be hidden by
@@ -587,15 +620,34 @@ class Component extends DCLogic {
     // account has a single real yacht asset in context) further scales within that bound.
     const activeBand = st.view === 'account' ? (this.vesselContextForAccount(st.accountId)?.size_class || null) : null;
     const sizeForNode = (n) => this.nR(n.ring, n.coi_weight, n.coi_freq, n.decision_dist, n, activeBand);
-    RingEngine.render(svg, {
+    // dimFn replaces array-filtering as the mechanism for expressing the active filter state —
+    // a dimmed node stays a full element in the DOM/layout (clickable, valid edge endpoint),
+    // only its opacity changes. filtersAreDefault() short-circuits the predicate so nothing
+    // dims when no filter is active.
+    const dimFn = n => !this.filtersAreDefault() && !this.roleMatchesFilters(n);
+    const { layout } = RingEngine.render(svg, {
       nodes, domains: this.domains, colorFn: relColor, sizeFn: sizeForNode,
       scoreFn: n => this.compScore(n),
       ringOf: n => n.ring, domainOf: n => this.categoryDomainId.get(n.category) || 1,
       labelFn: n => this.displayLabel(n, st.producerId), edges, activeId: st.selectedNodeId, showLabels: st.showLabels,
+      dimFn,
       vz: fitZoom, vx: st.panX || 0, vy: st.panY || 0, labelColor: t.ink2,
       onSelect: n => this.selectNode(n.id),
       onHover: (evt, n) => RingEngine.tooltip.show(evt, this.displayLabel(n, st.producerId), `Ring ${n.ring} · ${n.category}`, n.desc),
       onLeave: RingEngine.tooltip.hide,
+    });
+    // Bold outline for account-level/UBO contacts vs. ordinary role contacts — D4's isPrincipal
+    // pattern (stroke-width 2 vs 1.2), applied as a lightweight post-pass over the layout
+    // RingEngine.render() just returned. D1's canvas is role-only in the common case, but a
+    // selected role's structural "knows" neighborhood can pull in a real node_type:'principal'
+    // node (e.g. an SPV Director's reporting line to the Trust itself) — that's the node this
+    // outline is for. The active node's own halo/stroke treatment (r+7 halo, 2.5 stroke) is
+    // left untouched.
+    layout.forEach(p => {
+      if (p.n.id === st.selectedNodeId) return;
+      const g = svg.querySelector('g[data-nid="' + CSS.escape(p.n.id) + '"]');
+      const circle = g && g.querySelector('circle');
+      if (circle) circle.setAttribute('stroke-width', p.n.node_type === 'principal' ? '2' : '1.2');
     });
   }
 
@@ -615,6 +667,7 @@ class Component extends DCLogic {
     const isBookView = st.view === 'book';
     const isAccountView = st.view === 'account';
     const font = 'Inter, "Segoe UI", Arial, system-ui, sans-serif';
+    const isDrafted = !!(st.selectedNodeId && st.draftedIds && st.draftedIds[st.selectedNodeId]);
 
     const s = {
       root: { display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', background: t.bg, color: t.ink, fontFamily: font, overflow: 'hidden', fontSize: 13, lineHeight: 1.45 },
@@ -636,6 +689,8 @@ class Component extends DCLogic {
       suiteNavItem: { fontSize: 10.5, fontWeight: 500, letterSpacing: '.02em', color: t.ink3, textDecoration: 'none', whiteSpace: 'nowrap' },
       suiteNavCurrent: { fontSize: 10.5, fontWeight: 700, letterSpacing: '.02em', color: t.accent, whiteSpace: 'nowrap' },
       suiteNavSep: { fontSize: 10, color: t.border },
+      suiteNavLabel: { fontSize: 9.5, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: t.ink3, whiteSpace: 'nowrap' },
+      pilotLink: { fontSize: 10.5, fontWeight: 700, letterSpacing: '.02em', color: t.accent, textDecoration: 'none', whiteSpace: 'nowrap' },
 
       controlBar: { flexShrink: 0, minHeight: 44, borderBottom: `1px solid ${t.border}`, background: t.surface2, display: 'flex', alignItems: 'center', gap: 8, padding: '7px 20px', flexWrap: 'wrap' },
       select: { height: 36, padding: '0 8px', border: `1px solid ${t.borderStrong}`, borderRadius: 2, background: t.surface, color: t.ink, fontSize: 12, fontWeight: 600, fontFamily: font, cursor: 'pointer', minWidth: 170 },
@@ -654,7 +709,7 @@ class Component extends DCLogic {
       resetBtn: { height: 36, padding: '0 12px', border: `1px solid ${t.border}`, borderRadius: 2, background: 'transparent', color: t.ink3, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: font },
       spacer: { flex: 1 },
       bwiWrap: { display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px', border: `1px solid ${t.border}`, borderRadius: 2, background: t.surface },
-      bwiText: { fontSize: 11, color: t.ink2, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
+      bwiText: { fontSize: 11, color: t.ink2, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', fontFamily: t.fontMono },
       bwiTrack: { width: 56, height: 5, background: t.surface3, display: 'flex', overflow: 'hidden' },
 
       bodyRow: { flex: 1, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' },
@@ -674,7 +729,7 @@ class Component extends DCLogic {
       svg: { width: '100%', height: '100%', display: 'block' },
       legend: { position: 'absolute', top: 14, left: 16, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 2, padding: '10px 12px', fontSize: 11, color: t.ink2, display: 'flex', flexDirection: 'column', gap: 5, maxWidth: 230 },
       legendRow: { display: 'flex', alignItems: 'center', gap: 7 },
-      legendGradient: { width: 24, height: 9, background: 'linear-gradient(90deg, hsl(0,60%,40%), hsl(60,60%,40%), hsl(120,60%,40%))', borderRadius: 1, flexShrink: 0 },
+      legendGradient: { width: 24, height: 9, background: 'linear-gradient(90deg, hsl(38,60%,40%), hsl(79,60%,40%), hsl(120,60%,40%))', borderRadius: 1, flexShrink: 0 },
       legendSwatchUntapped: { width: 9, height: 9, background: t.untapped, flexShrink: 0, opacity: .6 },
       legendLineKnows: { width: 16, height: 0, borderTop: `1.5px solid ${t.ink3}`, flexShrink: 0 },
       legendLineReferral: { width: 16, height: 0, borderTop: `2px solid ${t.accent}`, flexShrink: 0 },
@@ -696,15 +751,18 @@ class Component extends DCLogic {
       scLabel: { fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.06em', color: t.ink3 },
       scTrack: { height: 8, background: t.surface3, borderRadius: 999, overflow: 'hidden', position: 'relative' },
       scFill: { height: 8, borderRadius: 999, transition: 'width .3s ease' },
-      scVal: { fontSize: 13, fontWeight: 800, color: t.ink, textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
+      scVal: { fontSize: 13, fontWeight: 800, color: t.ink, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontFamily: t.fontMono },
       scComposite: { marginTop: 10, padding: 10, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
       scCompositeLbl: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: t.ink3 },
-      scCompositeVal: { fontSize: 22, fontWeight: 900, color: t.ink, letterSpacing: '-.02em', fontVariantNumeric: 'tabular-nums' },
+      scCompositeVal: { fontSize: 22, fontWeight: 900, color: t.ink, letterSpacing: '-.02em', fontVariantNumeric: 'tabular-nums', fontFamily: t.fontMono },
       scCompositeMax: { fontSize: 13, fontWeight: 400, color: t.ink3 },
       infoTable: { display: 'flex', flexDirection: 'column', gap: 8 },
       infoRow: { display: 'grid', gridTemplateColumns: '120px 1fr', gap: 10 },
       infoKey: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', color: t.ink2 },
-      infoVal: { fontSize: 13, color: t.ink2, fontVariantNumeric: 'tabular-nums' },
+      // Weight / Activity(90d) / Last-contact rows — every value here is a number or a date
+      // (relationship_weight, touch/call/email/meeting counts, last_activity_date + "Nd ago"),
+      // per Brand Guidelines §7 "every dollar figure and every date is monospace".
+      infoVal: { fontSize: 13, color: t.ink2, fontVariantNumeric: 'tabular-nums', fontFamily: t.fontMono },
       expiringTag: { fontSize: 11, fontWeight: 700, color: t.warn, letterSpacing: '.02em' },
       talksList: { display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 },
       talksRow: { padding: '11px 13px', background: t.surface, borderRadius: 2, border: `1px solid ${t.border}` },
@@ -712,12 +770,15 @@ class Component extends DCLogic {
       talksDot: { width: 7, height: 7, borderRadius: '50%', background: t.accent, flexShrink: 0 },
       talksName: { fontSize: 13, fontWeight: 600, color: t.ink },
       talksWhy: { fontSize: 12.5, color: t.ink2, lineHeight: 1.6 },
-      talksRefDate: { color: t.ink3 },
+      talksRefDate: { color: t.ink3, fontFamily: t.fontMono },
       talksScript: { fontSize: 12, color: t.ink, lineHeight: 1.6, fontStyle: 'italic', marginTop: 6, paddingTop: 8, borderTop: `1px dashed ${t.border}` },
       talksTagOpp: { fontSize: 9, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', padding: '2px 6px', borderRadius: 2, background: t.goodSoft, color: t.good, marginLeft: 6 },
-      actionBtn: { width: '100%', height: 38, borderRadius: 2, border: `1px solid ${t.accent}`, background: t.accent, color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', marginTop: 4, fontFamily: font },
+      // Draft Intro Request — filled accent by default; once drafted for the selected node it
+      // flips to an outline "staged" treatment (never disabled — re-clicking stays idempotent)
+      // so the button itself visibly carries the "Draft — not sent" state, not just its label.
+      actionBtn: { width: '100%', height: 38, borderRadius: 2, border: `1px solid ${t.accent}`, background: isDrafted ? 'transparent' : t.accent, color: isDrafted ? t.accent : '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', marginTop: 4, fontFamily: font },
       tileWrap: { flex: '1 1 0', minWidth: 0, background: t.surface, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 2, overflow: 'hidden' },
-      tileVal: { fontSize: 18, fontWeight: 700, color: t.ink, fontVariantNumeric: 'tabular-nums' },
+      tileVal: { fontSize: 18, fontWeight: 700, color: t.ink, fontVariantNumeric: 'tabular-nums', fontFamily: t.fontMono },
       tileLabel: { fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: t.ink3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
     };
 
@@ -884,6 +945,7 @@ class Component extends DCLogic {
       onCanvasDown: this.onCanvasDown, onCanvasMove: this.onCanvasMove, onCanvasUp: this.onCanvasUp, onCanvasWheel: this.onCanvasWheel,
       zoomIn: this.zoomIn, zoomOut: this.zoomOut, zoomReset: this.zoomReset,
       isNarrow: st.windowWidth < 1180, closePanel: this.closePanel,
+      draftBtnLabel: isDrafted ? 'Draft — Not Sent' : 'Draft Intro Request', draftIntroRequest: this.draftIntroRequest,
     };
   }
 }

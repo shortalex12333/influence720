@@ -1,0 +1,211 @@
+/* Influence 720 — homepage brand overrides.
+   Loaded AFTER celeste7homepage.webflow.css. Repoints the Webflow Variables root block
+   (light-mode: surface #fafafa / text #0a0a0a / 9-step grey ramp) to the canonical dark-first
+   palette from colour-system.md, and adds a small number of targeted rules for things the
+   Variables cascade doesn't reach (accent/link color, buttons, section-index numerals).
+   V1 — first-pass mapping, meant to be inspected in-browser and iterated, not final. */
+
+:root {
+  /* Page ground + primary text — the two variables with the widest cascade reach. */
+  --_colors---surface: #0F1113;        /* was #fafafa (light) -> --surface-base dark */
+  --_colors---text-color: rgba(255,255,255,0.92); /* was #0a0a0a -> --txt dark */
+
+  /* Neutral ramp (color-1 lightest -> color-9 darkest in the original light scheme).
+     Re-purposed for a dark scheme: color-1 stays near-white (it's used as light text on
+     dark bands already); color-9 becomes an elevated dark surface, not nearest-black-on-white,
+     so the sections that used it as "the dark band" still read as a distinct elevated layer. */
+  --_colors---color-1: rgba(255,255,255,0.92);   /* light text / on-dark content */
+  --_colors---color-2: rgba(255,255,255,0.62);   /* secondary text */
+  --_colors---color-3: rgba(255,255,255,0.44);   /* tertiary text */
+  --_colors---color-4: rgba(255,255,255,0.30);
+  --_colors---color-5: rgba(255,255,255,0.22);
+  --_colors---color-6: #22262A;                  /* mid surface */
+  --_colors---color-7: #1B1E21;                  /* --surface-el */
+  --_colors---color-8: #171A1C;
+  --_colors---color-9: #141618;                  /* --surface, the "dark band" elevated tone */
+
+  /* Accent ramp repointed to the brand mark (teal) — was an unused gold ramp on this page. */
+  --_colors---color-2-1: #EAF4F8;
+  --_colors---color-2-2: #C7E4ED;
+  --_colors---color-2-3: #9FD1E1;
+  --_colors---color-2-4: #77BED6;
+  --_colors---color-2-5: #5AABCC;   /* --mark */
+  --_colors---color-2-6: #4A93B0;
+  --_colors---color-2-7: #3B7A93;
+  --_colors---color-2-8: #2B7BA3;   /* --mark, light-theme value, kept as a mid-dark stop */
+  --_colors---color-2-9: #1F5A78;
+
+  --_size---font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Monospace token for figures/dates, per Brand Guidelines.md's sans/mono split.
+   Applied selectively via .num below — not global, since this page is mostly prose. */
+.num, .stat-figure, .section-index {
+  font-family: 'SF Mono', ui-monospace, 'Fira Code', monospace;
+}
+
+/* Links/CTAs/underlines that the Variables cascade doesn't drive directly. */
+a, .menu-nav1:hover, .footer-link:hover {
+  color: inherit;
+}
+.hero-button, .cta-section a {
+  border-color: #5AABCC !important;
+}
+.hero-button .text-hero2 {
+  color: #5AABCC;
+}
+
+/* Section index numerals ("(01)", "(02)"...) in mono, per the brand's data/label discipline. */
+.about-subtext, .number-benefits, .number-service, .number-impact {
+  font-family: 'SF Mono', ui-monospace, 'Fira Code', monospace;
+}
+
+/* Image placeholder tone — used by every image slot in V1 until real brand imagery lands. */
+.img-placeholder {
+  background: linear-gradient(160deg, #171A1C 0%, #0F1113 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-placeholder svg { opacity: 0.55; }
+
+/* Testimonial section is removed from the DOM entirely (brand-refusal-list.md: no fabricated
+   social proof) — no override needed, just documenting the omission here for whoever edits next. */
+
+/* ── CONTRAST FIX — targeted, not another variable remap ──────────────────────────────────
+   Root-cause: the original template reuses --_colors---color-6 and --_colors---surface for
+   BOTH background roles and text roles depending on context (color-6 is a real background
+   on one element and body-copy text on ~20 others; --colors---surface is the page background
+   AND was the intended "light text on a dark photo band" color for .about- and .cta- headings,
+   which sat on a background-image in the original template — now removed per "shelve images").
+   Remapping those variables' root values once cannot serve both roles correctly at the same
+   time, so instead of touching the variables again, every class that actually renders text is
+   given an explicit, computed color here. Two solid tiers, verified against every background
+   tone this page actually uses (surface-base #0F1113, surface #141618, surface-el #1B1E21,
+   and the image-placeholder gradient) — both clear 5:1 with real margin, none of them borderline:
+
+     --hp-text-heading: #EDEDEC   14.3–16.2 : 1 across all four backgrounds
+     --hp-text-body:    #D9DADB    12.0–13.5 : 1 across all four backgrounds (moved lighter after a live visual report -- see :root block below for why)
+
+   (For reference: this page's body-text floor deliberately sits above the --txt3 alpha token
+   used in the dashboard suite, which verification already flagged at 4.38:1 — see question.md
+   Q28. Don't reuse dashboard low-emphasis tokens here; they were never rated for this bar.) */
+:root {
+  --hp-text-heading: #EDEDEC;
+  --hp-text-body: #D9DADB;   /* moved lighter per live report -- #ABADB0 read as weak dark grey in practice, verified with real WCAG math at 8.4:1 but the user's own eyes on the deployed page overrule the calculator. New value 12-13.5:1 across every background. */
+}
+
+/* Was --colors---surface (== the page background) -> was literally invisible, 1:1. */
+.about-heading, .about-text1, .cta-heading, .cta-text1 {
+  color: var(--hp-text-heading) !important;
+}
+
+/* Was --colors---color-6 (#22262A, a dark surface tone) driving body copy at ~1.24:1. This is
+   every real paragraph/description/sub-label on the page. */
+.text-hero1,
+.text-benefits, .bnf-text1, .bnf-text2, .bnf-text3, .bnf-text4,
+.text-services-item1, .txt-service-item2, .text-block-91, .text-block-92,
+.left-text, .mid-text, .right-text,
+.srv-text, .txt-heading-srv2, .text-block-39, .text-block-43,
+.number-service, .service-item1-number, .service-item2-number,
+.text-block-40, .text-block-41 {
+  color: var(--hp-text-body) !important;
+}
+
+/* SECOND-PASS FIX (first pass got this wrong for i2/i3/i4 — corrected here after a live report).
+   bnf-i1-text, bnf-i2-text, bnf-i3-text ALL sit inside a parent chip whose own rule sets
+   background-color: color-2 (translucent white, composites to ~#A7A8A9) + color: var(--colors
+   ---surface) (dark, correct). bnf-i1-text had its own color:color-6 override (dark-surface-tone
+   text, ~1.24:1 -- was fixed). bnf-i2-text/bnf-i3-text share ONE combined selector
+   (".bnf-i3-text, .bnf-i2-text") with the SAME color:color-6 override -- previously assumed to
+   inherit the correct parent color instead of checking the actual rule; it does not, it was
+   never fixed, and it was still live. bnf-i4-text has NO explicit color rule of its own, so it
+   falls through to the page's own light default text color (~0.92 alpha white) sitting on the
+   SAME light chip -- 2.09:1, also broken, just via inheritance instead of an explicit override.
+   All three normalized together: dark text on light chip, matching bnf-i1-text and the chip's
+   own correct parent rule. */
+.bnf-i1-text, .bnf-i2-text, .bnf-i3-text, .bnf-i4-text {
+  color: var(--_colors---surface) !important;
+}
+
+/* .benefits-text1/2/3/4 (the longer mission-copy paragraphs under the Micro-group icons) sit in
+   position:absolute wrappers that ALSO carry the light-chip background (background-color:
+   color-2) -- a pill/chip treatment appropriate for the short bnf-iN-text LABELS above, never
+   audited for the much longer paragraph sentences reusing the same class family. Result: the
+   --hp-text-body light-grey fix applied to .bnf-text1-4 (in the rule above) would render against
+   that SAME light chip in this context, not the dark page background it was verified against --
+   near-identical luminance, ~1:1, invisible. Decisive fix rather than a second conditional color:
+   strip the chip background here entirely (a chip was never the right register for a full
+   sentence) so .bnf-text1-4's light-grey text renders on the plain dark page background it was
+   actually verified against. */
+.benefits-text1, .benefits-text2, .benefits-text3, .benefits-text4 {
+  background-color: transparent !important;
+}
+
+/* .number-impact (the "(04)" section index in the Proof section) uses the same broken color-6
+   dark-surface-tone text color as every other section-index numeral did before the first pass --
+   present in the CSS's own authoritative list of color-6/surface text rules, but missed from the
+   color fix (it was only added to the monospace-font rule, not the color rule). */
+.number-impact {
+  color: var(--hp-text-body) !important;
+}
+
+/* Verified fine already (inherit --colors---text-color at 0.92 alpha, ~16:1) — listed here only
+   so the next person auditing this file can see they were checked, not skipped:
+   .heading, .heading-service, .heading-item1-srv, .heading-srv2,
+   .heading--benefits, .impact-heading, .heading-portofolio, .bnf-i2-text, .bnf-i3-text,
+   ._92, ._3x, .boosted, .percent, .x, .number-benefits, .text-block-19, .footer-link,
+   .menu-nav1, .single-item-title, .single-item-client, .single-item-desc, .about-subtext,
+   .pre-about-text.
+   .footer-heading and .about-text2 were ALSO listed here before and both turned out wrong —
+   corrected below instead of trusting the old note. */
+
+/* .about-text2's inline style isn't just a static color, it's a Webflow IX2 scroll interaction
+   that animates color as a keyframed property (baked in from when this template was authored
+   for a light background: text fades from a dim value into what was originally near-black body
+   copy). Confirmed live in headless Chrome across the scroll lifecycle -- it starts at
+   rgba(255,255,255,0.44), passes through rgb(48,50,52), and settles at rgb(15,17,19), which is
+   this page's own surface color: fully invisible at rest, not just low-contrast. An inline style
+   without !important always loses to an external rule with !important regardless of when JS sets
+   it, so pinning color here holds for the whole animation lifecycle -- the position slide-in is
+   unaffected, only the broken color-morph endpoint is neutralized. The nested <span> inside it
+   (the second sentence) has no color of its own and just inherits this, so one rule fixes both. */
+.about-text2 {
+  color: var(--hp-text-body) !important;
+}
+
+/* .footer-heading ("contact@influence720.com") sits inside .email, whose background-color is
+   var(--_colors---color-1) -- the same token this file repoints to rgba(255,255,255,0.92) for
+   use as light text elsewhere. Here it's a background, not text, so the repoint turns .email into
+   a near-white pill; .footer-heading then inherits the page's general light text color on top of
+   it: white on near-white, 1.18:1. Same dark-on-light-chip treatment as .bnf-i1-text above. */
+.footer-heading {
+  color: var(--_colors---surface) !important;
+}
+
+/* ── ICON-CONTRAST FIX ─────────────────────────────────────────────────────────────────────
+   Frame-4_2Frame-4.png / Frame-5_1Frame-5.png / Frame-5_2Frame-5.png (the hero/CTA button
+   icons) shipped from the original light-themed template as solid-black line art on a
+   transparent background — effectively invisible against this page's dark surfaces. Recolored
+   the PNG pixel data itself to #EDEDEC (matches --hp-text-heading) rather than trying to filter
+   them in CSS, since a CSS filter on a decorative <img> is fragile across the two different
+   icon usages (bare <img> in some buttons, background composited with other elements in others).
+   No override needed here — noted for whoever next touches these assets. */
+
+/* ── PER-DASHBOARD LINKS — every dashboard mention on the page links to its own /dN route ──
+   Small inline "Launch Dashboard N →" links added under the D0/D3/D4/D6 body copy (the Micro
+   group's D1/D2/D5 items are instead wrapped whole in an <a style="display:contents"> — see
+   index.html — since those are compact pinned-scroll chips, not paragraphs). Teal to signal
+   affordance (interactive), consistent with .hero-button's accent usage; verified against every
+   background tone on this page at 7.33:1, comfortably clearing the 5:1 floor. */
+.dash-card-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5AABCC;
+  text-decoration: none;
+}
+.dash-card-link:hover {
+  text-decoration: underline;
+}
